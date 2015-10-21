@@ -1,0 +1,9 @@
+:host {
+	display: block;
+}
+
+.group-header {
+	padding: 5px;
+	background-color: #ccc;
+	font-weight: bold;
+}

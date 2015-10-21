@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<title>Cosmoz Grouped List</title>
+
+	<script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+	<link rel="import" href="../cosmoz-grouped-list.html">
+</head>
+<body>
+	<template is="dom-bind" id="t">
+		<cosmoz-grouped-list id="pie1" data="{{ data }}"></cosmoz-grouped-list>
+	</template>
+	<script type="text/javascript">
+/*global document, window */
+(function () {
+	"use strict";
+	window.addEventListener('WebComponentsReady', function () {
+		var pieDataJson = '[{"items":[{"registered":"2015-01-30","id":0},{"registered":"2015-03-06","id":1},{"registered":"2014-02-18","id":2}],"amount":3775,"name":"KENEGY"},{"items":[{"registered":"2015-01-30","id":0},{"registered":"2015-03-06","id":1},{"registered":"2014-02-18","id":2}],"amount":6479,"name":"FILODYNE"},{"items":[{"registered":"2015-01-30","id":0},{"registered":"2015-03-06","id":1},{"registered":"2014-02-18","id":2}],"amount":3523,"name":"PIVITOL"},{"items":[{"registered":"2015-01-30","id":0},{"registered":"2015-03-06","id":1},{"registered":"2014-02-18","id":2}],"amount":6182,"name":"GENEKOM"},{"items":[{"registered":"2015-01-30","id":0},{"registered":"2015-03-06","id":1},{"registered":"2014-02-18","id":2}],"amount":1233,"name":"COFINE"}]';
+
+		document.getElementById('t').data = JSON.parse(pieDataJson);
+	});
+}());
+	</script>
+</body>
+</html>

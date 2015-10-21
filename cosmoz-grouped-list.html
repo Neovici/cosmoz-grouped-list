@@ -1,0 +1,42 @@
+<link rel="import" type="css" href="../polymer/polymer.html"/>
+<link rel="import" type="css" href="../iron-flex-layout/iron-flex-layout.html"/>
+<link rel="import" type="css" href="../iron-flex-layout/classes/iron-flex-layout.html"/>
+<link rel="import" type="css" href="../iron-list/iron-list.html"/>
+<link rel="import" type="css" href="../iron-icons/iron-icons.html"/>
+<link rel="import" type="css" href="../iron-icon/iron-icon.html"/>
+
+<!--
+`<cosmoz-grouped-list>` is an example implementation of grouping for iron-list
+with features like group count display and folding
+
+### Usage
+
+    <cosmoz-grouped-list data="{{ data }}"></cosmoz-grouped-list>
+
+@group Cosmoz Elements
+@element cosmoz-grouped-list
+@demo demo/index.html
+-->
+
+<dom-module id="cosmoz-grouped-list">
+	<link rel="import" type="css" href="cosmoz-grouped-list.css"/>
+	<template>
+		<iron-list id="list" items="[[_flatData]]" as="item">
+			<template>
+				<div>
+					<template is="dom-if" if="[[ isGroup(item) ]]">
+						<div class="horizontal layout flex center group-header" on-tap="toggleFold">
+							<div class="flex">[[item.name]]</div>
+							<div>[[ item.items.length ]]</div>
+							<iron-icon icon="[[ getFoldIcon(item.*) ]]"></iron-icon>
+						</div>
+					</template>
+					<template is="dom-if" if="{{ isVisibleItem(item.*) }}">
+						<div>[[item.id]]</div>
+					</template>
+				</div>
+			</template>
+		</iron-list>
+	</template>
+	<script type="text/javascript" src="cosmoz-grouped-list.js"></script>
+</dom-module>
