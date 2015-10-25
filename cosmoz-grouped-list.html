@@ -4,6 +4,8 @@
 <link rel="import" type="css" href="../iron-list/iron-list.html"/>
 <link rel="import" type="css" href="../iron-icons/iron-icons.html"/>
 <link rel="import" type="css" href="../iron-icon/iron-icon.html"/>
+<link rel="import" href="item-template.html">
+<link rel="import" href="template-selector.html">
 
 <!--
 `<cosmoz-grouped-list>` is an example implementation of grouping for iron-list
@@ -21,22 +23,22 @@ with features like group count display and folding
 <dom-module id="cosmoz-grouped-list">
 	<link rel="import" type="css" href="cosmoz-grouped-list.css"/>
 	<template>
-		<iron-list id="list" items="[[_flatData]]" as="item">
+		<iron-list id="list" items="{{flatData}}" as="item">
 			<template>
-				<div>
-					<template is="dom-if" if="[[ isGroup(item) ]]">
-						<div class="horizontal layout flex center group-header" on-tap="toggleFold">
-							<div class="flex">[[item.name]]</div>
-							<div>[[ item.items.length ]]</div>
-							<iron-icon icon="[[ getFoldIcon(item.*) ]]"></iron-icon>
-						</div>
-					</template>
-					<template is="dom-if" if="{{ isVisibleItem(item.*) }}">
-						<div>[[item.id]]</div>
-					</template>
-				</div>
+				<template-selector template="[[ getTemplateInstance(item.*) ]]"></template-selector>
 			</template>
 		</iron-list>
+		<div hidden>
+			<item-template id="groupTemplate">
+				<template>
+					<div class="horizontal layout flex center group-header" on-tap="toggleFold">
+						<div class="flex">[[item.name]]</div>
+						<div>[[ item.items.length ]]</div>
+						<iron-icon icon="[[ getFoldIcon(item.*) ]]"></iron-icon>
+					</div>
+				</template>
+			</item-template>
+		</div>
 	</template>
 	<script type="text/javascript" src="cosmoz-grouped-list.js"></script>
 </dom-module>

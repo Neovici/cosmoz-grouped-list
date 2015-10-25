@@ -11,7 +11,13 @@
 </head>
 <body>
 	<template is="dom-bind" id="t">
-		<cosmoz-grouped-list id="pie1" data="{{ data }}"></cosmoz-grouped-list>
+		<cosmoz-grouped-list id="pie1" data="{{ data }}">
+			<item-template>
+				<template>
+					<span>{{item.id}}</span>,<span>{{item.registered}}</span>
+				</template>
+			</item-template>
+		</cosmoz-grouped-list>
 	</template>
 	<script type="text/javascript">
 /*global document, window */

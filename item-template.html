@@ -1,0 +1,40 @@
+<dom-module id="item-template">
+	<style>
+		:host {
+			display: block;
+			position: relative !important;
+		}
+	</style>
+	<template>
+		<content></content>
+	</template>
+	<script>
+	/*global Polymer*/
+		"use strict";
+		Polymer({
+			is: 'item-template',
+
+			behaviors: [
+				Polymer.Templatizer
+			],
+			_ensureTemplatized: function () {
+				if (!this.ctor) {
+					this._userTemplate = Polymer.dom(this).querySelector('template');
+					this.templatize(this._userTemplate);
+				}
+			},
+
+			instantiateTemplate: function (item, as) {
+				var clone;
+
+				as = as || "item";
+
+				this._ensureTemplatized();
+				clone = this.stamp({});
+				clone[as] = item;
+
+				return clone;
+			}
+		});
+	</script>
+</dom-module>

@@ -1,0 +1,25 @@
+<dom-module id="template-selector">
+	<script>
+		/*global Polymer*/
+		"use strict";
+		Polymer({
+			is: 'template-selector',
+			properties: {
+				template: {
+					type: Object,
+					observer: '_templateChanged'
+				}
+			},
+
+			_templateChanged: function (newTemplate) {
+				var thisDom = Polymer.dom(this);
+				thisDom.childNodes.forEach(function (node) {
+					thisDom.removeChild(node);
+				});
+				if (newTemplate) {
+					thisDom.appendChild(newTemplate.root);
+				}
+			}
+		});
+	</script>
+</dom-module>

@@ -19,7 +19,7 @@
 					return [];
 				}
 			},
-			_flatData: {
+			flatData: {
 				type: Array,
 				computed: '_flattenData(data)',
 				notify: true
@@ -78,17 +78,30 @@
 		isGroup: function (item) {
 			return this.data.indexOf(item) > -1;
 		},
-		isVisibleItem: function (item, foldedGroups) {
-			if (this.isGroup(item.value)) {
+		isVisibleItem: function (itemNotify, foldedGroups) {
+			var
+				group,
+				item = itemNotify.value;
+			if (this.isGroup(item)) {
 				return false;
 			}
-			var group = this.getGroup(item.value);
+			group = this.getGroup(item);
 			return !this.isFolded(group);
 		},
+		getTemplateInstance: function (itemNotify) {
+			var item = itemNotify.value;
+
+			if (this.isGroup(item)) {
+				return this.$.groupTemplate.instantiateTemplate(item);
+			}
+			if (this.isVisibleItem(itemNotify)) {
+				return Polymer.dom(this).querySelector('item-template').instantiateTemplate(item);
+			}
+		},
 		notify: function (item) {
-			var flatIndex = this._flatData.indexOf(item),
-				notifyPath = '_flatData.' + flatIndex + '.__change' + this._changeIndex;
-			this.notifyPath(notifyPath, this._flatData[flatIndex]);
+			var flatIndex = this.flatData.indexOf(item),
+				notifyPath = 'flatData.' + flatIndex + '.__change' + this._changeIndex;
+			this.notifyPath(notifyPath, this.flatData[flatIndex]);
 			this._changeIndex += 1; // maintain uniqueness
 		},
 		toggleFold: function (event, detail, sender) {
