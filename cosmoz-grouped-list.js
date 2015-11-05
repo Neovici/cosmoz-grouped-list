@@ -4,28 +4,52 @@
 	"use strict";
 
 	Polymer({
+
 		is: 'cosmoz-grouped-list',
+
 		properties: {
+
 			data: {
-				type: Array,
-				value: function () {
-					return [];
-				}
-				// observer: '_dataChanged'
+				type: Array
 			},
+
+			as: {
+				type: String,
+				value: 'item'
+			},
+
 			foldedGroups: {
 				type: Array,
+				readOnly: true,
 				value: function () {
 					return [];
 				}
 			},
+
 			flatData: {
 				type: Array,
 				computed: '_flattenData(data)',
 				notify: true
 			}
 		},
+
+		observers: [
+			'_dataChanged(data.*)'
+		],
+
 		_changeIndex: 0,
+
+		_dataChanged: function (change) {
+			console.log('_dataChanged', change);
+
+			if (change.path === 'data') {
+				// new data reference
+			} else if (change.path === 'data.splices') {
+				// data were removed/added
+			} else {
+				// items changed
+			}
+		},
 		_flattenData: function (data) {
 			if (!data) {
 				return;
@@ -47,6 +71,7 @@
 
 			return fData;
 		},
+
 		foldGroup: function (group) {
 			if (this.isFolded(group)) {
 				return;
@@ -55,12 +80,14 @@
 			this.notify(group);
 			this.updateSizes(group);
 		},
+
 		getFoldIcon: function (item, foldedGroups) {
 			if (this.isFolded(item.value)) {
 				return 'expand-more';
 			}
 			return 'expand-less';
 		},
+
 		getGroup: function (item) {
 			var foundGroup;
 			this.data.some(function (group) {
@@ -72,12 +99,15 @@
 			});
 			return foundGroup;
 		},
+
 		isFolded: function (group) {
 			return this.foldedGroups.indexOf(group) > -1;
 		},
+
 		isGroup: function (item) {
 			return this.data.indexOf(item) > -1;
 		},
+
 		isVisibleItem: function (itemNotify, foldedGroups) {
 			var
 				group,
@@ -88,22 +118,29 @@
 			group = this.getGroup(item);
 			return !this.isFolded(group);
 		},
-		getTemplateInstance: function (itemNotify) {
-			var item = itemNotify.value;
 
+		getTemplateInstance: function (itemNotify) {
+
+			var
+				item = itemNotify.value,
+				index = this.flatData.indexOf(item);
+
+			// console.log('getTemplateInstance', itemNotify, item, index);
 			if (this.isGroup(item)) {
-				return this.$.groupTemplate.instantiateTemplate(item);
+				return this.$.groupTemplate.instantiateTemplate(item, index);
 			}
 			if (this.isVisibleItem(itemNotify)) {
-				return Polymer.dom(this).querySelector('item-template').instantiateTemplate(item);
+				return Polymer.dom(this).querySelector('item-template').instantiateTemplate(item, index);
 			}
 		},
+
 		notify: function (item) {
 			var flatIndex = this.flatData.indexOf(item),
 				notifyPath = 'flatData.' + flatIndex + '.__change' + this._changeIndex;
 			this.notifyPath(notifyPath, this.flatData[flatIndex]);
 			this._changeIndex += 1; // maintain uniqueness
 		},
+
 		toggleFold: function (event, detail, sender) {
 			var
 				item = event.model.__data__.item,
@@ -116,6 +153,7 @@
 				this.foldGroup(group);
 			}
 		},
+
 		unfoldGroup: function (group) {
 			if (!this.isFolded(group)) {
 				return;

@@ -12,11 +12,40 @@
 	/*global Polymer*/
 		"use strict";
 		Polymer({
+
 			is: 'item-template',
+
+			properties: {
+				as: {
+					type: String,
+					value: 'item'
+				},
+				indexAs: {
+					type: String,
+					value: 'index'
+				}
+			},
 
 			behaviors: [
 				Polymer.Templatizer
 			],
+
+			_templatesInUse: null,
+
+			_templatesAvailable: null,
+
+			ready: function () {
+				var instanceProps = {};
+
+				instanceProps[this.as] = true;
+				instanceProps[this.indexAs] = true;
+
+				this._instanceProps = instanceProps;
+
+				this._templatesInUse = [];
+				this._templatesAvailable = [];
+			},
+
 			_ensureTemplatized: function () {
 				if (!this.ctor) {
 					this._userTemplate = Polymer.dom(this).querySelector('template');
@@ -24,16 +53,50 @@
 				}
 			},
 
-			instantiateTemplate: function (item, as) {
+			_forwardParentProp: function(prop, value) {
+				console.log('forwarding prop to template instances', prop, value);
+				this._templatesInUse.forEach(function (template) {
+					template[prop] = value;
+				});
+
+				// Need to forward props even to template not currently in use
+				this._templatesAvailable.forEach(function (template) {
+					template[prop] = value;
+				});
+			},
+
+			_forwardParentPath: function(path, value) {
+				console.log('_forwardParentPath', path, value);
+			},
+
+			instantiateTemplate: function (item, index) {
 				var clone;
 
-				as = as || "item";
+				if (this._templatesAvailable.length > 0) {
+					clone = this._templatesAvailable.pop();
+					console.log('instantiateTemplate: reusing template ', this);
+				} else {
+					this._ensureTemplatized();
+					clone = this.stamp({});
+					console.log('new template', this, this._templatesAvailable.length, this._templatesInUse.length);
+				}
+				this._templatesInUse.push(clone);
 
-				this._ensureTemplatized();
-				clone = this.stamp({});
-				clone[as] = item;
+				clone[this.as] = item;
+				clone[this.indexAs] = index;
 
 				return clone;
+			},
+
+			releaseTemplate: function (template) {
+				var index = this._templatesInUse.indexOf(template);
+
+				if (index >= 0) {
+					this._templatesInUse.splice(index, 1);
+
+					// this._templatesAvailable.push(template);
+					console.log('releasing template', this, this._templatesAvailable.length, this._templatesInUse.length);
+				}
 			}
 		});
 	</script>

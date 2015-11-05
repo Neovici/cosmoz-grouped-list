@@ -1,9 +1,9 @@
-<link rel="import" type="css" href="../polymer/polymer.html"/>
-<link rel="import" type="css" href="../iron-flex-layout/iron-flex-layout.html"/>
-<link rel="import" type="css" href="../iron-flex-layout/classes/iron-flex-layout.html"/>
-<link rel="import" type="css" href="../iron-list/iron-list.html"/>
-<link rel="import" type="css" href="../iron-icons/iron-icons.html"/>
-<link rel="import" type="css" href="../iron-icon/iron-icon.html"/>
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html"/>
+<link rel="import" href="../iron-flex-layout/classes/iron-flex-layout.html"/>
+<link rel="import" href="../iron-list/iron-list.html"/>
+<link rel="import" href="../iron-icons/iron-icons.html"/>
+<link rel="import" href="../iron-icon/iron-icon.html"/>
 <link rel="import" href="item-template.html">
 <link rel="import" href="template-selector.html">
 
@@ -21,9 +21,19 @@ with features like group count display and folding
 -->
 
 <dom-module id="cosmoz-grouped-list">
-	<link rel="import" type="css" href="cosmoz-grouped-list.css"/>
 	<template>
-		<iron-list id="list" items="{{flatData}}" as="item">
+		<style>
+			:host {
+				display: block;
+				@apply(--layout-vertical);
+			}
+			.group-header {
+				padding: 5px;
+				background-color: #ccc;
+				font-weight: bold;
+			}
+		</style>
+		<iron-list id="list" items="{{flatData}}" as="item" class="flex">
 			<template>
 				<template-selector template="[[ getTemplateInstance(item.*) ]]"></template-selector>
 			</template>
@@ -31,7 +41,7 @@ with features like group count display and folding
 		<div hidden>
 			<item-template id="groupTemplate">
 				<template>
-					<div class="horizontal layout flex center group-header" on-tap="toggleFold">
+					<div class="horizontal layout center group-header" on-tap="toggleFold">
 						<div class="flex">[[item.name]]</div>
 						<div>[[ item.items.length ]]</div>
 						<iron-icon icon="[[ getFoldIcon(item.*) ]]"></iron-icon>

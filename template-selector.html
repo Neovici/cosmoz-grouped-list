@@ -3,15 +3,66 @@
 		/*global Polymer*/
 		"use strict";
 		Polymer({
+
 			is: 'template-selector',
+
 			properties: {
+
 				template: {
 					type: Object,
 					observer: '_templateChanged'
 				}
+
 			},
 
-			_templateChanged: function (newTemplate) {
+			// observers: [
+			// 	'_itemChanged(item.*)'
+			// ],
+
+			attached: function () {
+
+			},
+
+			_templateInstance: undefined,
+
+			_itemChanged: function (change) {
+				if (change.path === "item") {
+					// We receive a new item, need to decide if we have to change the template instance
+
+				} else {
+					console.log("template-selector _itemChanged", change);
+				}
+			},
+
+
+			_isGroupChanged: function (newValue, oldValue) {
+				console.log('_isGroupChanged', newValue, oldValue);
+			},
+
+			_templateChanged: function (newTemplate, oldTemplate) {
+				var
+					oldItem = oldTemplate ? oldTemplate.item : undefined,
+					newItem = newTemplate ? newTemplate.item : undefined;
+
+				if (oldTemplate) {
+					oldTemplate.dataHost.releaseTemplate(oldTemplate);
+				}
+
+				// console.log('_templateChanged', newTemplate, oldTemplate);
+				// if (oldItem && newItem) {
+
+				// 	if (newItem.items && !oldItem.items) {
+				// 		console.log(' template-selector: was displaying item now displaying group');
+				// 	}
+				// 	if (!newItem.items && oldItem.items) {
+				// 		console.log(' template-selector: was displaying group now displaying item');
+				// 	}
+				// }
+
+				// if (!newTemplate) {
+				// 	console.log('template-selector: not rendering any template');
+				// }
+
 				var thisDom = Polymer.dom(this);
 				thisDom.childNodes.forEach(function (node) {
 					thisDom.removeChild(node);
@@ -19,7 +70,12 @@
 				if (newTemplate) {
 					thisDom.appendChild(newTemplate.root);
 				}
+			},
+
+			detached: function () {
+				console.log('selector detached');
 			}
+
 		});
 	</script>
 </dom-module>

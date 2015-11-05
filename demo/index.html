@@ -8,25 +8,78 @@
 
 	<script src="../../webcomponentsjs/webcomponents-lite.js"></script>
 	<link rel="import" href="../cosmoz-grouped-list.html">
+	<link rel="import" href="../../iron-flex-layout/iron-flex-layout.html"/>
+	<link rel="import" href="../../iron-flex-layout/classes/iron-flex-layout.html"/>
+
 </head>
-<body>
+<body unresolved>
 	<template is="dom-bind" id="t">
-		<cosmoz-grouped-list id="pie1" data="{{ data }}">
-			<item-template>
-				<template>
-					<span>{{item.id}}</span>,<span>{{item.registered}}</span>
-				</template>
-			</item-template>
-		</cosmoz-grouped-list>
+		<div class="layout vertical fit">
+			<div>
+				<button id="button1">change value</button>
+				<button id="button2">change outer value</button>
+			</div>
+			<cosmoz-grouped-list id="pie1" data="{{ data }}" class="flex">
+				<item-template>
+					<template>
+						<div class="layout vertical" style="border-bottom: 1px solid grey;">
+							<div>Outer binding: <span>[[outerValue]]</span></div>
+							<div>Id: <span>{{item.id}}</span></div>
+							<div>Name: <span>{{item.name}}</span></div>
+							<div>Value: <span>{{item.value}}</span></div>
+						</div>
+					</template>
+				</item-template>
+			</cosmoz-grouped-list>
+		</div>
+
 	</template>
 	<script type="text/javascript">
 /*global document, window */
 (function () {
 	"use strict";
 	window.addEventListener('WebComponentsReady', function () {
-		var pieDataJson = '[{"items":[{"registered":"2015-01-30","id":0},{"registered":"2015-03-06","id":1},{"registered":"2014-02-18","id":2}],"amount":3775,"name":"KENEGY"},{"items":[{"registered":"2015-01-30","id":0},{"registered":"2015-03-06","id":1},{"registered":"2014-02-18","id":2}],"amount":6479,"name":"FILODYNE"},{"items":[{"registered":"2015-01-30","id":0},{"registered":"2015-03-06","id":1},{"registered":"2014-02-18","id":2}],"amount":3523,"name":"PIVITOL"},{"items":[{"registered":"2015-01-30","id":0},{"registered":"2015-03-06","id":1},{"registered":"2014-02-18","id":2}],"amount":6182,"name":"GENEKOM"},{"items":[{"registered":"2015-01-30","id":0},{"registered":"2015-03-06","id":1},{"registered":"2014-02-18","id":2}],"amount":1233,"name":"COFINE"}]';
+		var
+			template = document.getElementById('t'),
+			button1 = document.getElementById('button1'),
+			button2 = document.getElementById('button2'),
+			data = [],
+			group,
+			itemsCount,
+			i,
+			j,
+			n = 0;
 
-		document.getElementById('t').data = JSON.parse(pieDataJson);
+		for (i = 0; i < 20; i += 1) {
+			group = {
+				name: 'Group ' + i,
+				items: []
+
+			};
+			itemsCount = i * 2  + 1;
+			for (j = 0; j < itemsCount; j+= 1) {
+				group.items.push({
+					id: n,
+					name: group.name + ' item ' + j,
+					value: 0
+				});
+				n += 1;
+			}
+			data.push(group);
+
+		}
+
+
+		template.data = data;
+		template.outerValue = 0;
+		button1.addEventListener('click', function () {
+			console.log('click');
+			var i, j, group, item;
+			template.set('data.0.items.0.value', data[0].items[0].value + 1);
+		});
+		button2.addEventListener('click', function () {
+			template.outerValue += 1;
+		});
 	});
 }());
 	</script>
