@@ -35,7 +35,7 @@ with features like group count display and folding
 		</style>
 		<iron-list id="list" items="{{flatData}}" as="item" class="flex">
 			<template>
-				<template-selector item="{{item}}" template="[[ getTemplate(item.*) ]]"></template-selector>
+				<template-selector item="{{item}}" folded="{{folded}}" template="[[ getTemplate(item.*) ]]"></template-selector>
 			</template>
 		</iron-list>
 		<div hidden>
