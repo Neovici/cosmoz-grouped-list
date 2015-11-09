@@ -11,65 +11,56 @@
 				template: {
 					type: Object,
 					observer: '_templateChanged'
+				},
+				item: {
+					type: Object
 				}
 
 			},
+			observers: [
+				'_itemChanged(item.*)'
+			],
 
-			// observers: [
-			// 	'_itemChanged(item.*)'
-			// ],
+			_templates: null,
+
+			ready: function () {
+				this._templates = {};
+			},
 
 			attached: function () {
 
 			},
 
-			_templateInstance: undefined,
-
 			_itemChanged: function (change) {
 				if (change.path === "item") {
-					// We receive a new item, need to decide if we have to change the template instance
-
+					var templateInstance = this._templates[this.template.id];
+					templateInstance['item'] = change.value;
 				} else {
-					console.log("template-selector _itemChanged", change);
+					console.warn('template-selector _itemChanged path', change.path);
 				}
 			},
 
-
-			_isGroupChanged: function (newValue, oldValue) {
-				console.log('_isGroupChanged', newValue, oldValue);
-			},
 
 			_templateChanged: function (newTemplate, oldTemplate) {
 				var
-					oldItem = oldTemplate ? oldTemplate.item : undefined,
-					newItem = newTemplate ? newTemplate.item : undefined;
+					newInstance = this._templates[newTemplate.id],
+					oldInstance;
+
+				if (!newInstance) {
+					newInstance = newTemplate.instantiateTemplate();
+					this._templates[newTemplate.id] = newInstance;
+					Polymer.dom(this).appendChild(newInstance.root);
+				} else {
+					newInstance._showHideChildren(false);
+				}
 
 				if (oldTemplate) {
-					oldTemplate.dataHost.releaseTemplate(oldTemplate);
+					oldInstance = this._templates[oldTemplate.id];
+					if (oldInstance) {
+						oldInstance._showHideChildren(true);
+					}
 				}
 
-				// console.log('_templateChanged', newTemplate, oldTemplate);
-				// if (oldItem && newItem) {
-
-				// 	if (newItem.items && !oldItem.items) {
-				// 		console.log(' template-selector: was displaying item now displaying group');
-				// 	}
-				// 	if (!newItem.items && oldItem.items) {
-				// 		console.log(' template-selector: was displaying group now displaying item');
-				// 	}
-				// }
-
-				// if (!newTemplate) {
-				// 	console.log('template-selector: not rendering any template');
-				// }
-
-				var thisDom = Polymer.dom(this);
-				thisDom.childNodes.forEach(function (node) {
-					thisDom.removeChild(node);
-				});
-				if (newTemplate) {
-					thisDom.appendChild(newTemplate.root);
-				}
 			},
 
 			detached: function () {

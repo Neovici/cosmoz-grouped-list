@@ -19,8 +19,8 @@
 				<button id="button1">change value</button>
 				<button id="button2">change outer value</button>
 			</div>
-			<cosmoz-grouped-list id="pie1" data="{{ data }}" class="flex">
-				<item-template>
+			<cosmoz-grouped-list id="groupedList" data="{{ data }}" class="flex">
+				<item-template id="itemTemplate">
 					<template>
 						<div class="layout vertical" style="border-bottom: 1px solid grey;">
 							<div>Outer binding: <span>[[outerValue]]</span></div>

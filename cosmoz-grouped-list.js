@@ -119,7 +119,7 @@
 			return !this.isFolded(group);
 		},
 
-		getTemplateInstance: function (itemNotify) {
+		getTemplate: function (itemNotify) {
 
 			var
 				item = itemNotify.value,
@@ -127,15 +127,19 @@
 
 			// console.log('getTemplateInstance', itemNotify, item, index);
 			if (this.isGroup(item)) {
-				return this.$.groupTemplate.instantiateTemplate(item, index);
+				return this.$.groupTemplate;
 			}
 			if (this.isVisibleItem(itemNotify)) {
-				return Polymer.dom(this).querySelector('item-template').instantiateTemplate(item, index);
+				return Polymer.dom(this).querySelector('item-template');
 			}
+
+			console.warn('cosmoz-grouped-list getTemplate: not returning any template');
+
 		},
 
 		notify: function (item) {
-			var flatIndex = this.flatData.indexOf(item),
+			var
+				flatIndex = this.flatData.indexOf(item),
 				notifyPath = 'flatData.' + flatIndex + '.__change' + this._changeIndex;
 			this.notifyPath(notifyPath, this.flatData[flatIndex]);
 			this._changeIndex += 1; // maintain uniqueness
