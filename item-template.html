@@ -39,6 +39,7 @@ Polymer({
 
 		instanceProps[this.as] = true;
 		instanceProps[this.indexAs] = true;
+		instanceProps['folded'] = true;
 
 		this._instanceProps = instanceProps;
 
@@ -53,7 +54,7 @@ Polymer({
 		}
 	},
 
-	_forwardParentProp: function(prop, value) {
+	_forwardParentProp: function (prop, value) {
 		console.log('forwarding prop to template instances', prop, value);
 		this._templatesInUse.forEach(function (template) {
 			template[prop] = value;

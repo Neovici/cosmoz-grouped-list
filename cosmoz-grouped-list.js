@@ -31,6 +31,8 @@
 
 		_foldedGroups: null,
 
+		_groups: null,
+
 		_dataChanged: function (change) {
 			console.log('_dataChanged', change);
 
@@ -52,28 +54,25 @@
 				return;
 			}
 
-			var fData = [];
+			var
+				fData = [],
+				groups = new WeakMap();
 
 			data.forEach(function (group) {
 				if (group.items) {
 					fData = fData.concat(group, group.items);
+					groups.set(group, true);
 				} else {
 					fData = fData.concat(group);
 				}
 			});
 
 			this._foldedGroups = new WeakMap();
+			this._groups = groups;
 
 			return fData;
 		},
 
-		getFoldIcon: function (item) {
-			console.log('getFoldIcon', item);
-			if (this.isFolded(item)) {
-				return 'expand-more';
-			}
-			return 'expand-less';
-		},
 
 		getGroup: function (item) {
 			var foundGroup;
@@ -92,26 +91,29 @@
 		},
 
 		isGroup: function (item) {
-			return this.data.indexOf(item) > -1;
+			return !!this._groups.get(item);
 		},
 
-
-		getTemplate: function (itemNotify) {
+		_getTemplate: function (item) {
 
 			var
-				item = itemNotify.value,
 				index = this.flatData.indexOf(item);
 
 			if (this.isGroup(item)) {
-				return this.$.groupTemplate;
+				return Polymer.dom(this).querySelector('#groupTemplate');
 			} else {
-				return Polymer.dom(this).querySelector('item-template');
+				return Polymer.dom(this).querySelector('#itemTemplate');
 			}
 		},
 
-		toggleFold: function (event, detail, sender) {
+		_getFolded: function (item) {
+			var folded = this.isGroup(item) && this.isFolded(item);
+			return folded;
+		},
+
+		toggleFold: function (templateInstance) {
 			var
-				item = event.model.__data__.item,
+				item = templateInstance.item,
 				group = this.isGroup(item) ? item : this.getGroup(item),
 				isFolded = this.isFolded(group);
 
@@ -120,6 +122,9 @@
 			} else {
 				this.foldGroup(group);
 			}
+
+			templateInstance.folded = !isFolded;
+
 		},
 
 		unfoldGroup: function (group) {
@@ -130,7 +135,6 @@
 			this._foldedGroups.set(group, false);
 			var groupIndex = this.flatData.indexOf(group);
 			this.splice.apply(this, ['flatData', groupIndex + 1, 0].concat(group.items));
-			this.notifyPath(this, 'flatData.' + groupIndex, group);
 
 		},
 
@@ -141,17 +145,7 @@
 			this._foldedGroups.set(group, true);
 			var groupIndex = this.flatData.indexOf(group);
 			this.splice('flatData', groupIndex + 1, group.items.length);
-			this.notifyPath('flatData.' + groupIndex, group);
 		},
-/*
-
-		notify: function (item) {
-			var
-				flatIndex = this.flatData.indexOf(item),
-				notifyPath = 'flatData.' + flatIndex + '.__change' + this._changeIndex;
-			this.notifyPath(notifyPath, this.flatData[flatIndex]);
-			this._changeIndex += 1; // maintain uniqueness
-		},*/
 
 		updateSizes: function (group) {
 			var list = this.$.list,

@@ -27,27 +27,15 @@ with features like group count display and folding
 				display: block;
 				@apply(--layout-vertical);
 			}
-			.group-header {
-				padding: 5px;
-				background-color: #ccc;
-				font-weight: bold;
-			}
+
 		</style>
 		<iron-list id="list" items="{{flatData}}" as="item" class="flex">
 			<template>
-				<template-selector item="{{item}}" folded="{{folded}}" template="[[ getTemplate(item.*) ]]"></template-selector>
+				<template-selector template="[[ _getTemplate(item)]]" item="{{item}}" folded="{{_getFolded(item)}}"  ></template-selector>
 			</template>
 		</iron-list>
 		<div hidden>
-			<item-template id="groupTemplate">
-				<template>
-					<div class="horizontal layout center group-header" on-tap="toggleFold">
-						<div class="flex">[[item.name]]</div>
-						<div>[[ item.items.length ]]</div>
-						<iron-icon icon="[[ getFoldIcon(item.*) ]]"></iron-icon>
-					</div>
-				</template>
-			</item-template>
+
 		</div>
 	</template>
 	<script type="text/javascript" src="cosmoz-grouped-list.js"></script>

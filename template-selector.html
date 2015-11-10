@@ -2,71 +2,68 @@
 	<script>
 		/*global Polymer*/
 		"use strict";
-		Polymer({
+Polymer({
 
-			is: 'template-selector',
+	is: 'template-selector',
 
-			properties: {
+	properties: {
 
-				template: {
-					type: Object,
-					observer: '_templateChanged'
-				},
-				item: {
-					type: Object
-				}
+		template: {
+			type: Object,
+			observer: '_templateChanged'
+		},
 
-			},
-			observers: [
-				'_itemChanged(item.*)'
-			],
-
-			_templates: null,
-
-			ready: function () {
-				this._templates = {};
-			},
-
-			attached: function () {
-
-			},
-
-			_itemChanged: function (change) {
-				if (change.path === "item") {
-					var templateInstance = this._templates[this.template.id];
-					templateInstance['item'] = change.value;
-				} else {
-					console.warn('template-selector _itemChanged path', change.path);
-				}
-			},
+		item: {
+			type: Object
+		},
+		folded: {
+			type: Boolean
+		}
 
 
-			_templateChanged: function (newTemplate, oldTemplate) {
-				var
-					newInstance = this._templates[newTemplate.id],
-					oldInstance;
+	},
 
-				if (!newInstance) {
-					newInstance = newTemplate.instantiateTemplate();
-					this._templates[newTemplate.id] = newInstance;
-					Polymer.dom(this).appendChild(newInstance.root);
-				} else {
-					newInstance._showHideChildren(false);
-				}
+	observers: [
+		'_update(template, item, folded)'
+	],
 
-				if (oldTemplate) {
-					oldInstance = this._templates[oldTemplate.id];
-					if (oldInstance) {
-						oldInstance._showHideChildren(true);
-					}
-				}
+	_templates: null,
 
-			},
+	ready: function () {
+		this._templates = {};
+	},
 
-			detached: function () {
-				console.log('selector detached');
+	_update: function (template, item, folded) {
+		var templateInstance = this._templates[this.template.id];
+		templateInstance.item = item;
+		templateInstance.folded = folded;
+	},
+
+	_templateChanged: function (newTemplate, oldTemplate) {
+		var
+			newInstance = this._templates[newTemplate.id],
+			oldInstance;
+
+		if (!newInstance) {
+			newInstance = newTemplate.instantiateTemplate();
+			this._templates[newTemplate.id] = newInstance;
+			Polymer.dom(this).appendChild(newInstance.root);
+		} else {
+			newInstance._showHideChildren(false);
+		}
+
+		if (oldTemplate) {
+			oldInstance = this._templates[oldTemplate.id];
+			if (oldInstance) {
+				oldInstance._showHideChildren(true);
 			}
+		}
+	},
 
-		});
+	detached: function () {
+		console.log('selector detached');
+	}
+
+});
 	</script>
 </dom-module>
