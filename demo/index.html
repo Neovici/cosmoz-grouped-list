@@ -21,7 +21,7 @@
 <body unresolved>
 	<template is="dom-bind" id="t">
 		<div class="layout vertical fit">
-			<div style="display: block;">
+			<div>
 				<button id="button1">change value</button>
 				<button id="button2">change outer value</button>
 			</div>
@@ -53,7 +53,6 @@
 /*global document, window */
 (function () {
 	"use strict";
-	console.profile('new profiler');
 	window.addEventListener('WebComponentsReady', function () {
 		var
 			template = document.getElementById('t'),
@@ -67,7 +66,7 @@
 			j,
 			n = 0;
 
-		for (i = 0; i < 10; i += 1) {
+		for (i = 0; i < 50; i += 1) {
 			group = {
 				name: 'Group ' + i,
 				items: []

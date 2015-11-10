@@ -25,18 +25,14 @@ with features like group count display and folding
 		<style>
 			:host {
 				display: block;
-				@apply(--layout-vertical);
+				@apply(--layout-relative);
 			}
-
 		</style>
-		<iron-list id="list" items="{{flatData}}" as="item" class="flex">
+		<iron-list id="list" items="{{flatData}}" as="item" class="fit">
 			<template>
 				<template-selector template="[[ _getTemplate(item)]]" item="{{item}}" folded="{{_getFolded(item)}}"  ></template-selector>
 			</template>
 		</iron-list>
-		<div hidden>
-
-		</div>
 	</template>
 	<script type="text/javascript" src="cosmoz-grouped-list.js"></script>
 </dom-module>
