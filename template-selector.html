@@ -37,6 +37,14 @@ Polymer({
 		var templateInstance = this._templates[this.template.id];
 		templateInstance.item = item;
 		templateInstance.folded = folded;
+		this.fire('template-updated', {
+			selector: this,
+			item: item,
+			templateInstance: templateInstance
+		}, {
+			bubbles: true,
+			cancelable: false
+		});
 	},
 
 	_templateChanged: function (newTemplate, oldTemplate) {

@@ -23,6 +23,7 @@
 				computed: '_flattenData(data)',
 				notify: true
 			}
+
 		},
 
 		observers: [
@@ -33,15 +34,58 @@
 
 		_groups: null,
 
-		_dataChanged: function (change) {
-			console.log('_dataChanged', change);
+		_templateSelectorsKeys: null,
 
+		_templateSelectorsCount: null,
+
+		_physicalItems: null,
+
+		_templateInstances: null,
+
+
+		_dataChanged: function (change) {
 			if (change.path === 'data') {
-				// new data reference
+				// TODO: new data reference
 			} else if (change.path === 'data.splices') {
-				// data were removed/added
+				// TODO: data were removed/added
 			} else {
-				// items changed
+				this._forwardItemPath(change.path.split('.').slice(1), change.value);
+			}
+		},
+
+		_forwardItemPath: function (pathParts, value) {
+			var groupIndex, itemIndex, item, itemPath, physicalIndex, templateInstance;
+			if (pathParts.length >= 4 && pathParts[1] === 'items') {
+				groupIndex = pathParts[0];
+				if (groupIndex[0] === '#') {
+					groupIndex = groupIndex.slice(1);
+				}
+
+				itemIndex = pathParts[2];
+				if (itemIndex[0] === '#') {
+					itemIndex = itemIndex.slice(1);
+				}
+				item = this.data[groupIndex].items[itemIndex];
+				itemPath = pathParts.slice(3).join('.');
+				physicalIndex = this._physicalItems.indexOf(item);
+
+				// Notify only displayed items
+				if (physicalIndex >= 0) {
+					templateInstance = this._templateInstances[physicalIndex];
+					templateInstance.notifyPath('item.' + itemPath, value);
+				}
+			} else if (pathParts.length >= 2) {
+				groupIndex = pathParts[0];
+				if (groupIndex[0] === '#') {
+					groupIndex = groupIndex.slice(1);
+				}
+				item = this.data[groupIndex];
+				itemPath = pathParts.slice(1).join('.');
+				physicalIndex = this._physicalItems.indexOf(item);
+				if (physicalIndex >= 0) {
+					templateInstance = this._templateInstances[physicalIndex];
+					templateInstance.notifyPath('item.' + itemPath, value);
+				}
 			}
 		},
 
@@ -69,6 +113,10 @@
 
 			this._foldedGroups = new WeakMap();
 			this._groups = groups;
+			this._templateSelectorsKeys = new WeakMap();
+			this._templateSelectorsCount = 0;
+			this._physicalItems = [];
+			this._templateInstances = [];
 
 			return fData;
 		},
@@ -104,6 +152,22 @@
 			} else {
 				return Polymer.dom(this).querySelector('#itemTemplate');
 			}
+		},
+
+		_templateUpdated: function (event) {
+			var
+				item = event.detail.item,
+				selector = event.detail.selector,
+				selectorIndex;
+
+			selectorIndex = this._templateSelectorsKeys.get(selector);
+			if (!selectorIndex) {
+				selectorIndex = this._templateSelectorsCount;
+				this._templateSelectorsKeys.set(selector, selectorIndex);
+				this._templateSelectorsCount += 1;
+			}
+			this._physicalItems[selectorIndex] = item;
+			this._templateInstances[selectorIndex] = event.detail.templateInstance;
 		},
 
 		_getFolded: function (item) {

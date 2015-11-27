@@ -55,7 +55,6 @@ Polymer({
 	},
 
 	_forwardParentProp: function (prop, value) {
-		console.log('forwarding prop to template instances', prop, value);
 		this._templatesInUse.forEach(function (template) {
 			template[prop] = value;
 		});
@@ -66,9 +65,18 @@ Polymer({
 		});
 	},
 
-	_forwardParentPath: function(path, value) {
-		console.log('_forwardParentPath', path, value);
+/*	_forwardParentPath: function(path, value) {
+		console.log('forwarding prop to template instances', prop, value);
 	},
+
+	_forwardInstanceProp: function(inst, prop, value) {
+		console.log('_forwardInstanceProp', inst, prop, value);
+	},
+	_forwardInstancePath: function(inst, path, value) {
+		console.log('_forwardInstancePath', inst, path, value);
+
+	},*/
+
 
 	instantiateTemplate: function () {
 		var clone;
