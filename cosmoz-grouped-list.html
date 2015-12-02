@@ -30,8 +30,7 @@ with features like group count display and folding
 		</style>
 		<iron-list id="list" items="{{flatData}}" as="item" class="fit">
 			<template>
-				<template-selector template="[[ _getTemplate(item)]]" item="{{item}}"
-					folded="{{_getFolded(item)}}" on-template-updated="_templateUpdated"></template-selector>
+				<template-selector item="{{item}}" on-template-selector-item-changed="_onTemplateSelectorItemChanged"></template-selector>
 			</template>
 		</iron-list>
 	</template>

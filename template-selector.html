@@ -8,64 +8,58 @@ Polymer({
 
 	properties: {
 
-		template: {
-			type: Object,
-			observer: '_templateChanged'
-		},
-
 		item: {
-			type: Object
+			type: Object,
+			notify: true,
+			observer: '_itemChanged'
 		},
-		folded: {
-			type: Boolean
-		}
-
-
 	},
 
-	observers: [
-		'_update(template, item, folded)'
-	],
+	_groupTemplateInstance: null,
 
-	_templates: null,
+	_itemTemplateInstance: null,
 
 	ready: function () {
-		this._templates = {};
+		this._templatesInstances = {};
 	},
 
-	_update: function (template, item, folded) {
-		var templateInstance = this._templates[this.template.id];
-		templateInstance.item = item;
-		templateInstance.folded = folded;
-		this.fire('template-updated', {
+	_itemChanged: function (newItem, oldItem) {
+		this.fire('template-selector-item-changed', {
 			selector: this,
-			item: item,
-			templateInstance: templateInstance
-		}, {
-			bubbles: true,
-			cancelable: false
+			item: newItem
 		});
 	},
 
-	_templateChanged: function (newTemplate, oldTemplate) {
-		var
-			newInstance = this._templates[newTemplate.id],
-			oldInstance;
-
-		if (!newInstance) {
-			newInstance = newTemplate.instantiateTemplate();
-			this._templates[newTemplate.id] = newInstance;
-			Polymer.dom(this).appendChild(newInstance.root);
-		} else {
-			newInstance._showHideChildren(false);
+	renderGroup: function (template, folded) {
+		if (!this._groupTemplateInstance) {
+			this._groupTemplateInstance = template.instantiateTemplate();
+			Polymer.dom(this).appendChild(this._groupTemplateInstance.root);
 		}
 
-		if (oldTemplate) {
-			oldInstance = this._templates[oldTemplate.id];
-			if (oldInstance) {
-				oldInstance._showHideChildren(true);
-			}
+		this._groupTemplateInstance.item = this.item;
+		this._groupTemplateInstance.folded = folded;
+
+		this._groupTemplateInstance._showHideChildren(false);
+
+		if (this._itemTemplateInstance) {
+			this._itemTemplateInstance._showHideChildren(true);
 		}
+
+		return  this._groupTemplateInstance;
+	},
+
+	renderItem: function (template) {
+		if (!this._itemTemplateInstance) {
+			this._itemTemplateInstance = template.instantiateTemplate();
+			Polymer.dom(this).appendChild(this._itemTemplateInstance.root);
+		}
+		this._itemTemplateInstance.item = this.item;
+		this._itemTemplateInstance._showHideChildren(false);
+		if (this._groupTemplateInstance) {
+			this._groupTemplateInstance._showHideChildren(true);
+		}
+
+		return this._itemTemplateInstance;
 	},
 
 	detached: function () {

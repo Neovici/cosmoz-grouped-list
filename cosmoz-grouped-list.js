@@ -23,7 +23,6 @@
 				computed: '_flattenData(data)',
 				notify: true
 			}
-
 		},
 
 		observers: [
@@ -42,6 +41,10 @@
 
 		_templateInstances: null,
 
+		attached: function () {
+			this._groupTemplate = Polymer.dom(this).querySelector('#groupTemplate');
+			this._itemTemplate = Polymer.dom(this).querySelector('#itemTemplate');
+		},
 
 		_dataChanged: function (change) {
 			if (change.path === 'data') {
@@ -131,6 +134,7 @@
 				}
 				return found;
 			});
+
 			return foundGroup;
 		},
 
@@ -142,37 +146,35 @@
 			return !!this._groups.get(item);
 		},
 
-		_getTemplate: function (item) {
-
-			var
-				index = this.flatData.indexOf(item);
-
-			if (this.isGroup(item)) {
-				return Polymer.dom(this).querySelector('#groupTemplate');
-			} else {
-				return Polymer.dom(this).querySelector('#itemTemplate');
-			}
+		_getFolded: function (item) {
+			var folded = this.isGroup(item) && this.isFolded(item);
+			return folded;
 		},
 
-		_templateUpdated: function (event) {
+		_onTemplateSelectorItemChanged: function (event) {
 			var
 				item = event.detail.item,
 				selector = event.detail.selector,
-				selectorIndex;
+				selectorIndex,
+				templateInstance;
 
 			selectorIndex = this._templateSelectorsKeys.get(selector);
+
 			if (!selectorIndex) {
 				selectorIndex = this._templateSelectorsCount;
 				this._templateSelectorsKeys.set(selector, selectorIndex);
 				this._templateSelectorsCount += 1;
 			}
-			this._physicalItems[selectorIndex] = item;
-			this._templateInstances[selectorIndex] = event.detail.templateInstance;
-		},
 
-		_getFolded: function (item) {
-			var folded = this.isGroup(item) && this.isFolded(item);
-			return folded;
+			this._physicalItems[selectorIndex] = item;
+
+			if (this.isGroup(item)) {
+				templateInstance = selector.renderGroup(Polymer.dom(this).querySelector('#groupTemplate'), this.isFolded(item));
+			} else {
+				templateInstance = selector.renderItem(Polymer.dom(this).querySelector('#itemTemplate'));
+			}
+
+			this._templateInstances[selectorIndex] = templateInstance;
 		},
 
 		toggleFold: function (templateInstance) {
@@ -212,7 +214,8 @@
 		},
 
 		updateSizes: function (group) {
-			var list = this.$.list,
+			var
+				list = this.$.list,
 				that = this;
 			group.items.forEach(function (item) {
 				that.notify(item);
