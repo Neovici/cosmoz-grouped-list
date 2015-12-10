@@ -1,4 +1,4 @@
-/*global cz, document, Polymer, window, d3, nv */
+/*global cz, document, Polymer, window, WeakMap */
 (function () {
 
 	"use strict";
@@ -103,14 +103,17 @@
 
 			var
 				fData = [],
-				groups = new WeakMap();
+				groups = new WeakMap(),
+				includeGroups = data.length > 1 || data[0].name !== '';
 
 			data.forEach(function (group) {
 				if (group.items) {
-					fData = fData.concat(group, group.items);
-					groups.set(group, true);
-				} else {
-					fData = fData.concat(group);
+					if (includeGroups) {
+						fData = fData.concat(group, group.items);
+						groups.set(group, true);
+					} else {
+						fData = fData.concat(group.items);
+					}
 				}
 			});
 
