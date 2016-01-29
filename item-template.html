@@ -58,24 +58,23 @@ Polymer({
 		this._templatesInUse.forEach(function (template) {
 			template[prop] = value;
 		});
+	},
 
-		// Need to forward props even to template not currently in use
-		this._templatesAvailable.forEach(function (template) {
-			template[prop] = value;
+	_forwardParentPath: function (path, value) {
+		this._templatesInUse.forEach(function (template) {
+			template.notifyPath(path, value, true);
 		});
 	},
 
-/*	_forwardParentPath: function(path, value) {
-		console.log('forwarding prop to template instances', prop, value);
-	},
+	// _forwardInstanceProp: function(inst, prop, value) {
+	// 	console.log('_forwardInstanceProp inst=', inst);
+	// 	console.log('_forwardInstanceProp prop=', prop);
+	// 	console.log('_forwardInstanceProp value=', value);
+	// },
+	// _forwardInstancePath: function(inst, path, value) {
+	// 	console.log('_forwardInstancePath', inst, path, value);
 
-	_forwardInstanceProp: function(inst, prop, value) {
-		console.log('_forwardInstanceProp', inst, prop, value);
-	},
-	_forwardInstancePath: function(inst, path, value) {
-		console.log('_forwardInstancePath', inst, path, value);
-
-	},*/
+	// },
 
 
 	instantiateTemplate: function () {
@@ -86,17 +85,6 @@ Polymer({
 
 		this._templatesInUse.push(clone);
 		return clone;
-	},
-
-	releaseTemplate: function (template) {
-		var index = this._templatesInUse.indexOf(template);
-
-		if (index >= 0) {
-			this._templatesInUse.splice(index, 1);
-
-			// this._templatesAvailable.push(template);
-			console.log('releasing template', this, this._templatesAvailable.length, this._templatesInUse.length);
-		}
 	}
 });
 	</script>
