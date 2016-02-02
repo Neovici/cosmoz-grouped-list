@@ -41,6 +41,8 @@
 
 		_templateInstances: null,
 
+		_expandedItems: null,
+
 		attached: function () {
 			this._groupTemplate = Polymer.dom(this).querySelector('#groupTemplate');
 			this._itemTemplate = Polymer.dom(this).querySelector('#itemTemplate');
@@ -123,6 +125,7 @@
 			this._templateSelectorsCount = 0;
 			this._physicalItems = [];
 			this._templateInstances = [];
+			this._expandedItems = new WeakMap();
 
 			return fData;
 		},
@@ -174,7 +177,7 @@
 			if (this.isGroup(item)) {
 				templateInstance = selector.renderGroup(Polymer.dom(this).querySelector('#groupTemplate'), this.isFolded(item));
 			} else {
-				templateInstance = selector.renderItem(Polymer.dom(this).querySelector('#itemTemplate'));
+				templateInstance = selector.renderItem(Polymer.dom(this).querySelector('#itemTemplate'), this.isExpanded(item));
 			}
 
 			this._templateInstances[selectorIndex] = templateInstance;
@@ -224,6 +227,27 @@
 				that.notify(item);
 				list.updateSizeForItem(item);
 			});
+		},
+
+		toggleCollapse: function (item) {
+			var model = this._getModelFromItem(item);
+			model.expanded = !model.expanded;
+			this._expandedItems.set(item, model.expanded);
+			this.$.list.updateSizeForItem(item);
+		},
+
+		isExpanded: function (item) {
+			return !!this._expandedItems.get(item);
+		},
+
+		_getModelFromItem: function (item) {
+			var
+				physicalIndex = this._physicalItems.indexOf(item),
+				templateInstance;
+			if (physicalIndex >= 0) {
+				templateInstance = this._templateInstances[physicalIndex];
+				return templateInstance;
+			}
 		}
 	});
 }());

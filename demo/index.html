@@ -16,6 +16,15 @@
 			background-color: #ccc;
 			font-weight: bold;
 		}
+
+		.extra-content.expanded {
+			display: block;
+		}
+
+		.extra-content {
+			display: none;
+		}
+
 	</style>
 </head>
 <body unresolved>
@@ -25,7 +34,7 @@
 				<button id="button1">change value</button>
 				<button id="button2">change outer value</button>
 			</div>
-			<cosmoz-grouped-list id="groupedList" data="{{ data }}" class="flex">
+			<cosmoz-grouped-list id="groupedList" data="{{ data }}" class="flex" selection-enabled>
 				<item-template id="itemTemplate">
 					<template>
 						<div class="layout vertical" style="border-bottom: 1px solid grey;">
@@ -33,6 +42,10 @@
 							<div>Id: <span>{{item.id}}</span></div>
 							<div>Name: <span>{{item.name}}</span></div>
 							<div>Value: <span>{{item.value}}</span></div>
+							<div on-tap="toggleCollapse">[+]</div>
+							<div class$="{{_computeExtraContentClass(expanded)}}">
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed quis posuere turpis, quis commodo neque. Aenean dapibus consequat dolor, et vestibulum enim volutpat a. Donec vel dui at diam tristique condimentum dapibus ac elit. Sed consequat nibh id nibh posuere egestas. Phasellus blandit convallis tellus, nec pharetra orci viverra ut. In at arcu consectetur, tempus velit sit amet, congue diam. Suspendisse potenti. In ac tristique nulla, quis elementum nisi.
+							</div>
 						</div>
 					</template>
 				</item-template>
@@ -98,6 +111,14 @@
 				return 'expand-more';
 			}
 			return 'expand-less';
+		};
+
+		template.toggleCollapse = function (event) {
+			groupedList.toggleCollapse(event.model.item);
+		};
+
+		template._computeExtraContentClass = function (expanded) {
+			return expanded ? 'extra-content expanded' : 'extra-content';
 		};
 
 		button1.addEventListener('click', function () {
