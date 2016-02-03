@@ -6,6 +6,7 @@
 <link rel="import" href="../iron-icon/iron-icon.html"/>
 <link rel="import" href="item-template.html">
 <link rel="import" href="template-selector.html">
+<link rel="import" href="cosmoz-grouped-list-scroller.html">
 
 <!--
 `<cosmoz-grouped-list>` is an example implementation of grouping for iron-list
@@ -25,10 +26,25 @@ with features like group count display and folding
 		<style>
 			:host {
 				display: block;
-				@apply(--layout-relative);
+				position: relative;
+				@apply(--layout-vertical);
 			}
+
+			:host(:not(.has-scroll-target)) #list {
+				position: absolute;
+				top: 0;
+				right: 0;
+				bottom: 0;
+				left: 0;
+			}
+
+			:host(.has-scroll-target) #list {
+				flex: 1;
+			}
+
 		</style>
-		<iron-list id="list" items="{{flatData}}" as="item" class="fit">
+
+		<iron-list id="list" items="{{flatData}}" as="item">
 			<template>
 				<template-selector item="{{item}}" on-template-selector-item-changed="_onTemplateSelectorItemChanged"></template-selector>
 			</template>

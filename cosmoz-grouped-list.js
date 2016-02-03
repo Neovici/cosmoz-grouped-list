@@ -22,11 +22,16 @@
 				type: Array,
 				computed: '_flattenData(data)',
 				notify: true
+			},
+
+			scrollTarget: {
+				type: HTMLElement
 			}
 		},
 
 		observers: [
-			'_dataChanged(data.*)'
+			'_dataChanged(data.*)',
+			'_scrollTargetChanged(scrollTarget, isAttached)'
 		],
 
 		_foldedGroups: null,
@@ -43,10 +48,6 @@
 
 		_expandedItems: null,
 
-		attached: function () {
-			this._groupTemplate = Polymer.dom(this).querySelector('#groupTemplate');
-			this._itemTemplate = Polymer.dom(this).querySelector('#itemTemplate');
-		},
 
 		_dataChanged: function (change) {
 			if (change.path === 'data') {
@@ -91,6 +92,16 @@
 					templateInstance = this._templateInstances[physicalIndex];
 					templateInstance.notifyPath('item.' + itemPath, value);
 				}
+			}
+		},
+
+		_scrollTargetChanged: function (scrollTarget, isAttached)  {
+			if (scrollTarget && isAttached) {
+				this.classList.add('has-scroll-target');
+				this.$.list.scrollTarget = scrollTarget;
+			} else {
+				this.$.list.scrollTarget = undefined;
+				this.classList.remove('has-scroll-target');
 			}
 		},
 
