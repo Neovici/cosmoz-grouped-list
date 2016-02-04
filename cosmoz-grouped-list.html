@@ -1,9 +1,12 @@
-<link rel="import" type="css" href="../polymer/polymer.html"/>
-<link rel="import" type="css" href="../iron-flex-layout/iron-flex-layout.html"/>
-<link rel="import" type="css" href="../iron-flex-layout/classes/iron-flex-layout.html"/>
-<link rel="import" type="css" href="../iron-list/iron-list.html"/>
-<link rel="import" type="css" href="../iron-icons/iron-icons.html"/>
-<link rel="import" type="css" href="../iron-icon/iron-icon.html"/>
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html"/>
+<link rel="import" href="../iron-flex-layout/classes/iron-flex-layout.html"/>
+<link rel="import" href="../iron-list/iron-list.html"/>
+<link rel="import" href="../iron-icons/iron-icons.html"/>
+<link rel="import" href="../iron-icon/iron-icon.html"/>
+<link rel="import" href="item-template.html">
+<link rel="import" href="template-selector.html">
+<link rel="import" href="cosmoz-grouped-list-scroller.html">
 
 <!--
 `<cosmoz-grouped-list>` is an example implementation of grouping for iron-list
@@ -19,22 +22,31 @@ with features like group count display and folding
 -->
 
 <dom-module id="cosmoz-grouped-list">
-	<link rel="import" type="css" href="cosmoz-grouped-list.css"/>
 	<template>
-		<iron-list id="list" items="[[_flatData]]" as="item">
+		<style>
+			:host {
+				display: block;
+				position: relative;
+				@apply(--layout-vertical);
+			}
+
+			:host(:not(.has-scroll-target)) #list {
+				position: absolute;
+				top: 0;
+				right: 0;
+				bottom: 0;
+				left: 0;
+			}
+
+			:host(.has-scroll-target) #list {
+				flex: 1;
+			}
+
+		</style>
+
+		<iron-list id="list" items="{{flatData}}" as="item">
 			<template>
-				<div>
-					<template is="dom-if" if="[[ isGroup(item) ]]">
-						<div class="horizontal layout flex center group-header" on-tap="toggleFold">
-							<div class="flex">[[item.name]]</div>
-							<div>[[ item.items.length ]]</div>
-							<iron-icon icon="[[ getFoldIcon(item.*) ]]"></iron-icon>
-						</div>
-					</template>
-					<template is="dom-if" if="{{ isVisibleItem(item.*) }}">
-						<div>[[item.id]]</div>
-					</template>
-				</div>
+				<template-selector item="{{item}}" on-template-selector-item-changed="_onTemplateSelectorItemChanged"></template-selector>
 			</template>
 		</iron-list>
 	</template>
