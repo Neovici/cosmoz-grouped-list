@@ -6,7 +6,6 @@
   "authors": [
     "Neovici Development"
   ],
-  "main": "cosmoz-grouped-list.html",
   "description": "Polymer component for grouped iron-lists",
   "keywords": [
     "web-components",
@@ -29,6 +28,7 @@
     "iron-icon": "polymerelements/iron-icon#^1.0.0"
   },
   "devDependencies": {
-    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0"
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "web-component-tester": "^4.2.1"
   }
 }
