@@ -132,11 +132,15 @@
 
 			this._foldedGroups = new WeakMap();
 			this._groups = groups;
-			this._templateSelectorsKeys = new WeakMap();
-			this._templateSelectorsCount = 0;
-			this._physicalItems = [];
-			this._templateInstances = [];
 			this._expandedItems = new WeakMap();
+
+			if (!this._physicalItems) {
+				this._templateSelectorsKeys = new WeakMap();
+				this._templateSelectorsCount = 0;
+				this._physicalItems = [];
+				this._templateInstances = [];
+
+			}
 
 			return fData;
 		},
