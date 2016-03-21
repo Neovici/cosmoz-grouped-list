@@ -11,7 +11,7 @@
 	<link rel="import" href="../../iron-flex-layout/iron-flex-layout.html"/>
 	<link rel="import" href="../../iron-flex-layout/iron-flex-layout-classes.html"/>
 
-	<style is="custom-style" include="iron-flex iron-flex-alignment iron-positioning"> 
+	<style is="custom-style" include="iron-flex iron-flex-alignment iron-positioning">
 		.group-header {
 			padding: 5px;
 			background-color: #ccc;
@@ -34,8 +34,9 @@
 			<div>
 				<button id="button1">change value</button>
 				<button id="button2">change outer value</button>
+				<div>Selected items count = {{selectedItems.length}}</div>
 			</div>
-			<cosmoz-grouped-list id="groupedList" data="{{ data }}" class="flex" selection-enabled>
+			<cosmoz-grouped-list id="groupedList" data="{{ data }}" selected-items="{{selectedItems}}" class="flex">
 				<item-template id="itemTemplate">
 					<template>
 						<div class="layout vertical" style="border-bottom: 1px solid grey;">
@@ -43,6 +44,7 @@
 							<div>Id: <span>{{item.id}}</span></div>
 							<div>Name: <span>{{item.name}}</span></div>
 							<div>Value: <span>{{item.value}}</span></div>
+							<div on-tap="select">Selected: <span>{{selected}}</span> (click to change)</div>
 							<div on-tap="toggleCollapse">[+]</div>
 							<div class$="{{_computeExtraContentClass(expanded)}}">
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed quis posuere turpis, quis commodo neque. Aenean dapibus consequat dolor, et vestibulum enim volutpat a. Donec vel dui at diam tristique condimentum dapibus ac elit. Sed consequat nibh id nibh posuere egestas. Phasellus blandit convallis tellus, nec pharetra orci viverra ut. In at arcu consectetur, tempus velit sit amet, congue diam. Suspendisse potenti. In ac tristique nulla, quis elementum nisi.
@@ -52,10 +54,10 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed quis posuere turpis
 				</item-template>
 				<item-template id="groupTemplate">
 					<template>
-						<div class="horizontal layout center group-header" on-tap="groupSelected">
-							<div class="flex">[[item.name]]</div>
+						<div class="horizontal layout center group-header">
+							<div class="flex" on-tap="toggleSelect"><span>[[item.name]]</span>(selected=<span>{{selected}}</span>)</div>
 							<div>[[ item.items.length ]]</div>
-							<iron-icon icon="[[ getFoldIcon(folded) ]]"></iron-icon>
+							<iron-icon icon="[[ getFoldIcon(folded) ]]" on-tap="toggleFold"></iron-icon>
 						</div>
 					</template>
 				</item-template>
@@ -99,9 +101,21 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed quis posuere turpis
 
 		}
 
-		template.groupSelected = function (event) {
+		template.toggleFold = function (event) {
 			groupedList.toggleFold(event.model);
 
+		};
+
+		template.toggleSelect = function (event) {
+			var
+			 	model = event.model,
+			 	group = model.item,
+			 	selected = model.selected;
+			if (selected) {
+				groupedList.deselectGroup(group);
+			} else {
+				groupedList.selectGroup(group);
+			}
 		};
 
 		template.getFoldIcon = function (folded) {
@@ -110,6 +124,18 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed quis posuere turpis
 			}
 			return 'expand-less';
 		};
+
+		template.select = function (event) {
+			var
+				model = event.model,
+				item = model.item,
+				selected = model.selected;
+			if (selected) {
+				groupedList.deselectItem(item);
+			} else {
+				groupedList.selectItem(item);
+			}
+		},
 
 		template.toggleCollapse = function (event) {
 			groupedList.toggleCollapse(event.model.item);

@@ -26,6 +26,19 @@
 
 			scrollTarget: {
 				type: HTMLElement
+			},
+
+			selectedItems: {
+				type: Array,
+				notify: true
+			},
+
+			_groups: {
+				type: Array
+			},
+
+			_items: {
+				type: Array
 			}
 		},
 
@@ -36,8 +49,6 @@
 
 		_foldedGroups: null,
 
-		_groups: null,
-
 		_templateSelectorsKeys: null,
 
 		_templateSelectorsCount: null,
@@ -47,7 +58,6 @@
 		_templateInstances: null,
 
 		_expandedItems: null,
-
 
 		_dataChanged: function (change) {
 			if (change.path === 'data') {
@@ -116,22 +126,27 @@
 
 			var
 				fData = [],
-				groups = new WeakMap(),
+				groups = [],
+				items = [],
 				includeGroups = data.length > 1 || data[0].name !== '';
 
 			data.forEach(function (group) {
 				if (group.items) {
 					if (includeGroups) {
 						fData = fData.concat(group, group.items);
-						groups.set(group, true);
+						groups.push(group);
 					} else {
 						fData = fData.concat(group.items);
 					}
+
+					items = items.concat(group.items);
 				}
 			});
 
 			this._foldedGroups = new WeakMap();
 			this._groups = groups;
+			this._items = items;
+
 			this._expandedItems = new WeakMap();
 
 			if (!this._physicalItems) {
@@ -139,37 +154,9 @@
 				this._templateSelectorsCount = 0;
 				this._physicalItems = [];
 				this._templateInstances = [];
-
 			}
 
 			return fData;
-		},
-
-
-		getGroup: function (item) {
-			var foundGroup;
-			this.data.some(function (group) {
-				var found = group.items.indexOf(item) > -1;
-				if (found) {
-					foundGroup = group;
-				}
-				return found;
-			});
-
-			return foundGroup;
-		},
-
-		isFolded: function (group) {
-			return !!this._foldedGroups.get(group);
-		},
-
-		isGroup: function (item) {
-			return !!this._groups.get(item);
-		},
-
-		_getFolded: function (item) {
-			var folded = this.isGroup(item) && this.isFolded(item);
-			return folded;
 		},
 
 		_onTemplateSelectorItemChanged: function (event) {
@@ -190,12 +177,33 @@
 			this._physicalItems[selectorIndex] = item;
 
 			if (this.isGroup(item)) {
-				templateInstance = selector.renderGroup(Polymer.dom(this).querySelector('#groupTemplate'), this.isFolded(item));
+				templateInstance = selector.renderGroup(Polymer.dom(this).querySelector('#groupTemplate'), this.isFolded(item), this.isGroupSelected(item));
 			} else {
-				templateInstance = selector.renderItem(Polymer.dom(this).querySelector('#itemTemplate'), this.isExpanded(item));
+				templateInstance = selector.renderItem(Polymer.dom(this).querySelector('#itemTemplate'), this.isExpanded(item), this.isItemSelected(item));
 			}
 
 			this._templateInstances[selectorIndex] = templateInstance;
+		},
+
+		isGroup: function (item) {
+			return this._groups.indexOf(item) >= 0;
+		},
+
+		getGroup: function (item) {
+			var foundGroup;
+			this.data.some(function (group) {
+				var found = group.items.indexOf(item) > -1;
+				if (found) {
+					foundGroup = group;
+				}
+				return found;
+			});
+
+			return foundGroup;
+		},
+
+		isFolded: function (group) {
+			return !!this._foldedGroups.get(group);
 		},
 
 		toggleFold: function (templateInstance) {
@@ -232,6 +240,69 @@
 			this._foldedGroups.set(group, true);
 			var groupIndex = this.flatData.indexOf(group);
 			this.splice('flatData', groupIndex + 1, group.items.length);
+		},
+
+		selectItem: function (item) {
+			var model = this._getModelFromItem(item);
+
+			this.$.itemSelector.select(item);
+
+			if (model) {
+				model['selected'] = true;
+			}
+		},
+
+		deselectItem: function (item) {
+			var
+				model = this._getModelFromItem(item),
+				group = this.getGroup(item),
+				groupModel;
+
+			this.$.itemSelector.deselect(item);
+			if (model) {
+				model['selected'] = false;
+			}
+
+			if (this.isGroupSelected(group)) {
+				groupModel = this._getModelFromItem(group);
+				if (groupModel) {
+					groupModel['selected'] = false;
+				}
+				this.$.groupSelector.deselect(group);
+			}
+		},
+
+		isItemSelected: function (item) {
+			return this.$.itemSelector.isSelected(item);
+		},
+
+		selectGroup: function (group) {
+			var model = this._getModelFromItem(group);
+
+			this.$.groupSelector.select(group);
+
+			if (model) {
+				model['selected'] = true;
+			}
+
+			group.items.forEach(function (item) {
+				this.selectItem(item);
+			}.bind(this));
+		},
+
+		deselectGroup: function (group) {
+			var model = this._getModelFromItem(group);
+			this.$.groupSelector.deselect(group);
+			if (model) {
+				model['selected'] = false;
+			}
+			group.items.forEach(function (item) {
+				this.deselectItem(item);
+			}.bind(this));
+		},
+
+		isGroupSelected: function (group) {
+			return this.$.groupSelector.isSelected(group);
 		},
 
 		updateSizes: function (group) {

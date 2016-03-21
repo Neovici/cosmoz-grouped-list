@@ -30,7 +30,7 @@ Polymer({
 		});
 	},
 
-	renderGroup: function (template, folded) {
+	renderGroup: function (template, folded, selected) {
 		if (!this._groupTemplateInstance) {
 			this._groupTemplateInstance = template.instantiateTemplate();
 			Polymer.dom(this).appendChild(this._groupTemplateInstance.root);
@@ -38,6 +38,7 @@ Polymer({
 
 		this._groupTemplateInstance.item = this.item;
 		this._groupTemplateInstance.folded = folded;
+		this._groupTemplateInstance.selected = selected;
 
 		this._groupTemplateInstance._showHideChildren(false);
 
@@ -48,13 +49,14 @@ Polymer({
 		return  this._groupTemplateInstance;
 	},
 
-	renderItem: function (template, expanded) {
+	renderItem: function (template, expanded, selected) {
 		if (!this._itemTemplateInstance) {
 			this._itemTemplateInstance = template.instantiateTemplate();
 			Polymer.dom(this).appendChild(this._itemTemplateInstance.root);
 		}
 		this._itemTemplateInstance.item = this.item;
 		this._itemTemplateInstance.expanded = expanded;
+		this._itemTemplateInstance.selected = selected;
 		this._itemTemplateInstance._showHideChildren(false);
 		if (this._groupTemplateInstance) {
 			this._groupTemplateInstance._showHideChildren(true);
