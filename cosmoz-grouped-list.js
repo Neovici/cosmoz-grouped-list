@@ -1,7 +1,7 @@
 /*global cz, document, Polymer, window, WeakMap */
 (function () {
 
-	"use strict";
+	'use strict';
 
 	Polymer({
 
@@ -18,12 +18,6 @@
 				value: 'item'
 			},
 
-			flatData: {
-				type: Array,
-				computed: '_flattenData(data)',
-				notify: true
-			},
-
 			scrollTarget: {
 				type: HTMLElement
 			},
@@ -33,12 +27,18 @@
 				notify: true
 			},
 
-			_groups: {
-				type: Array
+			_flatData: {
+				type: Array,
+				notify: true
 			},
 
-			_items: {
-				type: Array
+			/**
+			 * Indicates wether this grouped-list should render groups without items.
+			 */
+			displayEmptyGroups: {
+				type: Boolean,
+				value: false
+
 			}
 		},
 
@@ -46,8 +46,6 @@
 			'_dataChanged(data.*)',
 			'_scrollTargetChanged(scrollTarget, isAttached)'
 		],
-
-		_foldedGroups: null,
 
 		_templateSelectorsKeys: null,
 
@@ -57,32 +55,42 @@
 
 		_templateInstances: null,
 
-		_expandedItems: null,
+		_dataCollection: null,
+
+		_groupsMap: null,
+
+		_itemsMap: null,
 
 		_dataChanged: function (change) {
+			var pathParts;
 			if (change.path === 'data') {
-				// TODO: new data reference
+				this._flatData = this._prepareData(change.value);
 			} else if (change.path === 'data.splices') {
-				// TODO: data were removed/added
+				this._groupsMapAddedOrRemoved(change);
 			} else {
-				this._forwardItemPath(change.path.split('.').slice(1), change.value);
+				pathParts = change.path.split('.').slice(1);
+				if (pathParts.length === 3 && pathParts[1] === 'items' && pathParts[2] === 'splices') {
+					// items were added or removed
+					this._itemsAddedOrRemoved(pathParts, change);
+				} else {
+					// Forward an item property change
+					this._forwardItemPath(pathParts, change.value);
+				}
 			}
 		},
 
 		_forwardItemPath: function (pathParts, value) {
-			var groupIndex, itemIndex, item, itemPath, physicalIndex, templateInstance;
+			var group, groupItemsCollection, item, itemPath, physicalIndex, templateInstance;
 			if (pathParts.length >= 4 && pathParts[1] === 'items') {
-				groupIndex = pathParts[0];
-				if (groupIndex[0] === '#') {
-					groupIndex = groupIndex.slice(1);
-				}
+				// Path looks like data.#0.items.#0.path
+				group = this._dataCollection.getItem(pathParts[0]);
 
-				itemIndex = pathParts[2];
-				if (itemIndex[0] === '#') {
-					itemIndex = itemIndex.slice(1);
-				}
-				item = this.data[groupIndex].items[itemIndex];
+				groupItemsCollection = Polymer.Collection.get(group.items);
+
+				item = groupItemsCollection.getItem(pathParts[2]);
+
 				itemPath = pathParts.slice(3).join('.');
+
 				physicalIndex = this._physicalItems.indexOf(item);
 
 				// Notify only displayed items
@@ -91,11 +99,8 @@
 					templateInstance.notifyPath('item.' + itemPath, value);
 				}
 			} else if (pathParts.length >= 2) {
-				groupIndex = pathParts[0];
-				if (groupIndex[0] === '#') {
-					groupIndex = groupIndex.slice(1);
-				}
-				item = this.data[groupIndex];
+				// Path looks like data.#0.path
+				item = this._dataCollection.getItem(pathParts[0]);
 				itemPath = pathParts.slice(1).join('.');
 				physicalIndex = this._physicalItems.indexOf(item);
 				if (physicalIndex >= 0) {
@@ -115,48 +120,110 @@
 			}
 		},
 
-		_flattenData: function (data) {
-			if (!data) {
-				return;
-			}
-
-			if (!(data instanceof Array) || !(data[0] instanceof Object)) {
-				return;
-			}
+		_itemsAddedOrRemoved: function (pathParts, change) {
+			// Simplest case : a single splice of removed items
+			// We just need to remove these items from _flatData
 
 			var
-				fData = [],
-				groups = [],
-				items = [],
-				includeGroups = data.length > 1 || data[0].name !== '';
-
-			data.forEach(function (group) {
-				if (group.items) {
-					if (includeGroups) {
-						fData = fData.concat(group, group.items);
-						groups.push(group);
-					} else {
-						fData = fData.concat(group.items);
-					}
-
-					items = items.concat(group.items);
+				indexSplices = change.value.indexSplices,
+				splice,
+				group, groupIndex;
+			if (indexSplices && indexSplices.length === 1 && indexSplices[0].addedCount === 0) {
+				splice = indexSplices[0];
+				group = this._dataCollection.getItem(pathParts[0]);
+				// Find the index of the group in _flatData
+				groupIndex = this._flatData.indexOf(group);
+				if (group.items.length === 0 && !this.displayEmptyGroups) {
+					this.splice('_flatData', groupIndex, splice.removed.length + 1);
+				} else {
+					this.splice('_flatData', groupIndex + splice.index + 1, splice.removed.length);
 				}
-			});
+				splice.removed.forEach(function (item) {
+					this.deselectItem(item);
+				}, this);
+			} else {
+				// TODO(pasleq): other cases
+				console.warn('Not implemented');
+			}
+		},
 
-			this._foldedGroups = new WeakMap();
-			this._groups = groups;
-			this._items = items;
+		_groupsAddedOrRemoved: function (change) {
+			// Simplest case: a single splice of removed groups
+			var
+				splices = change.value.indexSplices,
+				splice,
+				startGroup,
+				startIndex,
+				count,
+				i;
 
-			this._expandedItems = new WeakMap();
+			if (splices && splices.length === 1 && splices[0].addedCount === 0) {
+				splice = splices[0];
+				startGroup = this.data[splice.index];
+				startIndex = this._flatData.indexOf(startGroup);
+				for (i = 0 ; i < splice.removed.length ; i += 1) {
+					count += 1;
+					count += this.data[startIndex + i].items.length;
+				}
+				this.splice('_flatData', startIndex, count);
+			}
+		},
 
-			if (!this._physicalItems) {
-				this._templateSelectorsKeys = new WeakMap();
-				this._templateSelectorsCount = 0;
-				this._physicalItems = [];
-				this._templateInstances = [];
+		_prepareData: function (data) {
+
+			var flatData;
+
+			if (data && data.length) {
+				this.selectedItems = [];
+
+				this._dataCollection = Polymer.Collection.get(data);
+
+				this._itemsMap = new WeakMap();
+
+
+				if (!this._physicalItems) {
+					this._templateSelectorsKeys = new WeakMap();
+					this._templateSelectorsCount = 0;
+					this._physicalItems = [];
+					this._templateInstances = [];
+				}
+
+				if (data.length === 0 || !data[0].items) {
+					// no grouping, so render items as a standard list
+					flatData = data.slice();
+					this._groupsMap = null;
+				} else {
+					flatData = [];
+					this._groupsMap = new WeakMap();
+					data.forEach(function (group) {
+						if (group.items) {
+							if (group.items.length) {
+								flatData = flatData.concat(group, group.items);
+							} else if (this.displayEmptyGroups) {
+								flatData = flatData.concat(group);
+							}
+							this._groupsMap.set(group, { selected: false, folded: false });
+						} else {
+							console.warn('Incorrect data');
+						}
+					}, this);
+
+				}
+			} else {
+				flatData = null;
+
+				this._expandedItems = null;
+
+				this.selectedItems = null;
+				this._selectedItemsCollection = null;
+
+				this._dataCollection = null;
+
+				this._foldedGroups = null;
+				this._groupsMap = null;
 			}
 
-			return fData;
+			return flatData;
 		},
 
 		_onTemplateSelectorItemChanged: function (event) {
@@ -185,12 +252,44 @@
 			this._templateInstances[selectorIndex] = templateInstance;
 		},
 
-		isGroup: function (item) {
-			return this._groups.indexOf(item) >= 0;
+		/**
+		 * Utility method to remove an item from the list.
+		 * This method simply removes the specified item from the `data` using
+		 * Polymer array mutation methods.
+		 * Cannot be used to remove a group.
+		 */
+		removeItem: function (item) {
+			var i;
+
+			if (this._groupsMap) {
+				this.data.some(function (group, groupIndex) {
+					var index = group.items.indexOf(item);
+					if (index >= 0) {
+						this.splice('data.' + groupIndex + '.items', index, 1);
+						return true;
+
+					}
+				}.bind(this));
+			} else {
+				i = this.data.indexOf(item);
+				if (i >= 0) {
+					this.splice('data', i, 1);
+				}
+			}
 		},
 
-		getGroup: function (item) {
+		isGroup: function (item) {
+			return this._groupsMap && this._groupsMap.get(item) !== undefined;
+		},
+
+		/**
+		 * Returns the group of the specified item
+		 */
+		getItemGroup: function (item) {
 			var foundGroup;
+			if (!this._groupsMap) {
+				return;
+			}
 			this.data.some(function (group) {
 				var found = group.items.indexOf(item) > -1;
 				if (found) {
@@ -203,13 +302,14 @@
 		},
 
 		isFolded: function (group) {
-			return !!this._foldedGroups.get(group);
+			var groupState = this._groupsMap && this._groupsMap.get(group);
+			return groupState && groupState.folded;
 		},
 
 		toggleFold: function (templateInstance) {
 			var
 				item = templateInstance.item,
-				group = this.isGroup(item) ? item : this.getGroup(item),
+				group = this.isGroup(item) ? item : this.getItemGroup(item),
 				isFolded = this.isFolded(group);
 
 			if (isFolded) {
@@ -223,30 +323,36 @@
 		},
 
 		unfoldGroup: function (group) {
-			if (!this.isFolded(group)) {
-				return;
-			}
+			var
+				groupState = this._groupsMap && this._groupsMap.get(group),
+				groupFlatIndex;
 
-			this._foldedGroups.set(group, false);
-			var groupIndex = this.flatData.indexOf(group);
-			this.splice.apply(this, ['flatData', groupIndex + 1, 0].concat(group.items));
+			if (groupState && groupState.folded) {
+				groupState.folded = false;
+				groupFlatIndex = this._flatData.indexOf(group);
+				this.splice.apply(this, ['_flatData', groupFlatIndex + 1, 0].concat(group.items));
+			}
 
 		},
 
 		foldGroup: function (group) {
-			if (this.isFolded(group)) {
-				return;
+			var
+				groupState = this._groupsMap && this._groupsMap.get(group),
+				groupFlatIndex;
+
+			if (groupState && !groupState.folded) {
+				groupState.folded = true;
+				groupFlatIndex = this._flatData.indexOf(group);
+				this.splice('_flatData', groupFlatIndex + 1, group.items.length);
 			}
-			this._foldedGroups.set(group, true);
-			var groupIndex = this.flatData.indexOf(group);
-			this.splice('flatData', groupIndex + 1, group.items.length);
 		},
 
 		selectItem: function (item) {
 			var model = this._getModelFromItem(item);
 
-			this.$.itemSelector.select(item);
-
+			if (!this.isItemSelected(item)) {
+				this.push('selectedItems', item);
+			}
 			if (model) {
 				model['selected'] = true;
 			}
@@ -254,32 +360,45 @@
 
 		deselectItem: function (item) {
 			var
+				selectedIndex = this.selectedItems.indexOf(item),
 				model = this._getModelFromItem(item),
-				group = this.getGroup(item),
+				group = this.getItemGroup(item),
+				groupState,
 				groupModel;
 
-			this.$.itemSelector.deselect(item);
+
+			if (selectedIndex >= 0) {
+				this.splice('selectedItems', selectedIndex, 1);
+			}
+
 			if (model) {
 				model['selected'] = false;
 			}
 
-			if (this.isGroupSelected(group)) {
+			// If the containing group was selected, then deselect it
+			// as all items are not selected anymore
+			if (group && this.isGroupSelected(group)) {
+				groupState = this._groupsMap.get(group);
 				groupModel = this._getModelFromItem(group);
 				if (groupModel) {
 					groupModel['selected'] = false;
 				}
-				this.$.groupSelector.deselect(group);
+				groupState.selected = false;
 			}
 		},
 
 		isItemSelected: function (item) {
-			return this.$.itemSelector.isSelected(item);
+			return this.selectedItems.indexOf(item) >= 0;
 		},
 
 		selectGroup: function (group) {
-			var model = this._getModelFromItem(group);
+			var
+				model = this._getModelFromItem(group),
+				groupState = this._groupsMap && this._groupsMap.get(group);
 
-			this.$.groupSelector.select(group);
+			if (groupState) {
+				groupState.selected = true;
+			}
 
 			if (model) {
 				model['selected'] = true;
@@ -291,8 +410,13 @@
 		},
 
 		deselectGroup: function (group) {
-			var model = this._getModelFromItem(group);
-			this.$.groupSelector.deselect(group);
+			var
+				model = this._getModelFromItem(group),
+				groupState = this._groupsMap && this._groupsMap.get(group);
+
+			if (groupState) {
+				groupState.selected = false;
+			}
 			if (model) {
 				model['selected'] = false;
 			}
@@ -302,7 +426,8 @@
 		},
 
 		isGroupSelected: function (group) {
-			return this.$.groupSelector.isSelected(group);
+			var groupState = this._groupsMap && this._groupsMap.get(group);
+			return groupState !== undefined && groupState.selected;
 		},
 
 		updateSizes: function (group) {
@@ -316,14 +441,25 @@
 		},
 
 		toggleCollapse: function (item) {
-			var model = this._getModelFromItem(item);
+			var
+				model = this._getModelFromItem(item),
+				itemState = this._itemsMap.get(item);
+
 			model.expanded = !model.expanded;
-			this._expandedItems.set(item, model.expanded);
+
+			if (!itemState) {
+				itemState = { selected: false, expanded: false };
+				this._itemsMap.set(item, itemState);
+			}
+
+			itemState.expanded = model.expanded;
+
 			this.$.list.updateSizeForItem(item);
 		},
 
 		isExpanded: function (item) {
-			return !!this._expandedItems.get(item);
+			var itemState = this._itemsMap.get(item);
+			return itemState !== undefined && itemState.expanded;
 		},
 
 		_getModelFromItem: function (item) {

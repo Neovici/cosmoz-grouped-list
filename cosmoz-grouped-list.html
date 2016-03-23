@@ -42,10 +42,7 @@ with features like group count display and folding
 
 		</style>
 
-		<array-selector id="itemSelector" items="{{_items}}" selected="{{selectedItems}}" multi></array-selector>
-		<array-selector id="groupSelector" items="{{_groups}}" selected="{{selectedGroups}}" multi></array-selector>
-
-		<iron-list id="list" items="{{flatData}}" as="item">
+		<iron-list id="list" items="{{_flatData}}" as="item">
 			<template>
 				<template-selector item="{{item}}" on-template-selector-item-changed="_onTemplateSelectorItemChanged"></template-selector>
 			</template>
