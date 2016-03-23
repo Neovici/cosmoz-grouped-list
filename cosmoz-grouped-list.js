@@ -27,11 +27,6 @@
 				notify: true
 			},
 
-			_flatData: {
-				type: Array,
-				notify: true
-			},
-
 			/**
 			 * Indicates wether this grouped-list should render groups without items.
 			 */
@@ -39,12 +34,22 @@
 				type: Boolean,
 				value: false
 
+			},
+
+			_flatData: {
+				type: Array,
+				notify: true
+			},
+
+			_isAttached: {
+				type: Boolean
 			}
+
 		},
 
 		observers: [
 			'_dataChanged(data.*)',
-			'_scrollTargetChanged(scrollTarget, isAttached)'
+			'_scrollTargetChanged(scrollTarget, _isAttached)'
 		],
 
 		_templateSelectorsKeys: null,
@@ -60,6 +65,10 @@
 		_groupsMap: null,
 
 		_itemsMap: null,
+
+		attached: function () {
+			this._isAttached = true;
+		},
 
 		_dataChanged: function (change) {
 			var pathParts;
