@@ -430,6 +430,57 @@
 			return groupState !== undefined && groupState.selected;
 		},
 
+		selectAll: function () {
+
+			var i;
+
+			this.splice('selectedItems', 0);
+
+			if (this._groupsMap) {
+
+				this.data.forEach(function (group) {
+					var
+						model = this._getModelFromItem(group),
+						groupState = this._groupsMap.get(group);
+
+					groupState.selected = true;
+					this.splice.apply(this, ['selectedItems', this.selectedItems.length - 1, 0].concat(group.items));
+				}, this);
+			} else {
+				this.splice.apply(this, ['selectedItems', 0, 0].concat(this.data));
+			}
+
+			// Set the selected property to all visible items
+			for (i = 0; i < this._templateInstances.length ; i+= 1) {
+				this._templateInstances[i].selected = true;
+			}
+		},
+
+		deselectAll: function () {
+
+			var i;
+
+			this.splice('selectedItems', 0);
+
+			if (this._groupsMap) {
+
+				this.data.forEach(function (group) {
+					var
+						model = this._getModelFromItem(group),
+						groupState = this._groupsMap.get(group);
+
+					groupState.selected = false;
+				}, this);
+			}
+
+			// Set the selected property to all visible items
+			for (i = 0; i < this._templateInstances.length ; i+= 1) {
+				this._templateInstances[i].selected = false;
+			}
+		},
+
+
+
 		updateSizes: function (group) {
 			var
 				list = this.$.list,

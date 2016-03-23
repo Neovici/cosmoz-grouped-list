@@ -47,6 +47,10 @@
 					<button class="action" on-tap="_newFlatData">generate new data without grouping</button>
 					<button class="action" on-tap="_emptyData">empty data</button>
 					<button class="action" on-tap="_changeOuterValue">Increment outer binding value</button>
+				</div>
+				<div class="layout horizontal center">
+					<button class="action" on-tap="selectAll">Select all</button>
+					<button class="action" on-tap="deselectAll">Deelect all</button>
 					<button class="action" on-tap="removeSelected">Remove selected items</button>
 					<div class="action">Selected items count = {{selectedItems.length}}</div>
 				</div>
@@ -179,6 +183,14 @@
 			} else {
 				this.$.groupedList.selectItem(item);
 			}
+		},
+
+		selectAll: function (event) {
+			this.$.groupedList.selectAll();
+		},
+
+		deselectAll: function (event) {
+			this.$.groupedList.deselectAll();
 		},
 
 		toggleCollapse: function (event) {
