@@ -88,6 +88,26 @@
 			}
 		},
 
+		/**
+		 * Utility method that must me used when changing an item's property value.
+		 */
+		notifyItemPath: function (item, path, value) {
+			var group, gKey, iKey;
+
+			if (this._groupsMap) {
+				group = this.getItemGroup(item);
+				gKey = this._dataCollection.getKey(group);
+				iKey = Polymer.Collection.get(group.items).getKey(item);
+				this.notifyPath('data.' + gKey + '.items.' + iKey + '.' + path, value);
+			} else {
+				iKey = this._dataCollection.getKey(item);
+				// TODO(pasleq): this will cause a call to _dataChanged, that will call _forwardItemPath
+				// Would it better (and correct) to directly call _forwardItemPath ?
+				this.notifyPath('data.' + iKey + '.' + path, value);
+			}
+
+		},
+
 		_forwardItemPath: function (pathParts, value) {
 			var group, groupItemsCollection, item, itemPath, physicalIndex, templateInstance;
 			if (pathParts.length >= 4 && pathParts[1] === 'items') {
