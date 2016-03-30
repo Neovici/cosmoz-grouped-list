@@ -75,7 +75,7 @@
 			if (change.path === 'data') {
 				this._flatData = this._prepareData(change.value);
 			} else if (change.path === 'data.splices') {
-				this._groupsMapAddedOrRemoved(change);
+				this._groupsAddedOrRemoved(change);
 			} else {
 				pathParts = change.path.split('.').slice(1);
 				if (pathParts.length === 3 && pathParts[1] === 'items' && pathParts[2] === 'splices') {
@@ -177,24 +177,39 @@
 		},
 
 		_groupsAddedOrRemoved: function (change) {
-			// Simplest case: a single splice of removed groups
 			var
 				splices = change.value.indexSplices,
 				splice,
 				startGroup,
+				startItem,
 				startIndex,
-				count,
+				count = 0,
 				i;
 
 			if (splices && splices.length === 1 && splices[0].addedCount === 0) {
-				splice = splices[0];
-				startGroup = this.data[splice.index];
-				startIndex = this._flatData.indexOf(startGroup);
-				for (i = 0 ; i < splice.removed.length ; i += 1) {
-					count += 1;
-					count += this.data[startIndex + i].items.length;
+				if (this._groupsMap) {
+					// Simplest case: a single splice of removed groups
+					splice = splices[0];
+					startGroup = this.data[splice.index];
+					startIndex = this._flatData.indexOf(startGroup);
+					for (i = 0 ; i < splice.removed.length ; i += 1) {
+						count += 1;
+						count += this.data[startIndex + i].items.length;
+					}
+					this.splice('_flatData', startIndex, count);
+				} else {
+					// Data is not grouped, simply remove items
+					splice = splices[0];
+					startItem = splice.removed[0];
+					startIndex = this._flatData.indexOf(startItem);
+					this.splice('_flatData', startIndex, splice.removed.length);
+					splice.removed.forEach(function (item) {
+						this.deselectItem(item);
+					}, this);
 				}
-				this.splice('_flatData', startIndex, count);
+
+			} else {
+				console.warn('Not implemented');
 			}
 		},
 
