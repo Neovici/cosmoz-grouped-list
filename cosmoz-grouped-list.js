@@ -56,6 +56,8 @@
 
 		_templateSelectorsCount: null,
 
+		_templateSelectors: null,
+
 		_physicalItems: null,
 
 		_templateInstances: null,
@@ -230,6 +232,7 @@
 					this._templateSelectorsCount = 0;
 					this._physicalItems = [];
 					this._templateInstances = [];
+					this._templateSelectors = [];
 				}
 
 				if (data.length === 0 || !data[0].items) {
@@ -279,10 +282,11 @@
 
 			selectorIndex = this._templateSelectorsKeys.get(selector);
 
-			if (!selectorIndex) {
+			if (selectorIndex === undefined) {
 				selectorIndex = this._templateSelectorsCount;
 				this._templateSelectorsKeys.set(selector, selectorIndex);
 				this._templateSelectorsCount += 1;
+				this._templateSelectors[selectorIndex] = selector;
 			}
 
 			this._physicalItems[selectorIndex] = item;
@@ -294,6 +298,26 @@
 			}
 
 			this._templateInstances[selectorIndex] = templateInstance;
+		},
+
+		/**
+		 * Utility method that returns the element that displays the first visible item in the list.
+		 * This method is mainly aimed at `cosmoz-omnitable`.
+		 */
+		getFirstVisibleItemElement: function () {
+			var i;
+
+			if (!this._physicalItems) {
+				return;
+			}
+
+			i = this.$.list.firstVisibleIndex;
+
+			for (; i < this._physicalItems.length ; i += 1) {
+				if (!this.isGroup(this._physicalItems[i])) {
+					return this._templateSelectors[i].querySelector('#itemTemplate');
+				}
+			}
 		},
 
 		/**

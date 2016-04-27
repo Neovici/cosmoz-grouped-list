@@ -1,74 +1,78 @@
 <dom-module id="template-selector">
+	<template>
+		<div id="itemTemplate"></div>
+		<div id="groupTemplate"></div>
+	</template>
 	<script>
 		/*global Polymer*/
-		"use strict";
-Polymer({
+		'use strict';
+		Polymer({
 
-	is: 'template-selector',
+			is: 'template-selector',
 
-	properties: {
+			properties: {
 
-		item: {
-			type: Object,
-			notify: true,
-			observer: '_itemChanged'
-		}
-	},
+				item: {
+					type: Object,
+					notify: true,
+					observer: '_itemChanged'
+				}
+			},
 
-	_groupTemplateInstance: null,
+			_groupTemplateInstance: null,
 
-	_itemTemplateInstance: null,
+			_itemTemplateInstance: null,
 
-	ready: function () {
-		this._templatesInstances = {};
-	},
+			ready: function () {
+				this._templatesInstances = {};
+			},
 
-	_itemChanged: function (newItem, oldItem) {
-		this.fire('template-selector-item-changed', {
-			selector: this,
-			item: newItem
+			_itemChanged: function (newItem, oldItem) {
+				this.fire('template-selector-item-changed', {
+					selector: this,
+					item: newItem
+				});
+			},
+
+			renderGroup: function (template, folded, selected) {
+				if (!this._groupTemplateInstance) {
+					this._groupTemplateInstance = template.instantiateTemplate();
+					Polymer.dom(this.$.groupTemplate).appendChild(this._groupTemplateInstance.root);
+				}
+
+				this._groupTemplateInstance.item = this.item;
+				this._groupTemplateInstance.folded = folded;
+				this._groupTemplateInstance.selected = selected;
+
+				this._groupTemplateInstance._showHideChildren(false);
+
+				if (this._itemTemplateInstance) {
+					this._itemTemplateInstance._showHideChildren(true);
+				}
+
+				return  this._groupTemplateInstance;
+			},
+
+			renderItem: function (template, expanded, selected) {
+				if (!this._itemTemplateInstance) {
+					this._itemTemplateInstance = template.instantiateTemplate();
+					Polymer.dom(this.$.itemTemplate).appendChild(this._itemTemplateInstance.root);
+				}
+				this._itemTemplateInstance.item = this.item;
+				this._itemTemplateInstance.expanded = expanded;
+				this._itemTemplateInstance.selected = selected;
+				this._itemTemplateInstance._showHideChildren(false);
+				if (this._groupTemplateInstance) {
+					this._groupTemplateInstance._showHideChildren(true);
+				}
+
+				return this._itemTemplateInstance;
+			},
+
+			detached: function () {
+				console.log('selector detached');
+			}
+
 		});
-	},
-
-	renderGroup: function (template, folded, selected) {
-		if (!this._groupTemplateInstance) {
-			this._groupTemplateInstance = template.instantiateTemplate();
-			Polymer.dom(this).appendChild(this._groupTemplateInstance.root);
-		}
-
-		this._groupTemplateInstance.item = this.item;
-		this._groupTemplateInstance.folded = folded;
-		this._groupTemplateInstance.selected = selected;
-
-		this._groupTemplateInstance._showHideChildren(false);
-
-		if (this._itemTemplateInstance) {
-			this._itemTemplateInstance._showHideChildren(true);
-		}
-
-		return  this._groupTemplateInstance;
-	},
-
-	renderItem: function (template, expanded, selected) {
-		if (!this._itemTemplateInstance) {
-			this._itemTemplateInstance = template.instantiateTemplate();
-			Polymer.dom(this).appendChild(this._itemTemplateInstance.root);
-		}
-		this._itemTemplateInstance.item = this.item;
-		this._itemTemplateInstance.expanded = expanded;
-		this._itemTemplateInstance.selected = selected;
-		this._itemTemplateInstance._showHideChildren(false);
-		if (this._groupTemplateInstance) {
-			this._groupTemplateInstance._showHideChildren(true);
-		}
-
-		return this._itemTemplateInstance;
-	},
-
-	detached: function () {
-		console.log('selector detached');
-	}
-
-});
 	</script>
 </dom-module>
