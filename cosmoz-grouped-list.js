@@ -219,8 +219,9 @@
 
 			var flatData;
 
+			this.selectedItems = [];
+
 			if (data && data.length) {
-				this.selectedItems = [];
 
 				this._dataCollection = Polymer.Collection.get(data);
 
@@ -261,7 +262,6 @@
 
 				this._expandedItems = null;
 
-				this.selectedItems = null;
 				this._selectedItemsCollection = null;
 
 				this._dataCollection = null;

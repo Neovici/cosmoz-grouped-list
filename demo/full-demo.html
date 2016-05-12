@@ -46,6 +46,7 @@
 					<button class="action" on-tap="_newData">generate new data with grouping</button>
 					<button class="action" on-tap="_newFlatData">generate new data without grouping</button>
 					<button class="action" on-tap="_emptyData">empty data</button>
+					<button class="action" on-tap="_emptySelectedItems">Empty selectedItems</button>
 					<button class="action" on-tap="_changeOuterValue">Increment outer binding value</button>
 				</div>
 				<div class="layout horizontal center">
@@ -97,9 +98,9 @@
 	<demo-page class="fit"></demo-page>
 
 	<script type="text/javascript">
-/*global document, window */
+/*global Cosmoz,document, window */
 (function () {
-	"use strict";
+	'use strict';
 
 	Polymer({
 		is: 'demo-page',
@@ -156,9 +157,9 @@
 
 		toggleSelect: function (event) {
 			var
-			 	model = event.model,
-			 	group = model.item,
-			 	selected = model.selected;
+				model = event.model,
+				group = model.item,
+				selected = model.selected;
 			if (selected) {
 				this.$.groupedList.deselectGroup(group);
 			} else {
@@ -191,6 +192,10 @@
 
 		deselectAll: function (event) {
 			this.$.groupedList.deselectAll();
+		},
+
+		_emptySelectedItems: function () {
+			this.selectedItems = [];
 		},
 
 		toggleCollapse: function (event) {
