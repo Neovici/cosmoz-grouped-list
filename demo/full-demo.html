@@ -65,7 +65,7 @@
 					<button class="action" class="action" on-tap="_changeItemValue">change item value</button>
 				</div>
 				<cosmoz-grouped-list id="groupedList" data="{{ data }}" selected-items="{{selectedItems}}" class="flex">
-					<item-template id="itemTemplate">
+					<cosmoz-grouped-list-template id="itemTemplate">
 						<template>
 							<div class="layout vertical" style="border-bottom: 1px solid grey;">
 								<div>Outer binding: <span>[[outerValue]]</span></div>
@@ -79,8 +79,8 @@
 								</div>
 							</div>
 						</template>
-					</item-template>
-					<item-template id="groupTemplate">
+					</cosmoz-grouped-list-template>
+					<cosmoz-grouped-list-template id="groupTemplate">
 						<template>
 							<div class="horizontal layout center group-header">
 								<div class="flex" on-tap="toggleSelect"><span>[[item.name]]</span>(selected=<span>{{selected}}</span>)</div>
@@ -88,7 +88,7 @@
 								<iron-icon icon="[[ getFoldIcon(folded) ]]" on-tap="toggleFold"></iron-icon>
 							</div>
 						</template>
-					</item-template>
+					</cosmoz-grouped-list-template>
 				</cosmoz-grouped-list>
 			</div>
 

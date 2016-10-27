@@ -1,0 +1,68 @@
+<dom-module id="cosmoz-grouped-list-template-selector">
+	<template>
+		<div id="content"></div>
+	</template>
+<script>
+	/*global Polymer*/
+	'use strict';
+	Polymer({
+
+		is: 'cosmoz-grouped-list-template-selector',
+
+		properties: {
+
+			context: {
+				type: Object,
+                observer: '_contextChanged'
+			},
+
+		},
+
+		_currentTemplateInstance: null,
+
+		_contextChanged: function(newContext, oldContext) {
+			if (oldContext) {
+				if (oldContext.isGroup !== newContext.isGroup) {
+					// switching from group to item or vice versa
+					this._detachInstance(this._currentTemplateInstance);
+					this._currentTemplateInstance = newContext.getTemplateInstanceFunction(newContext, this, this._currentTemplateInstance);
+					this._attachInstance(this._currentTemplateInstance);
+				}
+			} else if (this._currentTemplateInstance === null) {
+				this._currentTemplateInstance = newContext.getTemplateInstanceFunction(newContext, this, null);
+				this._attachInstance(this._currentTemplateInstance);
+			}
+
+			this._bind(this._currentTemplateInstance, newContext);
+		},
+
+		_detachInstance: function (templateInstance) {
+			var
+				parent = Polymer.dom(this.$.content),
+				children = parent.childNodes,
+				i;
+				if (children) {
+					for (i = 0 ; i < children.length ; i+=1) {
+						parent.removeChild(children[i]);
+						templateInstance.root.appendChild(children[i]);
+					}
+				}
+		},
+
+		_attachInstance: function (templateInstance) {
+			Polymer.dom(this.$.content).appendChild(templateInstance.root);
+		},
+
+		_bind: function(templateInstance, context) {
+			templateInstance.item = context.item;
+			templateInstance.selected = context.isSelected;
+			if (context.isGroup) {
+				templateInstance.folded = context.isFolded;
+			} else {
+				templateInstance.expanded = context.isExpanded;
+			}
+		}
+
+
+	});
+</script>

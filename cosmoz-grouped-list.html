@@ -3,8 +3,8 @@
 <link rel="import" href="../iron-list/iron-list.html"/>
 <link rel="import" href="../iron-icons/iron-icons.html"/>
 <link rel="import" href="../iron-icon/iron-icon.html"/>
-<link rel="import" href="item-template.html">
-<link rel="import" href="template-selector.html">
+<link rel="import" href="cosmoz-grouped-list-template.html">
+<link rel="import" href="cosmoz-grouped-list-template-selector.html">
 
 <!--
 `<cosmoz-grouped-list>` is an example implementation of grouping for iron-list
@@ -42,9 +42,9 @@ with features like group count display and folding
 
 		</style>
 
-		<iron-list id="list" items="{{_flatData}}" as="item">
+		<iron-list id="list" items="[[_flatData]]" as="item">
 			<template>
-				<template-selector item="{{item}}" on-template-selector-item-changed="_onTemplateSelectorItemChanged"></template-selector>
+                <cosmoz-grouped-list-template-selector context="{{_getSelectorContext(item)}}"></cosmoz-grouped-list-template-selector>
 			</template>
 		</iron-list>
 	</template>

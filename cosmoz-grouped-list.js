@@ -91,7 +91,7 @@
 		},
 
 		/**
-		 * Utility method that must me used when changing an item's property value.
+		 * Utility method that must be used when changing an item's property value.
 		 */
 		notifyItemPath: function (item, path, value) {
 			var group, gKey, iKey;
@@ -271,6 +271,52 @@
 			}
 
 			return flatData;
+		},
+
+
+		created: function () {
+
+			this._boundTemplateInstanceFunction = this._getTemplateInstance.bind(this);
+		},
+
+		_getSelectorContext: function (item) {
+
+			if (this.isGroup(item)) {
+				return {
+					item: item,
+					isGroup: true,
+					isSelected: this.isGroupSelected(item),
+					isFolded: this.isFolded(item),
+					getTemplateInstanceFunction: this._boundTemplateInstanceFunction
+				};
+			} else {
+				return {
+					item: item,
+					isGroup: false,
+					isSelected: this.isItemSelected(item),
+					isExpanded: this.isExpanded(item),
+					getTemplateInstanceFunction: this._boundTemplateInstanceFunction
+				};
+
+			}
+		},
+
+		_getTemplateInstance: function (context, selector, previousTemplateInstance) {
+			var
+				groupTemplate = Polymer.dom(this).querySelector('#groupTemplate'),
+				itemTemplate = Polymer.dom(this).querySelector('#itemTemplate');
+
+			if (context.isGroup) {
+				if (previousTemplateInstance) {
+					itemTemplate.releaseInstance(previousTemplateInstance);
+				}
+				return groupTemplate.getInstance();
+			} else {
+				if (previousTemplateInstance) {
+					groupTemplate.releaseInstance(previousTemplateInstance);
+				}
+				return itemTemplate.getInstance();
+			}
 		},
 
 		_onTemplateSelectorItemChanged: function (event) {
