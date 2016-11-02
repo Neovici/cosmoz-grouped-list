@@ -1,8 +1,6 @@
 <link rel="import" href="../polymer/polymer.html"/>
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html"/>
 <link rel="import" href="../iron-list/iron-list.html"/>
-<link rel="import" href="../iron-icons/iron-icons.html"/>
-<link rel="import" href="../iron-icon/iron-icon.html"/>
 <link rel="import" href="cosmoz-grouped-list-template.html">
 <link rel="import" href="cosmoz-grouped-list-template-selector.html">
 
@@ -44,9 +42,11 @@ with features like group count display and folding
 
 		<iron-list id="list" items="[[_flatData]]" as="item">
 			<template>
-                <cosmoz-grouped-list-template-selector context="{{_getSelectorContext(item)}}"></cosmoz-grouped-list-template-selector>
+                <cosmoz-grouped-list-template-selector item="[[item]]"></cosmoz-grouped-list-template-selector>
 			</template>
 		</iron-list>
 	</template>
-	<script type="text/javascript" src="cosmoz-grouped-list.js"></script>
 </dom-module>
+
+<script type="text/javascript" src="cosmoz-grouped-list.js"></script>
+

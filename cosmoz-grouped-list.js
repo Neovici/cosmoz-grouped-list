@@ -62,82 +62,34 @@
 
 		_templateInstances: null,
 
-		_dataCollection: null,
-
 		_groupsMap: null,
 
 		_itemsMap: null,
 
+		_itemTemplate: null,
+
+		_groupTemplate: null,
+
 		attached: function () {
 			this._isAttached = true;
+			this.listen(this, 'template-selector-item-changed', '_onTemplateSelectorItemChanged');
+		},
+
+		detached: function () {
+			this._isAttached = false;
+			this.unlisten(this, 'template-selector-item-changed', '_onTemplateSelectorItemChanged');
 		},
 
 		_dataChanged: function (change) {
-			var pathParts;
+			var pathParts, firstVisibleIndex;
 			if (change.path === 'data') {
 				this._flatData = this._prepareData(change.value);
 			} else if (change.path === 'data.splices') {
 				this._groupsAddedOrRemoved(change);
 			} else {
-				pathParts = change.path.split('.').slice(1);
-				if (pathParts.length === 3 && pathParts[1] === 'items' && pathParts[2] === 'splices') {
-					// items were added or removed
-					this._itemsAddedOrRemoved(pathParts, change);
-				} else {
-					// Forward an item property change
-					this._forwardItemPath(pathParts, change.value);
-				}
-			}
-		},
-
-		/**
-		 * Utility method that must be used when changing an item's property value.
-		 */
-		notifyItemPath: function (item, path, value) {
-			var group, gKey, iKey;
-
-			if (this._groupsMap) {
-				group = this.getItemGroup(item);
-				gKey = this._dataCollection.getKey(group);
-				iKey = Polymer.Collection.get(group.items).getKey(item);
-				this.notifyPath('data.' + gKey + '.items.' + iKey + '.' + path, value);
-			} else {
-				iKey = this._dataCollection.getKey(item);
-				// TODO(pasleq): this will cause a call to _dataChanged, that will call _forwardItemPath
-				// Would it better (and correct) to directly call _forwardItemPath ?
-				this.notifyPath('data.' + iKey + '.' + path, value);
-			}
-
-		},
-
-		_forwardItemPath: function (pathParts, value) {
-			var group, groupItemsCollection, item, itemPath, physicalIndex, templateInstance;
-			if (pathParts.length >= 4 && pathParts[1] === 'items') {
-				// Path looks like data.#0.items.#0.path
-				group = this._dataCollection.getItem(pathParts[0]);
-
-				groupItemsCollection = Polymer.Collection.get(group.items);
-
-				item = groupItemsCollection.getItem(pathParts[2]);
-
-				itemPath = pathParts.slice(3).join('.');
-
-				physicalIndex = this._physicalItems.indexOf(item);
-
-				// Notify only displayed items
-				if (physicalIndex >= 0) {
-					templateInstance = this._templateInstances[physicalIndex];
-					templateInstance.notifyPath('item.' + itemPath, value);
-				}
-			} else if (pathParts.length >= 2) {
-				// Path looks like data.#0.path
-				item = this._dataCollection.getItem(pathParts[0]);
-				itemPath = pathParts.slice(1).join('.');
-				physicalIndex = this._physicalItems.indexOf(item);
-				if (physicalIndex >= 0) {
-					templateInstance = this._templateInstances[physicalIndex];
-					templateInstance.notifyPath('item.' + itemPath, value);
-				}
+				// In more complex cases, it is easier to replace the entire flatten data
+				// This might cause flickering though
+				this._flatData = this._prepareData(this.data);
 			}
 		},
 
@@ -151,32 +103,6 @@
 			}
 		},
 
-		_itemsAddedOrRemoved: function (pathParts, change) {
-			// Simplest case : a single splice of removed items
-			// We just need to remove these items from _flatData
-
-			var
-				indexSplices = change.value.indexSplices,
-				splice,
-				group, groupIndex;
-			if (indexSplices && indexSplices.length === 1 && indexSplices[0].addedCount === 0) {
-				splice = indexSplices[0];
-				group = this._dataCollection.getItem(pathParts[0]);
-				// Find the index of the group in _flatData
-				groupIndex = this._flatData.indexOf(group);
-				if (group.items.length === 0 && !this.displayEmptyGroups) {
-					this.splice('_flatData', groupIndex, splice.removed.length + 1);
-				} else {
-					this.splice('_flatData', groupIndex + splice.index + 1, splice.removed.length);
-				}
-				splice.removed.forEach(function (item) {
-					this.deselectItem(item);
-				}, this);
-			} else {
-				// TODO(pasleq): other cases
-				console.warn('Not implemented');
-			}
-		},
 
 		_groupsAddedOrRemoved: function (change) {
 			var
@@ -223,10 +149,7 @@
 
 			if (data && data.length) {
 
-				this._dataCollection = Polymer.Collection.get(data);
-
 				this._itemsMap = new WeakMap();
-
 
 				if (!this._physicalItems) {
 					this._templateSelectorsKeys = new WeakMap();
@@ -262,10 +185,6 @@
 
 				this._expandedItems = null;
 
-				this._selectedItemsCollection = null;
-
-				this._dataCollection = null;
-
 				this._foldedGroups = null;
 				this._groupsMap = null;
 			}
@@ -273,50 +192,18 @@
 			return flatData;
 		},
 
-
-		created: function () {
-
-			this._boundTemplateInstanceFunction = this._getTemplateInstance.bind(this);
+		_getItemTemplate: function () {
+			if (!this._itemTemplate) {
+				this._itemTemplate = Polymer.dom(this).querySelector('#itemTemplate');
+			}
+			return this._itemTemplate;
 		},
 
-		_getSelectorContext: function (item) {
-
-			if (this.isGroup(item)) {
-				return {
-					item: item,
-					isGroup: true,
-					isSelected: this.isGroupSelected(item),
-					isFolded: this.isFolded(item),
-					getTemplateInstanceFunction: this._boundTemplateInstanceFunction
-				};
-			} else {
-				return {
-					item: item,
-					isGroup: false,
-					isSelected: this.isItemSelected(item),
-					isExpanded: this.isExpanded(item),
-					getTemplateInstanceFunction: this._boundTemplateInstanceFunction
-				};
-
+		_getGroupTemplate: function () {
+			if (!this._groupTemplate) {
+				this._groupTemplate = Polymer.dom(this).querySelector('#groupTemplate');
 			}
-		},
-
-		_getTemplateInstance: function (context, selector, previousTemplateInstance) {
-			var
-				groupTemplate = Polymer.dom(this).querySelector('#groupTemplate'),
-				itemTemplate = Polymer.dom(this).querySelector('#itemTemplate');
-
-			if (context.isGroup) {
-				if (previousTemplateInstance) {
-					itemTemplate.releaseInstance(previousTemplateInstance);
-				}
-				return groupTemplate.getInstance();
-			} else {
-				if (previousTemplateInstance) {
-					groupTemplate.releaseInstance(previousTemplateInstance);
-				}
-				return itemTemplate.getInstance();
-			}
+			return this._groupTemplate;
 		},
 
 		_onTemplateSelectorItemChanged: function (event) {
@@ -324,7 +211,11 @@
 				item = event.detail.item,
 				selector = event.detail.selector,
 				selectorIndex,
-				templateInstance;
+				template,
+				templateInstance,
+				isGroup = this.isGroup(item),
+				currentTemplateInstance = selector.currentTemplateInstance,
+				currentTemplate = selector.currentTemplate;
 
 			selectorIndex = this._templateSelectorsKeys.get(selector);
 
@@ -337,10 +228,32 @@
 
 			this._physicalItems[selectorIndex] = item;
 
-			if (this.isGroup(item)) {
-				templateInstance = selector.renderGroup(Polymer.dom(this).querySelector('#groupTemplate'), this.isFolded(item), this.isGroupSelected(item));
+			if (isGroup) {
+				template = this._getGroupTemplate();
 			} else {
-				templateInstance = selector.renderItem(Polymer.dom(this).querySelector('#itemTemplate'), this.isExpanded(item), this.isItemSelected(item));
+				template = Polymer.dom(this).querySelector('#itemTemplate');
+			}
+
+			if (template !== currentTemplate) {
+				templateInstance = template.getInstance();
+			} else {
+				templateInstance = currentTemplateInstance;
+			}
+
+			templateInstance.item = item;
+			if (isGroup) {
+				templateInstance.selected = this.isGroupSelected(item);
+				templateInstance.folded = this.isFolded(item);
+			} else {
+				templateInstance.expanded = this.isExpanded(item);
+				templateInstance.selected = this.isItemSelected(item);
+			}
+
+			if (templateInstance !== currentTemplateInstance) {
+				selector.render(template, templateInstance);
+				if (currentTemplate) {
+					currentTemplate.releaseInstance(currentTemplateInstance);
+				}
 			}
 
 			this._templateInstances[selectorIndex] = templateInstance;
@@ -592,8 +505,6 @@
 				this._templateInstances[i].selected = false;
 			}
 		},
-
-
 
 		updateSizes: function (group) {
 			var

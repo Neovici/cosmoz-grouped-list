@@ -10,6 +10,8 @@
 	<link rel="import" href="../cosmoz-grouped-list.html">
 	<link rel="import" href="../../iron-flex-layout/iron-flex-layout.html"/>
 	<link rel="import" href="../../iron-flex-layout/iron-flex-layout-classes.html"/>
+	<link rel="import" href="../../iron-icons/iron-icons.html"/>
+	<link rel="import" href="../../iron-icon/iron-icon.html"/>
 	<link rel="import" href="list-demo-behavior.html">
 
 	<style is="custom-style" include="iron-flex iron-flex-alignment iron-positioning">
@@ -55,7 +57,7 @@
 					<button class="action" on-tap="removeSelected">Remove selected items</button>
 					<div class="action">Selected items count = {{selectedItems.length}}</div>
 				</div>
-				<div class="layout horizontal center">
+				<!--<div class="layout horizontal center">
 					<label class="action">Group index</label>
 					<input class="action" value="{{groupIndex::input}}">
 					<label class="action">Item index</label>
@@ -63,7 +65,7 @@
 					<label class="action">Item value</label>
 					<input class="action" value="{{itemValue::input}}">
 					<button class="action" class="action" on-tap="_changeItemValue">change item value</button>
-				</div>
+				</div>-->
 				<cosmoz-grouped-list id="groupedList" data="{{ data }}" selected-items="{{selectedItems}}" class="flex">
 					<cosmoz-grouped-list-template id="itemTemplate">
 						<template>
@@ -133,8 +135,11 @@
 		behaviors: [
 			Cosmoz.ListDemoBehavior
 		],
-		ready: function () {
-			this.data = this.generateListDemoData(10, 15, 1, 11);
+
+		attached: function () {
+			this.async(function () {
+				this.data = this.generateListDemoData(51, 53, 3, 17);
+			}.bind(this), 16);
 		},
 
 		removeSelected: function (event) {
