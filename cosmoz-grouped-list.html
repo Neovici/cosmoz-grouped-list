@@ -42,9 +42,13 @@ with features like group count display and folding
 
 		<iron-list id="list" items="[[_flatData]]" as="item">
 			<template>
-                <cosmoz-grouped-list-template-selector item="[[item]]"></cosmoz-grouped-list-template-selector>
+				<div>
+					<cosmoz-grouped-list-template-selector item="[[item]]"></cosmoz-grouped-list-template-selector>
+				</div>
 			</template>
 		</iron-list>
+
+		<content></content>
 	</template>
 </dom-module>
 

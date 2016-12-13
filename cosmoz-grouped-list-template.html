@@ -1,19 +1,6 @@
 <link rel="import" href="../polymer/polymer.html"/>
 
-<dom-module id="cosmoz-grouped-list-template">
-	<style>
-		:host {
-			display: block;
-			position: relative !important;
-		}
-	</style>
-	<template>
-		<content></content>
-	</template>
-</dom-module>
-
 <script>
-	/*global Polymer*/
 "use strict";
 Polymer({
 
@@ -83,12 +70,12 @@ Polymer({
 	// },
 
 	getInstance: function () {
-
 		var instance = this._templatesAvailable.pop();
 
 		if (!instance) {
 			this._ensureTemplatized();
 			instance = this.stamp({});
+
 			this._templatesInUse.push(instance);
 		}
 

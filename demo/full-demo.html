@@ -21,7 +21,7 @@
 <body class="fullbleed">
 	<dom-module id="demo-page">
 		<template>
-			<style is="custom-style" include="iron-flex iron-flex-alignment iron-positioning">
+			<style include="iron-flex iron-flex-alignment iron-positioning">
 				.group-header {
 					padding: 5px;
 					background-color: #ccc;
@@ -40,7 +40,6 @@
 					padding: 5px;
 					margin: 5px 5px 10px 5px;
 				}
-
 			</style>
 			<div class="layout vertical fit">
 				<h3>cosmoz-grouped-list demo</h3>
@@ -50,6 +49,7 @@
 					<button class="action" on-tap="_emptyData">empty data</button>
 					<button class="action" on-tap="_emptySelectedItems">Empty selectedItems</button>
 					<button class="action" on-tap="_changeOuterValue">Increment outer binding value</button>
+					<button class="action" on-tap="_firstVisibleItem">First visible item</button>
 				</div>
 				<div class="layout horizontal center">
 					<button class="action" on-tap="selectAll">Select all</button>
@@ -69,7 +69,7 @@
 				<cosmoz-grouped-list id="groupedList" data="{{ data }}" selected-items="{{selectedItems}}" class="flex">
 					<cosmoz-grouped-list-template id="itemTemplate">
 						<template>
-							<div class="layout vertical" style="border-bottom: 1px solid grey;">
+							<div class="toto layout vertical" style="border-bottom: 1px solid grey;">
 								<div>Outer binding: <span>[[outerValue]]</span></div>
 								<div>Id: <span>{{item.id}}</span></div>
 								<div>Name: <span>{{item.name}}</span></div>
@@ -138,7 +138,8 @@
 
 		attached: function () {
 			this.async(function () {
-				this.data = this.generateListDemoData(51, 53, 3, 17);
+				var data = this.generateListDemoData(10, 13, 1, 7);
+				this.data = data;
 			}.bind(this), 16);
 		},
 
@@ -233,6 +234,9 @@
 		_newFlatData: function () {
 			var data = this.generateListDemoData(3, 3, 50,80);
 			this.data = data[3].items;
+		},
+		_firstVisibleItem: function () {
+			console.log(this.$.groupedList.getFirstVisibleItemElement());
 		}
 
 

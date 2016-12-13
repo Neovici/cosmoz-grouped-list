@@ -1,6 +1,11 @@
 <dom-module id="cosmoz-grouped-list-template-selector">
 	<template>
-		<div id="content"></div>
+		<style>
+			:host {
+				display: block;
+			}
+		</style>
+		<content></content>
 	</template>
 </dom-module>
 
@@ -17,69 +22,46 @@
 				observer: '_itemChanged'
 			},
 
-			currentTemplate: {
-				type: Object
-			},
-
-			currentTemplateInstance: {
-				type: Object
+			selectorId: {
+				type: Number,
 			}
 		},
 
-		_isAttached: false,
-
-		_fireItemChangedOnAttached: false,
 
 		attached: function () {
-			this._isAttached = true;
-			if (this._fireItemChangedOnAttached) {
+			if (this.selectorId === undefined) {
+				// Notifies parent cosmoz-grouped-list that a new template-selector
+				// has been added so that it gets a selectorId
+				this.fire('template-selector-attached', {
+					selector: this
+				});
+
+				var item = this.parentElement;
+
+				//this._slot = document.createElement('slot');
+				//this._slot.setAttribute('name', 'slot' + this.selectorId);
+				this._slot = document.createElement('content');
+				this._slot.setAttribute('select', '#slot' + this.selectorId);
+				Polymer.dom(item).appendChild(this._slot);
+
+				this.id = 'slot' + this.selectorId;
+				this.setAttribute('slot', this.id);
+				item._selectorId = this.selectorId;
+				Polymer.dom(this.domHost).appendChild(this);
+				Polymer.dom.flush();
+
 				this.fire('template-selector-item-changed', {
 					selector: this,
 					item: this.item,
 				});
-
-				this._fireItemChangedOnAttached = false;
 			}
-		},
-
-		detached: function () {
-			this._isAttached = false;
 		},
 
 		_itemChanged: function (newItem, oldItem) {
-			if (this._isAttached) {
-				this.fire('template-selector-item-changed', {
-					selector: this,
-					item: newItem,
-				});
-			} else {
-				this._fireItemChangedOnAttached = true;
-			}
+			this.fire('template-selector-item-changed', {
+				selector: this,
+				item: newItem,
+			});
 		},
-
-		_detachInstance: function (templateInstance) {
-			var
-				parent = Polymer.dom(this.$.content),
-				children = parent.childNodes,
-				i;
-				if (children) {
-					for (i = 0 ; i < children.length ; i+=1) {
-						parent.removeChild(children[i]);
-						templateInstance.root.appendChild(children[i]);
-					}
-				}
-		},
-
-		render: function (template, templateInstance) {
-			if (this.currentTemplateInstance) {
-				this._detachInstance(this.currentTemplateInstance);
-			}
-
-			Polymer.dom(this.$.content).appendChild(templateInstance.root);
-
-			this.currentTemplateInstance = templateInstance;
-			this.currentTemplate = template;
-		}
-
 	});
 </script>

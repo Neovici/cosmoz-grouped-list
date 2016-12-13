@@ -52,16 +52,6 @@
 			'_scrollTargetChanged(scrollTarget, _isAttached)'
 		],
 
-		_templateSelectorsKeys: null,
-
-		_templateSelectorsCount: null,
-
-		_templateSelectors: null,
-
-		_physicalItems: null,
-
-		_templateInstances: null,
-
 		_groupsMap: null,
 
 		_itemsMap: null,
@@ -70,8 +60,27 @@
 
 		_groupTemplate: null,
 
+		_templateSelectorsCount: null,
+
+		_physicalItems: null,
+
+		_templateInstances: null,
+
+		_templates: null,
+
+		_slots: null,
+
+		created: function () {
+			this._physicalItems = [];
+			this._templateInstances = [];
+			this._templates = [];
+			this._slots = [];
+			this._templateSelectorsCount = 0;
+		},
+
 		attached: function () {
 			this._isAttached = true;
+			this.listen(this, 'template-selector-attached', '_onTemplateSelectorAttached');
 			this.listen(this, 'template-selector-item-changed', '_onTemplateSelectorItemChanged');
 		},
 
@@ -151,14 +160,6 @@
 
 				this._itemsMap = new WeakMap();
 
-				if (!this._physicalItems) {
-					this._templateSelectorsKeys = new WeakMap();
-					this._templateSelectorsCount = 0;
-					this._physicalItems = [];
-					this._templateInstances = [];
-					this._templateSelectors = [];
-				}
-
 				if (data.length === 0 || !data[0].items) {
 					// no grouping, so render items as a standard list
 					flatData = data.slice();
@@ -192,6 +193,85 @@
 			return flatData;
 		},
 
+		_onTemplateSelectorAttached: function (event) {
+			var
+				selector = event.detail.selector,
+				slot;
+
+			selector.selectorId = this._templateSelectorsCount;
+
+			this._slots[selector.selectorId] = selector;
+
+			this._templateSelectorsCount += 1;
+		},
+
+
+		_onTemplateSelectorItemChanged: function (event) {
+			var
+				item = event.detail.item,
+				selector = event.detail.selector,
+				selectorId = selector.selectorId,
+				currentTemplateInstance = this._templateInstances[selectorId],
+				currentTemplate = this._templates[selectorId],
+				slot = this._slots[selectorId],
+				template,
+				templateInstance,
+				isGroup = this.isGroup(item);
+
+
+			this._physicalItems[selectorId] = item;
+
+			if (isGroup) {
+				template = this._getGroupTemplate();
+			} else {
+				template = this._getItemTemplate();
+			}
+
+			if (template !== currentTemplate) {
+				templateInstance = template.getInstance();
+			} else {
+				templateInstance = currentTemplateInstance;
+			}
+
+			templateInstance.item = item;
+
+			if (isGroup) {
+				templateInstance.selected = this.isGroupSelected(item);
+				templateInstance.folded = this.isFolded(item);
+			} else {
+				templateInstance.expanded = this.isExpanded(item);
+				templateInstance.selected = this.isItemSelected(item);
+			}
+
+			if (templateInstance !== currentTemplateInstance) {
+				if (currentTemplateInstance) {
+					this._detachInstance(currentTemplateInstance, slot);
+				}
+
+				Polymer.dom(slot).appendChild(templateInstance.root);
+
+				if (currentTemplate) {
+					currentTemplate.releaseInstance(currentTemplateInstance);
+				}
+			}
+
+			this._templates[selectorId] = template;
+			this._templateInstances[selectorId] = templateInstance;
+		},
+
+		_detachInstance: function (templateInstance, slot) {
+			var
+				parent = Polymer.dom(slot),
+				children = parent.childNodes,
+				i;
+			if (children) {
+				for (i = 0 ; i < children.length ; i+=1) {
+					parent.removeChild(children[i]);
+					templateInstance.root.appendChild(children[i]);
+				}
+			}
+		},
+
 		_getItemTemplate: function () {
 			if (!this._itemTemplate) {
 				this._itemTemplate = Polymer.dom(this).querySelector('#itemTemplate');
@@ -204,59 +284,6 @@
 				this._groupTemplate = Polymer.dom(this).querySelector('#groupTemplate');
 			}
 			return this._groupTemplate;
-		},
-
-		_onTemplateSelectorItemChanged: function (event) {
-			var
-				item = event.detail.item,
-				selector = event.detail.selector,
-				selectorIndex,
-				template,
-				templateInstance,
-				isGroup = this.isGroup(item),
-				currentTemplateInstance = selector.currentTemplateInstance,
-				currentTemplate = selector.currentTemplate;
-
-			selectorIndex = this._templateSelectorsKeys.get(selector);
-
-			if (selectorIndex === undefined) {
-				selectorIndex = this._templateSelectorsCount;
-				this._templateSelectorsKeys.set(selector, selectorIndex);
-				this._templateSelectorsCount += 1;
-				this._templateSelectors[selectorIndex] = selector;
-			}
-
-			this._physicalItems[selectorIndex] = item;
-
-			if (isGroup) {
-				template = this._getGroupTemplate();
-			} else {
-				template = Polymer.dom(this).querySelector('#itemTemplate');
-			}
-
-			if (template !== currentTemplate) {
-				templateInstance = template.getInstance();
-			} else {
-				templateInstance = currentTemplateInstance;
-			}
-
-			templateInstance.item = item;
-			if (isGroup) {
-				templateInstance.selected = this.isGroupSelected(item);
-				templateInstance.folded = this.isFolded(item);
-			} else {
-				templateInstance.expanded = this.isExpanded(item);
-				templateInstance.selected = this.isItemSelected(item);
-			}
-
-			if (templateInstance !== currentTemplateInstance) {
-				selector.render(template, templateInstance);
-				if (currentTemplate) {
-					currentTemplate.releaseInstance(currentTemplateInstance);
-				}
-			}
-
-			this._templateInstances[selectorIndex] = templateInstance;
 		},
 
 		/**
@@ -274,7 +301,8 @@
 
 			for (; i < this._physicalItems.length ; i += 1) {
 				if (!this.isGroup(this._physicalItems[i])) {
-					return this._templateSelectors[i].querySelector('#itemTemplate');
+					var element = this._slots[i];
+					return element;
 				}
 			}
 		},
