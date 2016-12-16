@@ -27,6 +27,11 @@
 				notify: true
 			},
 
+			warmUp: {
+				type: Number,
+				value: 30
+			},
+
 			/**
 			 * Indicates wether this grouped-list should render groups without items.
 			 */
@@ -60,6 +65,8 @@
 
 		_groupTemplate: null,
 
+		_warmUpTemplate: null,
+
 		_templateSelectorsCount: null,
 
 		_physicalItems: null,
@@ -76,17 +83,28 @@
 			this._templates = [];
 			this._slots = [];
 			this._templateSelectorsCount = 0;
+
 		},
 
 		attached: function () {
 			this._isAttached = true;
 			this.listen(this, 'template-selector-attached', '_onTemplateSelectorAttached');
 			this.listen(this, 'template-selector-item-changed', '_onTemplateSelectorItemChanged');
+			this._warmUp();
 		},
 
 		detached: function () {
 			this._isAttached = false;
 			this.unlisten(this, 'template-selector-item-changed', '_onTemplateSelectorItemChanged');
+		},
+
+		_warmUp: function () {
+			var warmUpData = [];
+			for (var i = 0; i < this.warmUp; i++) {
+				warmUpData[i] = { warmUp: i};
+			}
+			this._flatData = warmUpData;
+
 		},
 
 		_dataChanged: function (change) {
@@ -111,7 +129,6 @@
 				this.classList.remove('has-scroll-target');
 			}
 		},
-
 
 		_groupsAddedOrRemoved: function (change) {
 			var
@@ -216,12 +233,15 @@
 				slot = this._slots[selectorId],
 				template,
 				templateInstance,
-				isGroup = this.isGroup(item);
+				isGroup = this.isGroup(item),
+				isWarmUp = item.warmUp >= 0;
 
 
 			this._physicalItems[selectorId] = item;
 
-			if (isGroup) {
+			if (isWarmUp) {
+				template = this._getWarmUpTemplate();
+			} else if (isGroup) {
 				template = this._getGroupTemplate();
 			} else {
 				template = this._getItemTemplate();
@@ -233,14 +253,16 @@
 				templateInstance = currentTemplateInstance;
 			}
 
-			templateInstance.item = item;
+			if (!isWarmUp) {
+				templateInstance.item = item;
 
-			if (isGroup) {
-				templateInstance.selected = this.isGroupSelected(item);
-				templateInstance.folded = this.isFolded(item);
-			} else {
-				templateInstance.expanded = this.isExpanded(item);
-				templateInstance.selected = this.isItemSelected(item);
+				if (isGroup) {
+					templateInstance.selected = this.isGroupSelected(item);
+					templateInstance.folded = this.isFolded(item);
+				} else {
+					templateInstance.expanded = this.isExpanded(item);
+					templateInstance.selected = this.isItemSelected(item);
+				}
 			}
 
 			if (templateInstance !== currentTemplateInstance) {
@@ -284,6 +306,13 @@
 				this._groupTemplate = Polymer.dom(this).querySelector('#groupTemplate');
 			}
 			return this._groupTemplate;
+		},
+
+		_getWarmUpTemplate: function () {
+			if (!this._warmUpTemplate) {
+				this._warmUpTemplate = Polymer.dom(this).querySelector('#warmUpTemplate');
+			}
+			return this._warmUpTemplate;
 		},
 
 		/**
