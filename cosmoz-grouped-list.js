@@ -88,23 +88,22 @@
 
 		attached: function () {
 			this._isAttached = true;
-			this.listen(this, 'template-selector-attached', '_onTemplateSelectorAttached');
-			this.listen(this, 'template-selector-item-changed', '_onTemplateSelectorItemChanged');
 			this._warmUp();
 		},
 
 		detached: function () {
 			this._isAttached = false;
-			this.unlisten(this, 'template-selector-item-changed', '_onTemplateSelectorItemChanged');
 		},
 
 		_warmUp: function () {
-			var warmUpData = [];
-			for (var i = 0; i < this.warmUp; i++) {
-				warmUpData[i] = { warmUp: i};
+			if (this._getWarmUpTemplate()) {
+				var warmUpData = [];
+				for (var i = 0; i < this.warmUp; i++) {
+					warmUpData[i] = { warmUp: i};
+				}
+				this._flatData = warmUpData;
 			}
-			this._flatData = warmUpData;
-
+			this._warmUpCount = 0;
 		},
 
 		_dataChanged: function (change) {
@@ -210,7 +209,7 @@
 			return flatData;
 		},
 
-		_onTemplateSelectorAttached: function (event) {
+		_onTemplateSelectorCreated: function (event) {
 			var
 				selector = event.detail.selector,
 				slot;
@@ -241,6 +240,8 @@
 
 			if (isWarmUp) {
 				template = this._getWarmUpTemplate();
+				this._warmUpCount += 1;
+				console.log(this._warmUpCount);
 			} else if (isGroup) {
 				template = this._getGroupTemplate();
 			} else {

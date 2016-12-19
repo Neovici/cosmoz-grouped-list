@@ -27,40 +27,37 @@
 			}
 		},
 
-
-		attached: function () {
+		_itemChanged: function (newItem, oldItem) {
 			if (this.selectorId === undefined) {
 				// Notifies parent cosmoz-grouped-list that a new template-selector
 				// has been added so that it gets a selectorId
-				this.fire('template-selector-attached', {
+				this.fire('template-selector-created', {
 					selector: this
+				}, {
+					bubbles: false
 				});
 
-				var item = this.parentElement;
+				var
+					ironListItem = this.parentElement,
+					slotId = 'slot' + this.selectorId;
 
 				//this._slot = document.createElement('slot');
 				//this._slot.setAttribute('name', 'slot' + this.selectorId);
 				this._slot = document.createElement('content');
-				this._slot.setAttribute('select', '#slot' + this.selectorId);
-				Polymer.dom(item).appendChild(this._slot);
+				this._slot.setAttribute('select', '#'+ slotId);
+				Polymer.dom(ironListItem).appendChild(this._slot);
 
-				this.id = 'slot' + this.selectorId;
-				this.setAttribute('slot', this.id);
-				item._selectorId = this.selectorId;
+				this.id = slotId;
+				this.setAttribute('slot', slotId);
 				Polymer.dom(this.domHost).appendChild(this);
 				Polymer.dom.flush();
-
-				this.fire('template-selector-item-changed', {
-					selector: this,
-					item: this.item,
-				});
 			}
-		},
 
-		_itemChanged: function (newItem, oldItem) {
 			this.fire('template-selector-item-changed', {
 				selector: this,
 				item: newItem,
+			}, {
+				bubbles: false
 			});
 		},
 	});
