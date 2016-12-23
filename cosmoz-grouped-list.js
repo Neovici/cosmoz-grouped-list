@@ -241,7 +241,6 @@
 			if (isWarmUp) {
 				template = this._getWarmUpTemplate();
 				this._warmUpCount += 1;
-				console.log(this._warmUpCount);
 			} else if (isGroup) {
 				template = this._getGroupTemplate();
 			} else {
