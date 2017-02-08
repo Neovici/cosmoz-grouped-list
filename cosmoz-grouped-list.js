@@ -107,16 +107,21 @@
 		},
 
 		_dataChanged: function (change) {
-			var pathParts, firstVisibleIndex;
-			if (change.path === 'data') {
-				this._flatData = this._prepareData(change.value);
-			} else if (change.path === 'data.splices') {
-				this._groupsAddedOrRemoved(change);
-			} else {
-				// In more complex cases, it is easier to replace the entire flatten data
-				// This might cause flickering though
-				this._flatData = this._prepareData(this.data);
+			var emptyData;
+
+			// Polymer 2.0 will remove key-based path and splice notifications
+			// for arrays. Handle any data changed by resetting the data array.
+			if (this._templateInstances && this._templateInstances.length) {
+				emptyData = [];
+				this._templateInstances.forEach(function (instance) {
+					emptyData.push({});
+				}, this);
+				this._flatData = emptyData;
 			}
+
+			this.debounce('prepareData', function () {
+				this._flatData = this._prepareData(this.data);
+			}.bind(this));
 		},
 
 		_scrollTargetChanged: function (scrollTarget, isAttached)  {
@@ -126,43 +131,6 @@
 			} else {
 				this.$.list.scrollTarget = undefined;
 				this.classList.remove('has-scroll-target');
-			}
-		},
-
-		_groupsAddedOrRemoved: function (change) {
-			var
-				splices = change.value.indexSplices,
-				splice,
-				startGroup,
-				startItem,
-				startIndex,
-				count = 0,
-				i;
-
-			if (splices && splices.length === 1 && splices[0].addedCount === 0) {
-				if (this._groupsMap) {
-					// Simplest case: a single splice of removed groups
-					splice = splices[0];
-					startGroup = this.data[splice.index];
-					startIndex = this._flatData.indexOf(startGroup);
-					for (i = 0 ; i < splice.removed.length ; i += 1) {
-						count += 1;
-						count += this.data[startIndex + i].items.length;
-					}
-					this.splice('_flatData', startIndex, count);
-				} else {
-					// Data is not grouped, simply remove items
-					splice = splices[0];
-					startItem = splice.removed[0];
-					startIndex = this._flatData.indexOf(startItem);
-					this.splice('_flatData', startIndex, splice.removed.length);
-					splice.removed.forEach(function (item) {
-						this.deselectItem(item);
-					}, this);
-				}
-
-			} else {
-				console.warn('Not implemented');
 			}
 		},
 
