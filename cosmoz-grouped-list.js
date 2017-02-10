@@ -559,7 +559,7 @@
 		},
 
 		isExpanded: function (item) {
-			var itemState = this._itemsMap.get(item);
+			var itemState = this._itemsMap ? this._itemsMap.get(item) : undefined;
 			return itemState !== undefined && itemState.expanded;
 		},
 
