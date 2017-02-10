@@ -1,0 +1,93 @@
+<link rel="import" href="../polymer/polymer.html"/>
+
+<script>
+"use strict";
+Polymer({
+
+	is: 'cosmoz-grouped-list-template',
+
+	properties: {
+		as: {
+			type: String,
+			value: 'item'
+		},
+		indexAs: {
+			type: String,
+			value: 'index'
+		}
+	},
+
+	behaviors: [
+		Polymer.Templatizer
+	],
+
+	_templatesInUse: null,
+
+	_templatesAvailable: null,
+
+	ready: function () {
+		var instanceProps = {};
+
+		instanceProps[this.as] = true;
+		instanceProps[this.indexAs] = true;
+		instanceProps['folded'] = true;
+		instanceProps['expanded'] = true;
+		instanceProps['selected'] = true;
+
+		this._instanceProps = instanceProps;
+
+		this._templatesInUse = [];
+		this._templatesAvailable = [];
+	},
+
+	_ensureTemplatized: function () {
+		if (!this.ctor) {
+			this._userTemplate = Polymer.dom(this).querySelector('template');
+			this.templatize(this._userTemplate);
+		}
+	},
+
+	_forwardParentProp: function (prop, value) {
+		this._templatesInUse.forEach(function (template) {
+			template[prop] = value;
+		});
+	},
+
+	_forwardParentPath: function (path, value) {
+		this._templatesInUse.forEach(function (template) {
+			template.notifyPath(path, value, true);
+		});
+	},
+
+	// _forwardInstanceProp: function(inst, prop, value) {
+	// 	console.log('_forwardInstanceProp inst=', inst);
+	// 	console.log('_forwardInstanceProp prop=', prop);
+	// 	console.log('_forwardInstanceProp value=', value);
+	// },
+	// _forwardInstancePath: function(inst, path, value) {
+	// 	console.log('_forwardInstancePath', inst, path, value);
+
+	// },
+
+	getInstance: function () {
+		var instance = this._templatesAvailable.pop();
+
+		if (!instance) {
+			this._ensureTemplatized();
+			instance = this.stamp({});
+
+			this._templatesInUse.push(instance);
+		}
+
+		return instance;
+	},
+
+	releaseInstance: function (templateInstance) {
+		var index = this._templatesInUse.indexOf(templateInstance);
+		if (index >= 0) {
+			this._templatesInUse.splice(index, 1);
+			this._templatesAvailable.push(templateInstance);
+		}
+	}
+});
+</script>

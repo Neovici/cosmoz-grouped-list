@@ -27,6 +27,11 @@
 				notify: true
 			},
 
+			warmUp: {
+				type: Number,
+				value: 30
+			},
+
 			/**
 			 * Indicates wether this grouped-list should render groups without items.
 			 */
@@ -52,93 +57,71 @@
 			'_scrollTargetChanged(scrollTarget, _isAttached)'
 		],
 
-		_templateSelectorsKeys: null,
+		_groupsMap: null,
+
+		_itemsMap: null,
+
+		_itemTemplate: null,
+
+		_groupTemplate: null,
+
+		_warmUpTemplate: null,
 
 		_templateSelectorsCount: null,
-
-		_templateSelectors: null,
 
 		_physicalItems: null,
 
 		_templateInstances: null,
 
-		_dataCollection: null,
+		_templates: null,
 
-		_groupsMap: null,
+		_slots: null,
 
-		_itemsMap: null,
+		created: function () {
+			this._physicalItems = [];
+			this._templateInstances = [];
+			this._templates = [];
+			this._slots = [];
+			this._templateSelectorsCount = 0;
+
+		},
 
 		attached: function () {
 			this._isAttached = true;
+			this._warmUp();
+		},
+
+		detached: function () {
+			this._isAttached = false;
+		},
+
+		_warmUp: function () {
+			if (this._getWarmUpTemplate()) {
+				var warmUpData = [];
+				for (var i = 0; i < this.warmUp; i++) {
+					warmUpData[i] = { warmUp: i};
+				}
+				this._flatData = warmUpData;
+			}
+			this._warmUpCount = 0;
 		},
 
 		_dataChanged: function (change) {
-			var pathParts;
-			if (change.path === 'data') {
-				this._flatData = this._prepareData(change.value);
-			} else if (change.path === 'data.splices') {
-				this._groupsAddedOrRemoved(change);
-			} else {
-				pathParts = change.path.split('.').slice(1);
-				if (pathParts.length === 3 && pathParts[1] === 'items' && pathParts[2] === 'splices') {
-					// items were added or removed
-					this._itemsAddedOrRemoved(pathParts, change);
-				} else {
-					// Forward an item property change
-					this._forwardItemPath(pathParts, change.value);
-				}
-			}
-		},
+			var emptyData;
 
-		/**
-		 * Utility method that must me used when changing an item's property value.
-		 */
-		notifyItemPath: function (item, path, value) {
-			var group, gKey, iKey;
-
-			if (this._groupsMap) {
-				group = this.getItemGroup(item);
-				gKey = this._dataCollection.getKey(group);
-				iKey = Polymer.Collection.get(group.items).getKey(item);
-				this.notifyPath('data.' + gKey + '.items.' + iKey + '.' + path, value);
-			} else {
-				iKey = this._dataCollection.getKey(item);
-				// TODO(pasleq): this will cause a call to _dataChanged, that will call _forwardItemPath
-				// Would it better (and correct) to directly call _forwardItemPath ?
-				this.notifyPath('data.' + iKey + '.' + path, value);
+			// Polymer 2.0 will remove key-based path and splice notifications
+			// for arrays. Handle any data changed by resetting the data array.
+			if (this._templateInstances && this._templateInstances.length) {
+				emptyData = [];
+				this._templateInstances.forEach(function (instance) {
+					emptyData.push({});
+				}, this);
+				this._flatData = emptyData;
 			}
 
-		},
-
-		_forwardItemPath: function (pathParts, value) {
-			var group, groupItemsCollection, item, itemPath, physicalIndex, templateInstance;
-			if (pathParts.length >= 4 && pathParts[1] === 'items') {
-				// Path looks like data.#0.items.#0.path
-				group = this._dataCollection.getItem(pathParts[0]);
-
-				groupItemsCollection = Polymer.Collection.get(group.items);
-
-				item = groupItemsCollection.getItem(pathParts[2]);
-
-				itemPath = pathParts.slice(3).join('.');
-
-				physicalIndex = this._physicalItems.indexOf(item);
-
-				// Notify only displayed items
-				if (physicalIndex >= 0) {
-					templateInstance = this._templateInstances[physicalIndex];
-					templateInstance.notifyPath('item.' + itemPath, value);
-				}
-			} else if (pathParts.length >= 2) {
-				// Path looks like data.#0.path
-				item = this._dataCollection.getItem(pathParts[0]);
-				itemPath = pathParts.slice(1).join('.');
-				physicalIndex = this._physicalItems.indexOf(item);
-				if (physicalIndex >= 0) {
-					templateInstance = this._templateInstances[physicalIndex];
-					templateInstance.notifyPath('item.' + itemPath, value);
-				}
-			}
+			this.debounce('prepareData', function () {
+				this._flatData = this._prepareData(this.data);
+			}.bind(this));
 		},
 
 		_scrollTargetChanged: function (scrollTarget, isAttached)  {
@@ -151,70 +134,6 @@
 			}
 		},
 
-		_itemsAddedOrRemoved: function (pathParts, change) {
-			// Simplest case : a single splice of removed items
-			// We just need to remove these items from _flatData
-
-			var
-				indexSplices = change.value.indexSplices,
-				splice,
-				group, groupIndex;
-			if (indexSplices && indexSplices.length === 1 && indexSplices[0].addedCount === 0) {
-				splice = indexSplices[0];
-				group = this._dataCollection.getItem(pathParts[0]);
-				// Find the index of the group in _flatData
-				groupIndex = this._flatData.indexOf(group);
-				if (group.items.length === 0 && !this.displayEmptyGroups) {
-					this.splice('_flatData', groupIndex, splice.removed.length + 1);
-				} else {
-					this.splice('_flatData', groupIndex + splice.index + 1, splice.removed.length);
-				}
-				splice.removed.forEach(function (item) {
-					this.deselectItem(item);
-				}, this);
-			} else {
-				// TODO(pasleq): other cases
-				console.warn('Not implemented');
-			}
-		},
-
-		_groupsAddedOrRemoved: function (change) {
-			var
-				splices = change.value.indexSplices,
-				splice,
-				startGroup,
-				startItem,
-				startIndex,
-				count = 0,
-				i;
-
-			if (splices && splices.length === 1 && splices[0].addedCount === 0) {
-				if (this._groupsMap) {
-					// Simplest case: a single splice of removed groups
-					splice = splices[0];
-					startGroup = this.data[splice.index];
-					startIndex = this._flatData.indexOf(startGroup);
-					for (i = 0 ; i < splice.removed.length ; i += 1) {
-						count += 1;
-						count += this.data[startIndex + i].items.length;
-					}
-					this.splice('_flatData', startIndex, count);
-				} else {
-					// Data is not grouped, simply remove items
-					splice = splices[0];
-					startItem = splice.removed[0];
-					startIndex = this._flatData.indexOf(startItem);
-					this.splice('_flatData', startIndex, splice.removed.length);
-					splice.removed.forEach(function (item) {
-						this.deselectItem(item);
-					}, this);
-				}
-
-			} else {
-				console.warn('Not implemented');
-			}
-		},
-
 		_prepareData: function (data) {
 
 			var flatData;
@@ -223,18 +142,7 @@
 
 			if (data && data.length) {
 
-				this._dataCollection = Polymer.Collection.get(data);
-
 				this._itemsMap = new WeakMap();
-
-
-				if (!this._physicalItems) {
-					this._templateSelectorsKeys = new WeakMap();
-					this._templateSelectorsCount = 0;
-					this._physicalItems = [];
-					this._templateInstances = [];
-					this._templateSelectors = [];
-				}
 
 				if (data.length === 0 || !data[0].items) {
 					// no grouping, so render items as a standard list
@@ -262,10 +170,6 @@
 
 				this._expandedItems = null;
 
-				this._selectedItemsCollection = null;
-
-				this._dataCollection = null;
-
 				this._foldedGroups = null;
 				this._groupsMap = null;
 			}
@@ -273,31 +177,110 @@
 			return flatData;
 		},
 
+		_onTemplateSelectorCreated: function (event) {
+			var
+				selector = event.detail.selector,
+				slot;
+
+			selector.selectorId = this._templateSelectorsCount;
+
+			this._slots[selector.selectorId] = selector;
+
+			this._templateSelectorsCount += 1;
+		},
+
+
 		_onTemplateSelectorItemChanged: function (event) {
 			var
 				item = event.detail.item,
 				selector = event.detail.selector,
-				selectorIndex,
-				templateInstance;
+				selectorId = selector.selectorId,
+				currentTemplateInstance = this._templateInstances[selectorId],
+				currentTemplate = this._templates[selectorId],
+				slot = this._slots[selectorId],
+				template,
+				templateInstance,
+				isGroup = this.isGroup(item),
+				isWarmUp = item.warmUp >= 0;
 
-			selectorIndex = this._templateSelectorsKeys.get(selector);
 
-			if (selectorIndex === undefined) {
-				selectorIndex = this._templateSelectorsCount;
-				this._templateSelectorsKeys.set(selector, selectorIndex);
-				this._templateSelectorsCount += 1;
-				this._templateSelectors[selectorIndex] = selector;
-			}
+			this._physicalItems[selectorId] = item;
 
-			this._physicalItems[selectorIndex] = item;
-
-			if (this.isGroup(item)) {
-				templateInstance = selector.renderGroup(Polymer.dom(this).querySelector('#groupTemplate'), this.isFolded(item), this.isGroupSelected(item));
+			if (isWarmUp) {
+				template = this._getWarmUpTemplate();
+				this._warmUpCount += 1;
+			} else if (isGroup) {
+				template = this._getGroupTemplate();
 			} else {
-				templateInstance = selector.renderItem(Polymer.dom(this).querySelector('#itemTemplate'), this.isExpanded(item), this.isItemSelected(item));
+				template = this._getItemTemplate();
 			}
 
-			this._templateInstances[selectorIndex] = templateInstance;
+			if (template !== currentTemplate) {
+				templateInstance = template.getInstance();
+			} else {
+				templateInstance = currentTemplateInstance;
+			}
+
+			if (!isWarmUp) {
+				templateInstance.item = item;
+
+				if (isGroup) {
+					templateInstance.selected = this.isGroupSelected(item);
+					templateInstance.folded = this.isFolded(item);
+				} else {
+					templateInstance.expanded = this.isExpanded(item);
+					templateInstance.selected = this.isItemSelected(item);
+				}
+			}
+
+			if (templateInstance !== currentTemplateInstance) {
+				if (currentTemplateInstance) {
+					this._detachInstance(currentTemplateInstance, slot);
+				}
+
+				Polymer.dom(slot).appendChild(templateInstance.root);
+
+				if (currentTemplate) {
+					currentTemplate.releaseInstance(currentTemplateInstance);
+				}
+			}
+
+			this._templates[selectorId] = template;
+			this._templateInstances[selectorId] = templateInstance;
+		},
+
+		_detachInstance: function (templateInstance, slot) {
+			var
+				parent = Polymer.dom(slot),
+				children = parent.childNodes,
+				i;
+			if (children) {
+				for (i = 0 ; i < children.length ; i+=1) {
+					parent.removeChild(children[i]);
+					templateInstance.root.appendChild(children[i]);
+				}
+			}
+		},
+
+		_getItemTemplate: function () {
+			if (!this._itemTemplate) {
+				this._itemTemplate = Polymer.dom(this).querySelector('#itemTemplate');
+			}
+			return this._itemTemplate;
+		},
+
+		_getGroupTemplate: function () {
+			if (!this._groupTemplate) {
+				this._groupTemplate = Polymer.dom(this).querySelector('#groupTemplate');
+			}
+			return this._groupTemplate;
+		},
+
+		_getWarmUpTemplate: function () {
+			if (!this._warmUpTemplate) {
+				this._warmUpTemplate = Polymer.dom(this).querySelector('#warmUpTemplate');
+			}
+			return this._warmUpTemplate;
 		},
 
 		/**
@@ -315,7 +298,8 @@
 
 			for (; i < this._physicalItems.length ; i += 1) {
 				if (!this.isGroup(this._physicalItems[i])) {
-					return this._templateSelectors[i].querySelector('#itemTemplate');
+					var element = this._slots[i];
+					return element;
 				}
 			}
 		},
@@ -547,8 +531,6 @@
 			}
 		},
 
-
-
 		updateSizes: function (group) {
 			var
 				list = this.$.list,
@@ -577,7 +559,7 @@
 		},
 
 		isExpanded: function (item) {
-			var itemState = this._itemsMap.get(item);
+			var itemState = this._itemsMap ? this._itemsMap.get(item) : undefined;
 			return itemState !== undefined && itemState.expanded;
 		},
 

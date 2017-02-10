@@ -1,0 +1,64 @@
+<dom-module id="cosmoz-grouped-list-template-selector">
+	<template>
+		<style>
+			:host {
+				display: block;
+			}
+		</style>
+		<content></content>
+	</template>
+</dom-module>
+
+<script>
+	/*global Polymer*/
+	'use strict';
+	Polymer({
+
+		is: 'cosmoz-grouped-list-template-selector',
+
+		properties: {
+			item: {
+				type: Object,
+				observer: '_itemChanged'
+			},
+
+			selectorId: {
+				type: Number,
+			}
+		},
+
+		_itemChanged: function (newItem, oldItem) {
+			if (this.selectorId === undefined) {
+				// Notifies parent cosmoz-grouped-list that a new template-selector
+				// has been added so that it gets a selectorId
+				this.fire('template-selector-created', {
+					selector: this
+				}, {
+					bubbles: false
+				});
+
+				var
+					ironListItem = this.parentElement,
+					slotId = 'slot' + this.selectorId;
+
+				//this._slot = document.createElement('slot');
+				//this._slot.setAttribute('name', 'slot' + this.selectorId);
+				this._slot = document.createElement('content');
+				this._slot.setAttribute('select', '#'+ slotId);
+				Polymer.dom(ironListItem).appendChild(this._slot);
+
+				this.id = slotId;
+				this.setAttribute('slot', slotId);
+				Polymer.dom(this.domHost).appendChild(this);
+				Polymer.dom.flush();
+			}
+
+			this.fire('template-selector-item-changed', {
+				selector: this,
+				item: newItem,
+			}, {
+				bubbles: false
+			});
+		},
+	});
+</script>

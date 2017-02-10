@@ -1,10 +1,8 @@
 <link rel="import" href="../polymer/polymer.html"/>
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html"/>
 <link rel="import" href="../iron-list/iron-list.html"/>
-<link rel="import" href="../iron-icons/iron-icons.html"/>
-<link rel="import" href="../iron-icon/iron-icon.html"/>
-<link rel="import" href="item-template.html">
-<link rel="import" href="template-selector.html">
+<link rel="import" href="cosmoz-grouped-list-template.html">
+<link rel="import" href="cosmoz-grouped-list-template-selector.html">
 
 <!--
 `<cosmoz-grouped-list>` is an example implementation of grouping for iron-list
@@ -42,11 +40,21 @@ with features like group count display and folding
 
 		</style>
 
-		<iron-list id="list" items="{{_flatData}}" as="item">
+		<iron-list id="list" items="[[_flatData]]" as="item">
 			<template>
-				<template-selector item="{{item}}" on-template-selector-item-changed="_onTemplateSelectorItemChanged"></template-selector>
+				<div>
+					<cosmoz-grouped-list-template-selector
+							item="[[item]]"
+							on-template-selector-created="_onTemplateSelectorCreated"
+							on-template-selector-item-changed="_onTemplateSelectorItemChanged">
+					</cosmoz-grouped-list-template-selector>
+				</div>
 			</template>
 		</iron-list>
+
+		<content></content>
 	</template>
-	<script type="text/javascript" src="cosmoz-grouped-list.js"></script>
 </dom-module>
+
+<script type="text/javascript" src="cosmoz-grouped-list.js"></script>
+

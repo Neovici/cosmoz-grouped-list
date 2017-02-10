@@ -49,7 +49,6 @@
 					<button class="action" on-tap="_emptyData">empty data</button>
 					<button class="action" on-tap="_emptySelectedItems">Empty selectedItems</button>
 					<button class="action" on-tap="_changeOuterValue">Increment outer binding value</button>
-					<button class="action" class="action" on-tap="_changeItemValue">change item value</button>
 					<button class="action" on-tap="_firstVisibleItem">First visible item</button>
 				</div>
 				<div class="layout horizontal center">
@@ -67,19 +66,18 @@
 					<input class="action" value="{{itemValue::input}}">
 					<button class="action" class="action" on-tap="_changeItemValue">change item value</button>
 				</div>-->
-				<cosmoz-grouped-list id="groupedList" data="{{ data }}" selected-items="{{selectedItems}}" class="flex">
+				<cosmoz-grouped-list id="groupedList"
+						data="{{ data }}"
+						selected-items="{{selectedItems}}"
+						class="flex"
+						warm-up="50">
 					<cosmoz-grouped-list-template id="itemTemplate">
 						<template>
-							<div class="layout vertical" style="border-bottom: 1px solid grey;">
-								<div>Outer binding: <span>[[outerValue]]</span></div>
+							<div class="layout horizontal" style="border-bottom: 1px solid grey;">
 								<div>Id: <span>{{item.id}}</span></div>
+								<div>Outer binding: <span>[[outerValue]]</span></div>
 								<div>Name: <span>{{item.name}}</span></div>
 								<div>Value: <span>{{item.value}}</span></div>
-								<div on-tap="select">Selected: <span>{{selected}}</span> (click to select/deselect)</div>
-								<div on-tap="toggleCollapse">[+]</div>
-								<div class$="{{_computeExtraContentClass(expanded)}}">
-	Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed quis posuere turpis, quis commodo neque. Aenean dapibus consequat dolor, et vestibulum enim volutpat a. Donec vel dui at diam tristique condimentum dapibus ac elit. Sed consequat nibh id nibh posuere egestas. Phasellus blandit convallis tellus, nec pharetra orci viverra ut. In at arcu consectetur, tempus velit sit amet, congue diam. Suspendisse potenti. In ac tristique nulla, quis elementum nisi.
-								</div>
 							</div>
 						</template>
 					</cosmoz-grouped-list-template>
@@ -90,6 +88,11 @@
 								<div>[[ item.items.length ]]</div>
 								<iron-icon icon="[[ getFoldIcon(folded) ]]" on-tap="toggleFold"></iron-icon>
 							</div>
+						</template>
+					</cosmoz-grouped-list-template>
+					<cosmoz-grouped-list-template id="warmUpTemplate">
+						<template>
+							<div style="min-height: 20px"></div>
 						</template>
 					</cosmoz-grouped-list-template>
 				</cosmoz-grouped-list>
@@ -139,7 +142,7 @@
 
 		attached: function () {
 			this.async(function () {
-				var data = this.generateListDemoData(10, 13, 1, 7);
+				var data = this.generateListDemoData(30, 30, 1, 13);
 				this.data = data;
 			}.bind(this), 16);
 		},
