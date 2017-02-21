@@ -23,8 +23,6 @@ Polymer({
 
 	_templatesInUse: null,
 
-	_templatesAvailable: null,
-
 	ready: function () {
 		var instanceProps = {};
 
@@ -37,7 +35,6 @@ Polymer({
 		this._instanceProps = instanceProps;
 
 		this._templatesInUse = [];
-		this._templatesAvailable = [];
 	},
 
 	_ensureTemplatized: function () {
@@ -70,15 +67,10 @@ Polymer({
 	// },
 
 	getInstance: function () {
-		var instance = this._templatesAvailable.pop();
-
-		if (!instance) {
-			this._ensureTemplatized();
-			instance = this.stamp({});
-
-			this._templatesInUse.push(instance);
-		}
-
+		var instance;
+		this._ensureTemplatized();
+		instance = this.stamp({});
+		this._templatesInUse.push(instance);
 		return instance;
 	},
 
@@ -86,7 +78,6 @@ Polymer({
 		var index = this._templatesInUse.indexOf(templateInstance);
 		if (index >= 0) {
 			this._templatesInUse.splice(index, 1);
-			this._templatesAvailable.push(templateInstance);
 		}
 	}
 });
