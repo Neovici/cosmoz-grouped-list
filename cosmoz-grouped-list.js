@@ -136,63 +136,54 @@
 
 		_prepareData: function (data) {
 
-			var flatData;
-
 			this.selectedItems = [];
 
-			if (data && data.length) {
-
-				this._itemsMap = new WeakMap();
-
-				if (data.length === 0 || !data[0].items) {
-					// no grouping, so render items as a standard list
-					flatData = data.slice();
-					this._groupsMap = null;
-				} else {
-					flatData = [];
-					this._groupsMap = new WeakMap();
-					data.forEach(function (group) {
-						if (group.items) {
-							if (group.items.length) {
-								flatData = flatData.concat(group, group.items);
-							} else if (this.displayEmptyGroups) {
-								flatData = flatData.concat(group);
-							}
-							this._groupsMap.set(group, { selected: false, folded: false });
-						} else {
-							console.warn('Incorrect data');
-						}
-					}, this);
-
-				}
-			} else {
-				flatData = null;
-
+			if (!data || !data.length) {
 				this._expandedItems = null;
-
 				this._foldedGroups = null;
 				this._groupsMap = null;
+				return null;
 			}
 
-			return flatData;
+			this._itemsMap = new WeakMap();
+
+			if (data.length === 0 || !data[0].items) {
+				// no grouping, so render items as a standard list
+				this._groupsMap = null;
+				return data.slice();
+			}
+
+			this._groupsMap = new WeakMap();
+
+			return data.reduce(function (flatData, group) {
+				if (!group.items) {
+					console.warn('Incorrect data');
+					return flatData;
+				}
+
+				this._groupsMap.set(group, {
+					selected: false,
+					folded: false
+				});
+
+				if (group.items.length) {
+					return flatData.concat(group, group.items);
+				} else if (this.displayEmptyGroups) {
+					return flatData.concat(group);
+				}
+				return flatData;
+			}.bind(this), []);
 		},
 
 		_onTemplateSelectorCreated: function (event) {
-			var
-				selector = event.detail.selector,
-				slot;
-
+			var	selector = event.detail.selector;
 			selector.selectorId = this._templateSelectorsCount;
-
 			this._slots[selector.selectorId] = selector;
-
 			this._templateSelectorsCount += 1;
 		},
 
-
 		_onTemplateSelectorItemChanged: function (event) {
-			var
-				item = event.detail.item,
+			var item = event.detail.item,
 				selector = event.detail.selector,
 				selectorId = selector.selectorId,
 				currentTemplateInstance = this._templateInstances[selectorId],
@@ -202,7 +193,6 @@
 				templateInstance,
 				isGroup = this.isGroup(item),
 				isWarmUp = item.warmUp >= 0;
-
 
 			this._physicalItems[selectorId] = item;
 
@@ -250,8 +240,7 @@
 		},
 
 		_detachInstance: function (templateInstance, slot) {
-			var
-				parent = Polymer.dom(slot),
+			var parent = Polymer.dom(slot),
 				children = parent.childNodes,
 				i;
 			if (children) {
@@ -311,19 +300,16 @@
 		 * Cannot be used to remove a group.
 		 */
 		removeItem: function (item) {
-			var i;
-
 			if (this._groupsMap) {
-				this.data.some(function (group, groupIndex) {
+				return this.data.some(function (group, groupIndex) {
 					var index = group.items.indexOf(item);
 					if (index >= 0) {
 						this.splice('data.' + groupIndex + '.items', index, 1);
 						return true;
-
 					}
-				}.bind(this));
+				}, this);
 			} else {
-				i = this.data.indexOf(item);
+				var i = this.data.indexOf(item);
 				if (i >= 0) {
 					this.splice('data', i, 1);
 				}
@@ -338,10 +324,10 @@
 		 * Returns the group of the specified item
 		 */
 		getItemGroup: function (item) {
-			var foundGroup;
 			if (!this._groupsMap) {
 				return;
 			}
+			var foundGroup;
 			this.data.some(function (group) {
 				var found = group.items.indexOf(item) > -1;
 				if (found) {
@@ -359,8 +345,7 @@
 		},
 
 		toggleFold: function (templateInstance) {
-			var
-				item = templateInstance.item,
+			var item = templateInstance.item,
 				group = this.isGroup(item) ? item : this.getItemGroup(item),
 				isFolded = this.isFolded(group);
 
@@ -371,12 +356,10 @@
 			}
 
 			templateInstance.folded = !isFolded;
-
 		},
 
 		unfoldGroup: function (group) {
-			var
-				groupState = this._groupsMap && this._groupsMap.get(group),
+			var groupState = this._groupsMap && this._groupsMap.get(group),
 				groupFlatIndex;
 
 			if (groupState && groupState.folded) {
@@ -388,8 +371,7 @@
 		},
 
 		foldGroup: function (group) {
-			var
-				groupState = this._groupsMap && this._groupsMap.get(group),
+			var groupState = this._groupsMap && this._groupsMap.get(group),
 				groupFlatIndex;
 
 			if (groupState && !groupState.folded) {
@@ -411,8 +393,7 @@
 		},
 
 		deselectItem: function (item) {
-			var
-				selectedIndex = this.selectedItems.indexOf(item),
+			var selectedIndex = this.selectedItems.indexOf(item),
 				model = this._getModelFromItem(item),
 				group = this.getItemGroup(item),
 				groupState,
@@ -444,8 +425,7 @@
 		},
 
 		selectGroup: function (group) {
-			var
-				model = this._getModelFromItem(group),
+			var model = this._getModelFromItem(group),
 				groupState = this._groupsMap && this._groupsMap.get(group);
 
 			if (groupState) {
@@ -458,12 +438,11 @@
 
 			group.items.forEach(function (item) {
 				this.selectItem(item);
-			}.bind(this));
+			}, this);
 		},
 
 		deselectGroup: function (group) {
-			var
-				model = this._getModelFromItem(group),
+			var model = this._getModelFromItem(group),
 				groupState = this._groupsMap && this._groupsMap.get(group);
 
 			if (groupState) {
@@ -474,7 +453,7 @@
 			}
 			group.items.forEach(function (item) {
 				this.deselectItem(item);
-			}.bind(this));
+			}, this);
 		},
 
 		isGroupSelected: function (group) {
@@ -491,8 +470,7 @@
 			if (this._groupsMap) {
 
 				this.data.forEach(function (group) {
-					var
-						model = this._getModelFromItem(group),
+					var model = this._getModelFromItem(group),
 						groupState = this._groupsMap.get(group);
 
 					groupState.selected = true;
@@ -517,8 +495,7 @@
 			if (this._groupsMap) {
 
 				this.data.forEach(function (group) {
-					var
-						model = this._getModelFromItem(group),
+					var model = this._getModelFromItem(group),
 						groupState = this._groupsMap.get(group);
 
 					groupState.selected = false;
@@ -531,19 +508,19 @@
 			}
 		},
 
+		updateSize: function (item) {
+			// this.notify(item);
+			this.$.list.updateSizeForItem(item);
+		},
+
 		updateSizes: function (group) {
-			var
-				list = this.$.list,
-				that = this;
 			group.items.forEach(function (item) {
-				that.notify(item);
-				list.updateSizeForItem(item);
-			});
+				this.updateSize(item);
+			}, this);
 		},
 
 		toggleCollapse: function (item) {
-			var
-				model = this._getModelFromItem(item),
+			var model = this._getModelFromItem(item),
 				itemState = this._itemsMap.get(item);
 
 			model.expanded = !model.expanded;
@@ -564,12 +541,9 @@
 		},
 
 		_getModelFromItem: function (item) {
-			var
-				physicalIndex = this._physicalItems.indexOf(item),
-				templateInstance;
+			var	physicalIndex = this._physicalItems.indexOf(item);
 			if (physicalIndex >= 0) {
-				templateInstance = this._templateInstances[physicalIndex];
-				return templateInstance;
+				return this._templateInstances[physicalIndex];
 			}
 		}
 	});
