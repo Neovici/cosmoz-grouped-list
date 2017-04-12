@@ -5,7 +5,7 @@
 				display: block;
 			}
 		</style>
-		<content></content>
+		<slot></slot>
 	</template>
 </dom-module>
 
@@ -43,8 +43,8 @@
 
 				//this._slot = document.createElement('slot');
 				//this._slot.setAttribute('name', 'slot' + this.selectorId);
-				this._slot = document.createElement('content');
-				this._slot.setAttribute('select', '#'+ slotId);
+				this._slot = document.createElement('slot');
+				this._slot.setAttribute('name', '#'+ slotId);
 				Polymer.dom(ironListItem).appendChild(this._slot);
 
 				this.id = slotId;
