@@ -43,7 +43,6 @@
 
 			_flatData: {
 				type: Array,
-				notify: true
 			},
 
 			_isAttached: {
@@ -83,7 +82,6 @@
 			this._templates = [];
 			this._slots = [];
 			this._templateSelectorsCount = 0;
-
 		},
 
 		attached: function () {
@@ -93,6 +91,12 @@
 
 		detached: function () {
 			this._isAttached = false;
+			this._physicalItems = null;
+			this._templateInstances = null;
+			this._templates = null;
+			this._slots = null;
+			this._flatData = null;
+			this._warmUpTemplate = null;
 		},
 
 		_warmUp: function () {
