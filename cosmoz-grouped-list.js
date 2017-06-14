@@ -27,11 +27,6 @@
 				notify: true
 			},
 
-			warmUp: {
-				type: Number,
-				value: 30
-			},
-
 			/**
 			 * Indicates wether this grouped-list should render groups without items.
 			 */
@@ -56,76 +51,144 @@
 			'_scrollTargetChanged(scrollTarget, _isAttached)'
 		],
 
+		/**
+		 * A map of (group,state).
+		 * If source data is grouped, then this map stores group level items, with an associated state object indicating wether
+		 * the group is folded and selected.
+		 */
 		_groupsMap: null,
 
+		/**
+		 * A map of (item,state), used to store an object indicating wether an item is selected and expanded.
+		 */
 		_itemsMap: null,
 
+		/**
+		 * The <cosmoz-grouped-list-template> used to render items.
+		 */
 		_itemTemplate: null,
 
+		/**
+		 * The <cosmoz-grouped-list-template> used to render groups.
+		 */
 		_groupTemplate: null,
 
-		_warmUpTemplate: null,
+		/**
+		 * The number of <cosmoz-grouped-list-template-selector> currently used by iron-list.
+		 * This number should grows until the viewport is filled by iron-list, then it should not change anymoer.
+		 */
+		_templateSelectorsCount: 0,
 
-		_templateSelectorsCount: null,
+		/**
+		 * Array of <cosmoz-grouped-list-template-selector> instantiated by <iron-list>
+		 */
+		_templateSelectors: null,
 
-		_physicalItems: null,
-
-		_templateInstances: null,
-
-		_templates: null,
-
-		_slots: null,
+		/**
+		 * Array of items currently rendered.
+		 * Note that an item might be a 'real' item, or a group.
+		 */
+		_renderedItems: null,
 
 		created: function () {
-			this._physicalItems = [];
-			this._templateInstances = [];
-			this._templates = [];
-			this._slots = [];
-			this._templateSelectorsCount = 0;
+			this._templateSelectors = [];
+			this._renderedItems = [];
+			this._physicalItens = [];
 		},
 
 		attached: function () {
 			this._isAttached = true;
-			this._warmUp();
+			this._debounceRender();
 		},
 
 		detached: function () {
 			this._isAttached = false;
-			this._physicalItems = null;
-			this._templateInstances = null;
-			this._templates = null;
-			this._slots = null;
-			this._flatData = null;
-			this._warmUpTemplate = null;
-		},
-
-		_warmUp: function () {
-			if (this._getWarmUpTemplate()) {
-				var warmUpData = [];
-				for (var i = 0; i < this.warmUp; i++) {
-					warmUpData[i] = { warmUp: i};
-				}
-				this._flatData = warmUpData;
-			}
-			this._warmUpCount = 0;
+			this.cancelDebouncer('render');
 		},
 
 		_dataChanged: function (change) {
-			var emptyData;
+			if (change.path === 'data' || change.path.slice(-8) === '.splices') {
+				this._debounceRender();
+			} else if (change.path.slice(-7) !== '.length') {
+				if (!this._forwardItemPath(change.path, change.value)) {
+					this._debounceRender();
+				}
+			}
+		},
 
-			// Polymer 2.0 will remove key-based path and splice notifications
-			// for arrays. Handle any data changed by resetting the data array.
-			if (this._templateInstances && this._templateInstances.length) {
-				emptyData = [];
-				this._templateInstances.forEach(function (instance) {
-					emptyData.push({});
-				}, this);
-				this._flatData = emptyData;
+		_debounceRender: function () {
+			this.debounce('render', this._render);
+		},
+
+		_render: function () {
+			if (!this._isAttached) {
+				return;
 			}
 
-			this.debounce('prepareData', function () {
-				this._flatData = this._prepareData(this.data);
-			}.bind(this));
+			this._flatData = this._prepareData(this.data);
+		},
+
+		_forwardItemPath: function (path, value) {
+			var pathArray = path.split('.'),
+				itemPath,
+				groupIndex,
+				itemIndex,
+				templateInstance,
+				item;
+
+			if (this._groupsMap !== null) {
+				if (pathArray.length === 5) {
+					// item property changed, path looks like data.#2.items.#0.value
+					if (pathArray[1][0] === '#') {
+						groupIndex = parseInt(pathArray[1].slice(1), 10);
+					} else {
+						groupIndex = parseInt(pathArray[1], 10);
+					}
+					if (pathArray[3][0] === '#') {
+						itemIndex = parseInt(pathArray[3].slice(1), 10);
+					} else {
+						itemIndex = parseInt(pathArray[3], 10);
+					}
+
+					item = this.data[groupIndex].items[itemIndex];
+					templateInstance = this._getModelFromItem(item);
+					if (templateInstance) {
+						itemPath = ['item'].concat(pathArray.slice(4));
+						templateInstance.notifyPath(itemPath, value);
+						return true;
+					}
+				}
+			} else if (pathArray.length === 3) {
+				// item property change when no grouping
+				// path looks like data.#0.value
+				if (pathArray[1][0] === '#') {
+					itemIndex = parseInt(pathArray[1].slice(1), 10);
+				} else {
+					itemIndex = parseInt(pathArray[1], 10);
+				}
+				item = this.data[itemIndex];
+				templateInstance = this._getModelFromItem(item);
+				if (templateInstance) {
+					itemPath = ['item'].concat(pathArray.slice(2));
+					templateInstance.notifyPath(itemPath, value);
+					return true;
+				}
+			}
+		},
+
+		_resetAllTemplates: function () {
+			if (this._templateSelectors.length > 0) {
+				this._templateSelectors.forEach(function (selector) {
+					if (selector.element) {
+						selector.element.setAttribute('slot', 'reusableTemplate');
+						selector.template.releaseInstance(selector.templateInstance);
+						selector.element = null;
+						selector.template = null;
+						selector.templateInstance = null;
+					}
+				});
+			}
+
 		},
 
 		_scrollTargetChanged: function (scrollTarget, isAttached)  {
@@ -182,7 +245,8 @@
 		_onTemplateSelectorCreated: function (event) {
 			var	selector = event.detail.selector;
 			selector.selectorId = this._templateSelectorsCount;
-			this._slots[selector.selectorId] = selector;
+			selector.groupedList = this;
+			this._templateSelectors[selector.selectorId] = selector;
 			this._templateSelectorsCount += 1;
 		},
 
@@ -190,68 +254,55 @@
 			var item = event.detail.item,
 				selector = event.detail.selector,
 				selectorId = selector.selectorId,
-				currentTemplateInstance = this._templateInstances[selectorId],
-				currentTemplate = this._templates[selectorId],
-				slot = this._slots[selectorId],
-				template,
-				templateInstance,
+				currentTemplateInstance = selector.templateInstance,
+				currentTemplate = selector.template,
+				newTemplate,
+				newTemplateInstance,
 				isGroup = this.isGroup(item),
-				isWarmUp = item.warmUp >= 0;
+				element;
 
-			this._physicalItems[selectorId] = item;
+			this._renderedItems[selectorId] = item;
 
-			if (isWarmUp) {
-				template = this._getWarmUpTemplate();
-				this._warmUpCount += 1;
-			} else if (isGroup) {
-				template = this._getGroupTemplate();
+			if (isGroup) {
+				newTemplate = this._getGroupTemplate();
 			} else {
-				template = this._getItemTemplate();
+				newTemplate = this._getItemTemplate();
 			}
 
-			if (template !== currentTemplate) {
-				templateInstance = template.getInstance();
-			} else {
-				templateInstance = currentTemplateInstance;
-			}
-
-			if (!isWarmUp) {
-				templateInstance.item = item;
-
-				if (isGroup) {
-					templateInstance.selected = this.isGroupSelected(item);
-					templateInstance.folded = this.isFolded(item);
-				} else {
-					templateInstance.expanded = this.isExpanded(item);
-					templateInstance.selected = this.isItemSelected(item);
-				}
-			}
-
-			if (templateInstance !== currentTemplateInstance) {
-				if (currentTemplateInstance) {
-					this._detachInstance(currentTemplateInstance, slot);
+			if (newTemplate !== currentTemplate) {
+				newTemplateInstance = newTemplate.getInstance();
+				element = newTemplateInstance.__element;
+				if (!element) {
+					// Copied from iron-list to get first child of template instance
+					element = newTemplateInstance.root.querySelector('*');
+					newTemplateInstance.__element = element;
+					Polymer.dom(this).appendChild(newTemplateInstance.root);
 				}
 
-				Polymer.dom(slot).appendChild(templateInstance.root);
-
+				element.setAttribute('slot', selector.slotName);
 				if (currentTemplate) {
+					selector.element.setAttribute('slot', 'reusableTemplate');
 					currentTemplate.releaseInstance(currentTemplateInstance);
 				}
+
+				// This is needed when using Shady DOM to redistribute the element content to the right slot.
+				this.distributeContent();
+
+				selector.template = newTemplate;
+				selector.element = element;
+				selector.templateInstance = newTemplateInstance;
+			} else {
+				newTemplateInstance = currentTemplateInstance;
 			}
 
-			this._templates[selectorId] = template;
-			this._templateInstances[selectorId] = templateInstance;
-		},
+			newTemplateInstance.item = item;
 
-		_detachInstance: function (templateInstance, slot) {
-			var parent = Polymer.dom(slot),
-				children = parent.childNodes,
-				i;
-			if (children) {
-				for (i = 0 ; i < children.length ; i+=1) {
-					parent.removeChild(children[i]);
-					templateInstance.root.appendChild(children[i]);
-				}
+			if (isGroup) {
+				newTemplateInstance.selected = this.isGroupSelected(item);
+				newTemplateInstance.folded = this.isFolded(item);
+			} else {
+				newTemplateInstance.expanded = this.isExpanded(item);
+				newTemplateInstance.selected = this.isItemSelected(item);
 			}
 		},
 
@@ -269,30 +320,27 @@
 			return this._groupTemplate;
 		},
 
-		_getWarmUpTemplate: function () {
-			if (!this._warmUpTemplate) {
-				this._warmUpTemplate = Polymer.dom(this).querySelector('#warmUpTemplate');
-			}
-			return this._warmUpTemplate;
-		},
-
 		/**
 		 * Utility method that returns the element that displays the first visible item in the list.
 		 * This method is mainly aimed at `cosmoz-omnitable`.
 		 */
 		getFirstVisibleItemElement: function () {
-			var i;
+			var i,
+				element;
 
-			if (!this._physicalItems) {
+			if (!this._renderedItems) {
 				return;
 			}
 
 			i = this.$.list.firstVisibleIndex;
 
-			for (; i < this._physicalItems.length ; i += 1) {
-				if (!this.isGroup(this._physicalItems[i])) {
-					var element = this._slots[i];
-					return element;
+			for (; i < this._renderedItems.length ; i += 1) {
+				if (!this.isGroup(this._renderedItems[i])) {
+					element = this._templateSelectors[i];
+					// iron-list sets the hidden attribute on its reusable children when there are not used anymore
+					if (element.getAttribute('hidden') === null) {
+						return element;
+					}
 				}
 			}
 		},
@@ -485,9 +533,11 @@
 			}
 
 			// Set the selected property to all visible items
-			for (i = 0; i < this._templateInstances.length ; i+= 1) {
-				this._templateInstances[i].selected = true;
-			}
+			this._templateSelectors.forEach(function (selector) {
+				if (selector.templateInstance) {
+					selector.templateInstance.selected = true;
+				}
+			});
 		},
 
 		deselectAll: function () {
@@ -507,9 +557,11 @@
 			}
 
 			// Set the selected property to all visible items
-			for (i = 0; i < this._templateInstances.length ; i+= 1) {
-				this._templateInstances[i].selected = false;
-			}
+			this._templateSelectors.forEach(function (selector) {
+				if (selector.templateInstance) {
+					selector.templateInstance.selected = false;
+				}
+			});
 		},
 
 		updateSize: function (item) {
@@ -545,9 +597,9 @@
 		},
 
 		_getModelFromItem: function (item) {
-			var	physicalIndex = this._physicalItems.indexOf(item);
+			var	physicalIndex = this._renderedItems.indexOf(item);
 			if (physicalIndex >= 0) {
-				return this._templateInstances[physicalIndex];
+				return this._templateSelectors[physicalIndex].templateInstance;
 			}
 		}
 	});

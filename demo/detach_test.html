@@ -19,6 +19,39 @@
 	</style>
 </head>
 <body class="fullbleed">
+	<dom-module id="demo-container">
+		<template>
+			<style>
+				:host {
+					@apply --layout-vertical;
+				}
+				#content1 {
+					@apply --layout-flex;
+					@apply --layout-relative;
+				}
+				#content2 {
+					@apply --layout-flex;
+					@apply --layout-relative;
+				}
+			</style>
+
+			<button on-tap="toggleSlot">Change slot</button>
+			<template is="dom-if" if="[[ !showContent2 ]]" restamp>
+				<h1>Content1</h1>
+				<div id="content1">
+					<slot></slot>
+				</div>
+			</template>
+			<template is="dom-if" if="[[ showContent2 ]]" restamp>
+				<h1>Content2</h1>
+				<div id="content2">
+					<slot></slot>
+				</div>
+			</template>
+
+
+		</template>
+	</dom-module>
 	<dom-module id="demo-page">
 		<template>
 			<style include="iron-flex iron-flex-alignment iron-positioning">
@@ -45,12 +78,10 @@
 				<h3>cosmoz-grouped-list demo</h3>
 				<div class="layout horizontal center">
 					<button class="action" on-tap="_newData">generate new data with grouping</button>
-					<button class="action" on-tap="_newSmallData">generate new small data with grouping</button>
 					<button class="action" on-tap="_newFlatData">generate new data without grouping</button>
 					<button class="action" on-tap="_emptyData">empty data</button>
 					<button class="action" on-tap="_emptySelectedItems">Empty selectedItems</button>
 					<button class="action" on-tap="_changeOuterValue">Increment outer binding value</button>
-					<input class="action" value="{{itemValue::input}}">
 					<button class="action" class="action" on-tap="_changeItemValue">change item value</button>
 					<button class="action" on-tap="_firstVisibleItem">First visible item</button>
 				</div>
@@ -69,32 +100,35 @@
 					<input class="action" value="{{itemValue::input}}">
 					<button class="action" class="action" on-tap="_changeItemValue">change item value</button>
 				</div>-->
-				<cosmoz-grouped-list id="groupedList" data="{{ data }}" selected-items="{{selectedItems}}" class="flex">
-					<cosmoz-grouped-list-template id="itemTemplate">
-						<template>
-							<div class="layout vertical" style="border-bottom: 1px solid grey;">
-								<div>Outer binding: <span>[[outerValue]]</span></div>
-								<div>Id: <span>{{item.id}}</span></div>
-								<div>Name: <span>{{item.name}}</span></div>
-								<div>Value: <span>{{item.value}}</span></div>
-								<div on-tap="select">Selected: <span>{{selected}}</span> (click to select/deselect)</div>
-								<div on-tap="toggleCollapse">[+]</div>
-								<div class$="{{_computeExtraContentClass(expanded)}}">
-	Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed quis posuere turpis, quis commodo neque. Aenean dapibus consequat dolor, et vestibulum enim volutpat a. Donec vel dui at diam tristique condimentum dapibus ac elit. Sed consequat nibh id nibh posuere egestas. Phasellus blandit convallis tellus, nec pharetra orci viverra ut. In at arcu consectetur, tempus velit sit amet, congue diam. Suspendisse potenti. In ac tristique nulla, quis elementum nisi.
+				<demo-container class="flex relative">
+					<cosmoz-grouped-list id="groupedList" data="{{ data }}" selected-items="{{selectedItems}}" class="fit">
+						<cosmoz-grouped-list-template id="itemTemplate">
+							<template>
+								<div class="layout vertical" style="border-bottom: 1px solid grey;">
+									<div>Outer binding: <span>[[outerValue]]</span></div>
+									<div>Id: <span>{{item.id}}</span></div>
+									<div>Name: <span>{{item.name}}</span></div>
+									<div>Value: <span>{{item.value}}</span></div>
+									<div on-tap="select">Selected: <span>{{selected}}</span> (click to select/deselect)</div>
+									<div on-tap="toggleCollapse">[+]</div>
+									<div class$="{{_computeExtraContentClass(expanded)}}">
+		Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed quis posuere turpis, quis commodo neque. Aenean dapibus consequat dolor, et vestibulum enim volutpat a. Donec vel dui at diam tristique condimentum dapibus ac elit. Sed consequat nibh id nibh posuere egestas. Phasellus blandit convallis tellus, nec pharetra orci viverra ut. In at arcu consectetur, tempus velit sit amet, congue diam. Suspendisse potenti. In ac tristique nulla, quis elementum nisi.
+									</div>
 								</div>
-							</div>
-						</template>
-					</cosmoz-grouped-list-template>
-					<cosmoz-grouped-list-template id="groupTemplate">
-						<template>
-							<div class="horizontal layout center group-header">
-								<div class="flex" on-tap="toggleSelect"><span>[[item.name]]</span>(selected=<span>{{selected}}</span>)</div>
-								<div>[[ item.items.length ]]</div>
-								<iron-icon icon="[[ getFoldIcon(folded) ]]" on-tap="toggleFold"></iron-icon>
-							</div>
-						</template>
-					</cosmoz-grouped-list-template>
-				</cosmoz-grouped-list>
+							</template>
+						</cosmoz-grouped-list-template>
+						<cosmoz-grouped-list-template id="groupTemplate">
+							<template>
+								<div class="horizontal layout center group-header">
+									<div class="flex" on-tap="toggleSelect"><span>[[item.name]]</span>(selected=<span>{{selected}}</span>)</div>
+									<div>[[ item.items.length ]]</div>
+									<iron-icon icon="[[ getFoldIcon(folded) ]]" on-tap="toggleFold"></iron-icon>
+								</div>
+							</template>
+						</cosmoz-grouped-list-template>
+					</cosmoz-grouped-list>
+				</demo-container>
+
 			</div>
 
 		</template>
@@ -107,6 +141,18 @@
 (function () {
 	'use strict';
 
+	Polymer({
+		is: 'demo-container',
+		properties: {
+			showContent2: {
+				type: Boolean,
+				value: false
+			}
+		},
+		toggleSlot: function () {
+			this.showContent2 = !this.showContent2;
+		}
+	});
 	Polymer({
 		is: 'demo-page',
 		properties: {
@@ -232,10 +278,6 @@
 
 		_newData: function () {
 			this.data = this.generateListDemoData(10, 15, 1, 7);
-		},
-
-		_newSmallData: function () {
-			this.data = this.generateListDemoData(1, 1, 2, 3);
 		},
 
 		_newFlatData: function () {

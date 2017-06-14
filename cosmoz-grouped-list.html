@@ -38,21 +38,25 @@ with features like group count display and folding
 				flex: 1;
 			}
 
+			#reusableTemplates {
+				display: none !important;
+			}
+
 		</style>
 
 		<iron-list id="list" items="[[_flatData]]" as="item">
 			<template>
-				<div>
-					<cosmoz-grouped-list-template-selector
-							item="[[item]]"
-							on-template-selector-created="_onTemplateSelectorCreated"
-							on-template-selector-item-changed="_onTemplateSelectorItemChanged">
-					</cosmoz-grouped-list-template-selector>
-				</div>
+				<cosmoz-grouped-list-template-selector
+						item="[[item]]"
+						on-template-selector-created="_onTemplateSelectorCreated"
+						on-template-selector-item-changed="_onTemplateSelectorItemChanged">
+					<slot name="tempSlotName"></slot>
+				</cosmoz-grouped-list-template-selector>
 			</template>
 		</iron-list>
-
-		<content></content>
+		<div id="reusableTemplates">
+			<slot name="reusableTemplate"></slot>
+		</div>
 	</template>
 </dom-module>
 

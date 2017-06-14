@@ -1,11 +1,12 @@
 <dom-module id="cosmoz-grouped-list-template-selector">
 	<template>
 		<style>
-			:host {
-				display: block;
+
+			[hidden] {
+				display: none !important;
 			}
 		</style>
-		<content></content>
+		<slot></slot>
 	</template>
 </dom-module>
 
@@ -24,10 +25,28 @@
 
 			selectorId: {
 				type: Number,
+			},
+
+			template: {
+				type: Object
+			},
+
+			templateInstance: {
+				type: Object
+			},
+
+			element: {
+				type: Object
+			},
+
+			slotName: {
+				type: String
 			}
 		},
 
-		_itemChanged: function (newItem, oldItem) {
+		_itemChanged: function (newItem) {
+			var slot;
+
 			if (this.selectorId === undefined) {
 				// Notifies parent cosmoz-grouped-list that a new template-selector
 				// has been added so that it gets a selectorId
@@ -37,20 +56,15 @@
 					bubbles: false
 				});
 
-				var
-					ironListItem = this.parentElement,
-					slotId = 'slot' + this.selectorId;
-
-				//this._slot = document.createElement('slot');
-				//this._slot.setAttribute('name', 'slot' + this.selectorId);
-				this._slot = document.createElement('content');
-				this._slot.setAttribute('select', '#'+ slotId);
-				Polymer.dom(ironListItem).appendChild(this._slot);
-
-				this.id = slotId;
-				this.setAttribute('slot', slotId);
-				Polymer.dom(this.domHost).appendChild(this);
-				Polymer.dom.flush();
+				this.slotName = 'selectorSlot' + this.selectorId;
+				slot = Polymer.dom(this).querySelector('slot');
+				if (slot !== null) {
+					slot.setAttribute('name', this.slotName);
+				} else {
+					slot = Polymer.dom(this).querySelector('content');
+					slot.setAttribute('select', '[slot="' + this.slotName + '"]');
+					slot.setAttribute('name', this.slotName);
+				}
 			}
 
 			this.fire('template-selector-item-changed', {

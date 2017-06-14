@@ -21,7 +21,9 @@ Polymer({
 		Polymer.Templatizer
 	],
 
-	_templatesInUse: null,
+	_instancesInUse: null,
+
+	_reusableInstances: null,
 
 	ready: function () {
 		var instanceProps = {};
@@ -34,7 +36,8 @@ Polymer({
 
 		this._instanceProps = instanceProps;
 
-		this._templatesInUse = [];
+		this._instancesInUse = [];
+		this._reusableInstances = [];
 	},
 
 	_ensureTemplatized: function () {
@@ -45,39 +48,44 @@ Polymer({
 	},
 
 	_forwardParentProp: function (prop, value) {
-		this._templatesInUse.forEach(function (template) {
+		this._instancesInUse.forEach(function (template) {
 			template[prop] = value;
 		});
 	},
 
 	_forwardParentPath: function (path, value) {
-		this._templatesInUse.forEach(function (template) {
+		this._instancesInUse.forEach(function (template) {
 			template.notifyPath(path, value, true);
 		});
 	},
 
-	// _forwardInstanceProp: function(inst, prop, value) {
+	// _forwardInstanceProp: function (inst, prop, value) {
 	// 	console.log('_forwardInstanceProp inst=', inst);
 	// 	console.log('_forwardInstanceProp prop=', prop);
 	// 	console.log('_forwardInstanceProp value=', value);
 	// },
-	// _forwardInstancePath: function(inst, path, value) {
+	// _forwardInstancePath: function (inst, path, value) {
 	// 	console.log('_forwardInstancePath', inst, path, value);
 
 	// },
 
 	getInstance: function () {
 		var instance;
-		this._ensureTemplatized();
-		instance = this.stamp({});
-		this._templatesInUse.push(instance);
+		if (this._reusableInstances.length > 0) {
+			instance = this._reusableInstances.pop();
+		} else {
+			this._ensureTemplatized();
+			instance = this.stamp({});
+		}
+		this._instancesInUse.push(instance);
 		return instance;
 	},
 
 	releaseInstance: function (templateInstance) {
-		var index = this._templatesInUse.indexOf(templateInstance);
+		var index = this._instancesInUse.indexOf(templateInstance);
 		if (index >= 0) {
-			this._templatesInUse.splice(index, 1);
+			this._instancesInUse.splice(index, 1);
+			this._reusableInstances.push(templateInstance);
 		}
 	}
 });
