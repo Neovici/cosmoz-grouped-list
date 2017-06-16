@@ -326,7 +326,7 @@
 		 */
 		getFirstVisibleItemElement: function () {
 			var i,
-				element;
+				selector;
 
 			if (!this._renderedItems) {
 				return;
@@ -336,10 +336,10 @@
 
 			for (; i < this._renderedItems.length ; i += 1) {
 				if (!this.isGroup(this._renderedItems[i])) {
-					element = this._templateSelectors[i];
+					selector = this._templateSelectors[i];
 					// iron-list sets the hidden attribute on its reusable children when there are not used anymore
-					if (element.getAttribute('hidden') === null) {
-						return element;
+					if (selector.getAttribute('hidden') === null) {
+						return selector.element;
 					}
 				}
 			}

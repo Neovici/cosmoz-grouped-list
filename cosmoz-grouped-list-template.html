@@ -51,10 +51,19 @@ Polymer({
 		this._instancesInUse.forEach(function (template) {
 			template[prop] = value;
 		});
+
+		// As reusable instances might be reused, we need to keep their bindings up to date
+		this._reusableInstances.forEach(function (template) {
+			template[prop] = value;
+		});
 	},
 
 	_forwardParentPath: function (path, value) {
 		this._instancesInUse.forEach(function (template) {
+			template.notifyPath(path, value, true);
+		});
+		// As reusable instances might be reused, we need to keep their bindings up to date
+		this._reusableInstances.forEach(function (template) {
 			template.notifyPath(path, value, true);
 		});
 	},
