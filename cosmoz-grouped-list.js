@@ -326,20 +326,25 @@
 		 */
 		getFirstVisibleItemElement: function () {
 			var i,
-				selector;
+				selector,
+				item,
+				selectorIndex;
 
-			if (!this._renderedItems) {
+			if (!this._flatData || !this._renderedItems) {
 				return;
 			}
 
 			i = this.$.list.firstVisibleIndex;
-
-			for (; i < this._renderedItems.length ; i += 1) {
-				if (!this.isGroup(this._renderedItems[i])) {
-					selector = this._templateSelectors[i];
-					// iron-list sets the hidden attribute on its reusable children when there are not used anymore
-					if (selector.getAttribute('hidden') === null) {
-						return selector.element;
+			for (; i < this._flatData.length ; i += 1) {
+				item = this._flatData[i];
+				if (!this.isGroup(item)) {
+					selectorIndex = this._renderedItems.indexOf(item);
+					if (selectorIndex >= 0) {
+						selector = this._templateSelectors[selectorIndex];
+						// iron-list sets the hidden attribute on its reusable children when there are not used anymore
+						if (selector.getAttribute('hidden') === null) {
+							return selector.element;
+						}
 					}
 				}
 			}

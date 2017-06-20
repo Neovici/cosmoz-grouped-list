@@ -40,6 +40,18 @@
 					padding: 5px;
 					margin: 5px 5px 10px 5px;
 				}
+
+				.item-template {
+					@apply --layout-vertical;
+				}
+
+				.group-template {
+					@apply --layout-horizontal;
+					@apply --layout-center;
+					padding: 5px;
+					background-color: #ccc;
+					font-weight: bold;
+				}
 			</style>
 			<div class="layout vertical fit">
 				<h3>cosmoz-grouped-list demo</h3>
@@ -72,7 +84,7 @@
 				<cosmoz-grouped-list id="groupedList" data="{{ data }}" selected-items="{{selectedItems}}" class="flex">
 					<cosmoz-grouped-list-template id="itemTemplate">
 						<template>
-							<div class="layout vertical" style="border-bottom: 1px solid grey;">
+							<div class="item-template" style="border-bottom: 1px solid grey;">
 								<div>Outer binding: <span>[[outerValue]]</span></div>
 								<div>Id: <span>{{item.id}}</span></div>
 								<div>Name: <span>{{item.name}}</span></div>
@@ -87,7 +99,7 @@
 					</cosmoz-grouped-list-template>
 					<cosmoz-grouped-list-template id="groupTemplate">
 						<template>
-							<div class="horizontal layout center group-header">
+							<div class="group-template">
 								<div class="flex" on-tap="toggleSelect"><span>[[item.name]]</span>(selected=<span>{{selected}}</span>)</div>
 								<div>[[ item.items.length ]]</div>
 								<iron-icon icon="[[ getFoldIcon(folded) ]]" on-tap="toggleFold"></iron-icon>
