@@ -570,8 +570,10 @@
 		},
 
 		updateSize: function (item) {
-			// this.notify(item);
-			this.$.list.updateSizeForItem(item);
+			// Do not attempt to update size of item is not visible (for example when groups are folded)
+			if (this._flatData.indexOf(item) >= 0) {
+				this.$.list.updateSizeForItem(item);
+			}
 		},
 
 		updateSizes: function (group) {
