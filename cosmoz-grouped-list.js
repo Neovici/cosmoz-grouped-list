@@ -336,6 +336,23 @@
 		},
 
 		/**
+		 * Returns true if this list has rendered data.
+		 * This property returns true if at least one group or item has been rendered by iron-list.
+		 * If getFirstVisibleItemElement returns undefined, but hasRenderedData returns true,
+		 * this means we are displaying only group templates.
+		 */
+		get hasRenderedData() {
+			if (this._flatData && this._flatData.length > 0) {
+				return this._templateSelectors.some(function (selector) {
+					if (selector.getAttribute('hidden') === null) {
+						return true;
+					}
+				});
+			}
+			return false;
+		},
+
+		/**
 		 * Utility method to remove an item from the list.
 		 * This method simply removes the specified item from the `data` using
 		 * Polymer array mutation methods.
