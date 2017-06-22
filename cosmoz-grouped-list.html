@@ -37,12 +37,7 @@ with features like group count display and folding
 			:host(.has-scroll-target) #list {
 				flex: 1;
 			}
-
-			#reusableTemplates {
-				display: none !important;
-			}
-
-		</style>
+ 		</style>
 
 		<iron-list id="list" items="[[_flatData]]" as="item">
 			<template>
@@ -50,13 +45,11 @@ with features like group count display and folding
 						item="[[item]]"
 						on-template-selector-created="_onTemplateSelectorCreated"
 						on-template-selector-item-changed="_onTemplateSelectorItemChanged">
+					<!-- this slot will get a name when the selector is created by iron-list -->
 					<slot name="tempSlotName"></slot>
 				</cosmoz-grouped-list-template-selector>
 			</template>
 		</iron-list>
-		<div id="reusableTemplates">
-			<slot name="reusableTemplate"></slot>
-		</div>
 	</template>
 </dom-module>
 

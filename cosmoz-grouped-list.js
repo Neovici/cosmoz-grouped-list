@@ -250,16 +250,12 @@
 			this._templateSelectorsCount += 1;
 		},
 
-		_onTemplateSelectorItemChanged: function (event) {
-			var item = event.detail.item,
-				selector = event.detail.selector,
-				selectorId = selector.selectorId,
-				currentTemplateInstance = selector.templateInstance,
-				currentTemplate = selector.template,
-				newTemplate,
-				newTemplateInstance,
+		selectorItemChanged: function (selector, item) {
+			var selectorId = selector.selectorId,
 				isGroup = this.isGroup(item),
-				element;
+				newTemplate,
+				element,
+				templateInstance;
 
 			this._renderedItems[selectorId] = item;
 
@@ -269,41 +265,30 @@
 				newTemplate = this._getItemTemplate();
 			}
 
-			if (newTemplate !== currentTemplate) {
-				newTemplateInstance = newTemplate.getInstance();
-				element = newTemplateInstance.__element;
-				if (!element) {
-					// Copied from iron-list to get first child of template instance
-					element = newTemplateInstance.root.querySelector('*');
-					newTemplateInstance.__element = element;
-					Polymer.dom(this).appendChild(newTemplateInstance.root);
-				}
+			element = selector.elements[newTemplate.id];
 
+			if (!element) {
+				templateInstance =  newTemplate.getInstance();
+				element = templateInstance.root.querySelector('*');
+				element.__tmplInstance = templateInstance;
 				element.setAttribute('slot', selector.slotName);
-				if (currentTemplate) {
-					selector.element.setAttribute('slot', 'reusableTemplate');
-					currentTemplate.releaseInstance(currentTemplateInstance);
-				}
-
-				// This is needed when using Shady DOM to redistribute the element content to the right slot.
-				this.distributeContent();
-
-				selector.template = newTemplate;
-				selector.element = element;
-				selector.templateInstance = newTemplateInstance;
+				Polymer.dom(this).appendChild(templateInstance.root);
+				selector.elements[newTemplate.id] = element;
 			} else {
-				newTemplateInstance = currentTemplateInstance;
+				templateInstance = element.__tmplInstance;
 			}
 
-			newTemplateInstance.item = item;
+			templateInstance.item = item;
 
 			if (isGroup) {
-				newTemplateInstance.selected = this.isGroupSelected(item);
-				newTemplateInstance.folded = this.isFolded(item);
+				templateInstance.selected = this.isGroupSelected(item);
+				templateInstance.folded = this.isFolded(item);
 			} else {
-				newTemplateInstance.expanded = this.isExpanded(item);
-				newTemplateInstance.selected = this.isItemSelected(item);
+				templateInstance.expanded = this.isExpanded(item);
+				templateInstance.selected = this.isItemSelected(item);
 			}
+
+			selector.show(element, newTemplate.id);
 		},
 
 		_getItemTemplate: function () {
@@ -343,7 +328,7 @@
 						selector = this._templateSelectors[selectorIndex];
 						// iron-list sets the hidden attribute on its reusable children when there are not used anymore
 						if (selector.getAttribute('hidden') === null) {
-							return selector.element;
+							return selector.currentElement;
 						}
 					}
 				}
@@ -606,7 +591,7 @@
 		_getModelFromItem: function (item) {
 			var	physicalIndex = this._renderedItems.indexOf(item);
 			if (physicalIndex >= 0) {
-				return this._templateSelectors[physicalIndex].templateInstance;
+				return this._templateSelectors[physicalIndex].currentElement.__tmplInstance;
 			}
 		}
 	});

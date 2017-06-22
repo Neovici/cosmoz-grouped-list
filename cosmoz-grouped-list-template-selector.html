@@ -1,8 +1,7 @@
 <dom-module id="cosmoz-grouped-list-template-selector">
 	<template>
 		<style>
-
-			[hidden] {
+			:host ::slotted([hidden]) {
 				display: none !important;
 			}
 		</style>
@@ -22,32 +21,37 @@
 				type: Object,
 				observer: '_itemChanged'
 			},
+		},
 
-			selectorId: {
-				type: Number,
-			},
+		selectorId: null,
 
-			template: {
-				type: Object
-			},
+		elements: null,
 
-			templateInstance: {
-				type: Object
-			},
+		currentElement: null,
 
-			element: {
-				type: Object
-			},
+		currentTemplateId: null,
 
-			slotName: {
-				type: String
+		groupedList: null,
+
+		created: function () {
+			this.elements = {};
+		},
+
+		show: function (element, templateId) {
+			if (this.currentElement && element !== this.currentElement) {
+				this.currentElement.setAttribute('hidden', '');
 			}
+
+			element.removeAttribute('hidden');
+
+			this.currentElement = element;
+			this.currentTemplateId = templateId;
 		},
 
 		_itemChanged: function (newItem) {
 			var slot;
 
-			if (this.selectorId === undefined) {
+			if (this.selectorId === null) {
 				// Notifies parent cosmoz-grouped-list that a new template-selector
 				// has been added so that it gets a selectorId
 				this.fire('template-selector-created', {
@@ -67,12 +71,7 @@
 				}
 			}
 
-			this.fire('template-selector-item-changed', {
-				selector: this,
-				item: newItem,
-			}, {
-				bubbles: false
-			});
+			this.groupedList.selectorItemChanged(this, newItem);
 		},
 	});
 </script>
