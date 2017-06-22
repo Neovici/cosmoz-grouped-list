@@ -37,22 +37,19 @@ with features like group count display and folding
 			:host(.has-scroll-target) #list {
 				flex: 1;
 			}
-
-		</style>
+ 		</style>
 
 		<iron-list id="list" items="[[_flatData]]" as="item">
 			<template>
-				<div>
-					<cosmoz-grouped-list-template-selector
-							item="[[item]]"
-							on-template-selector-created="_onTemplateSelectorCreated"
-							on-template-selector-item-changed="_onTemplateSelectorItemChanged">
-					</cosmoz-grouped-list-template-selector>
-				</div>
+				<cosmoz-grouped-list-template-selector
+						item="[[item]]"
+						on-template-selector-created="_onTemplateSelectorCreated"
+						on-template-selector-item-changed="_onTemplateSelectorItemChanged">
+					<!-- this slot will get a name when the selector is created by iron-list -->
+					<slot name="tempSlotName"></slot>
+				</cosmoz-grouped-list-template-selector>
 			</template>
 		</iron-list>
-
-		<content></content>
 	</template>
 </dom-module>
 
