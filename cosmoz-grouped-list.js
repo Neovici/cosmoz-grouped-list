@@ -521,17 +521,13 @@
 		},
 
 		selectAll: function () {
-
-			var i;
-
+			// First clear selection
 			this.splice('selectedItems', 0);
 
 			if (this._groupsMap) {
 
 				this.data.forEach(function (group) {
-					var model = this._getModelFromItem(group),
-						groupState = this._groupsMap.get(group);
-
+					var groupState = this._groupsMap.get(group);
 					groupState.selected = true;
 					this.splice.apply(this, ['selectedItems', this.selectedItems.length - 1, 0].concat(group.items));
 				}, this);
@@ -541,32 +537,30 @@
 
 			// Set the selected property to all visible items
 			this._templateSelectors.forEach(function (selector) {
-				if (selector.templateInstance) {
-					selector.templateInstance.selected = true;
+				var templateInstance = selector.currentElement && selector.currentElement.__tmplInstance;
+				if (templateInstance) {
+					templateInstance.selected = true;
 				}
 			});
 		},
 
 		deselectAll: function () {
 
-			var i;
-
 			this.splice('selectedItems', 0);
 
 			if (this._groupsMap) {
 
 				this.data.forEach(function (group) {
-					var model = this._getModelFromItem(group),
-						groupState = this._groupsMap.get(group);
-
+					var groupState = this._groupsMap.get(group);
 					groupState.selected = false;
 				}, this);
 			}
 
 			// Set the selected property to all visible items
 			this._templateSelectors.forEach(function (selector) {
-				if (selector.templateInstance) {
-					selector.templateInstance.selected = false;
+				var templateInstance = selector.currentElement && selector.currentElement.__tmplInstance;
+				if (templateInstance) {
+					templateInstance.selected = false;
 				}
 			});
 		},
