@@ -11,8 +11,8 @@
 	<link rel="import" href="../cosmoz-grouped-list.html">
 	<link rel="import" href="../../iron-flex-layout/iron-flex-layout.html"/>
 	<link rel="import" href="../../iron-flex-layout/iron-flex-layout-classes.html"/>
-	
-	<style is="custom-style" include="iron-flex iron-flex-alignment iron-positioning"> 
+
+	<style is="custom-style" include="iron-flex iron-flex-alignment iron-positioning">
 		.group-header {
 			padding: 5px;
 			background-color: #ccc;
@@ -65,7 +65,7 @@
 	<script type="text/javascript">
 /*global document, window */
 (function () {
-	"use strict";
+	'use strict';
 	window.addEventListener('WebComponentsReady', function () {
 		var
 			template = document.getElementById('t'),
@@ -122,7 +122,6 @@
 
 		button1.addEventListener('click', function () {
 			console.log('click');
-			var i, j, group, item;
 			template.set('data.0.items.0.value', data[0].items[0].value + 1);
 		});
 		button2.addEventListener('click', function () {
