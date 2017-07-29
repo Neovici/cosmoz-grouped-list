@@ -358,6 +358,8 @@
 		 * This method simply removes the specified item from the `data` using
 		 * Polymer array mutation methods.
 		 * Cannot be used to remove a group.
+		 * @param {Object} item The item to remove
+		 * @returns {Boolean|undefined} true/false or null
 		 */
 		removeItem: function (item) {
 			if (this._groupsMap) {
@@ -382,6 +384,8 @@
 
 		/**
 		 * Returns the group of the specified item
+		 * @param {Object} item The item to search for
+		 * @returns {Object|null} The group the item is in or null
 		 */
 		getItemGroup: function (item) {
 			if (!this._groupsMap) {
