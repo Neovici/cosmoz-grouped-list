@@ -367,12 +367,12 @@
 						return true;
 					}
 				}, this);
-			} else {
-				var i = this.data.indexOf(item);
-				if (i >= 0) {
-					this.splice('data', i, 1);
-				}
 			}
+			var i = this.data.indexOf(item);
+			if (i >= 0) {
+				this.splice('data', i, 1);
+			}
+
 		},
 
 		isGroup: function (item) {
