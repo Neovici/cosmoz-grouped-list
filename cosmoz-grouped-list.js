@@ -1,4 +1,4 @@
-/*global cz, document, Polymer, window, WeakMap */
+/*global document, Polymer, window, WeakMap */
 (function () {
 
 	'use strict';
