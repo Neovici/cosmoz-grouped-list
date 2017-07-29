@@ -4,30 +4,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
 	<title>cosmoz-grouped-list basic test</title>
-	<script type="text/javascript">
-	var logStore = [],
-		errorStore = [],
-		warnStore = [],
-		oldLogFunc = console.log,
-		oldErrorFunc = console.error,
-		oldWarnFunc = console.warn;
 
-	console.log = function (logMessage) {
-		logStore.push(logMessage);
-		oldLogFunc.apply(console, arguments);
-	};
-
-	console.error = function (errorMessage) {
-		errorStore.push(errorMessage);
-		oldErrorFunc.apply(console, arguments);
-	};
-
-	console.warn = function (warnMessage) {
-		warnStore.push(warnMessage);
-		oldWarnFunc.apply(console, arguments);
-	};
-
-	</script>
 	<script src="../../web-component-tester/browser.js"></script>
 	<script src="../../webcomponentsjs/webcomponents-lite.js"></script>
 
@@ -36,33 +13,86 @@
 <body>
 	<test-fixture id="cosmoz-grouped-list-fixture">
 		<template>
-			<cosmoz-grouped-list></cosmoz-grouped-list>
+			<cosmoz-grouped-list>
+				<cosmoz-grouped-list-template id="itemTemplate">
+					<template>
+						<div class="item-template" style="border-bottom: 1px solid grey;">
+							<div>
+								ID:<span class="item-id">{{ item.id }}</span>
+								NAME:<span class="item-name">{{ item.name }}</span>
+								VALUE:<span class="item-value">{{ item.value }}</span>
+								<div>
+						</div>
+					</template>
+				</cosmoz-grouped-list-template>
+				<cosmoz-grouped-list-template id="groupTemplate">
+					<template>
+						<div class="group-template">
+							NAME:<span class="item-name">{{ item.name }}</span>
+							VALUE: <span class="item-value">{{ item.value }}</span>
+							SELECTED: <span class="item-selected">{{ selected }}</span>
+						<div>
+					</template>
+				</cosmoz-grouped-list-template>
+			</cosmoz-grouped-list>
 		</template>
 	</test-fixture>
 
 	<script>
-	/*global WCT, suite, fixture, setup, test, Polymer, assert, logStore, errorStore */
 	(function () {
 		'use strict';
 
 		suite('<cosmoz-grouped-list>', function () {
-			var myElement;
+			var element
+			, items;
 
-			setup(function () {
-				myElement = fixture('cosmoz-grouped-list-fixture');
+			setup(function (done) {
+				element = fixture('cosmoz-grouped-list-fixture');
+				items = [
+					{
+						name	: 'Group 0',
+						id		: 'g0',
+						items	: [
+							{
+								id		: 'g0-0',
+								name	: 'Group 0 item 0',
+								value : 0
+							},
+							{
+								id			: 'g0-1',
+								name		: 'Group 0 item 1',
+								value   : 1
+							}
+						]
+					},
+					{
+						name	: 'Group 1',
+						id		: 'g1',
+						items	: [
+							{
+								id		: 'g1-0',
+								name	: 'Group 1 item 0',
+								value : 0
+							},
+							{
+								id			: 'g1-1',
+								name		: 'Group 1 item 1',
+								value   : 1
+							}
+						]
+					}
+				];
+
+				element.data = items;
+				done();
 			});
 
-			test('No console logs should exist', function () {
-				assert.equal(logStore.length, 0, 'Log messages: ' + logStore.join(' | '));
+			test('instantiates a cosmoz-grouped-list element', function () {
+				expect(element.is).to.equal('cosmoz-grouped-list');
 			});
 
-			test('No console warn should exist', function () {
-				assert.equal(warnStore.length, 0, 'Warn messages: ' + warnStore.join(' | '));
-			});
 
-			test('No console errors should exist', function () {
-				assert.equal(errorStore.length, 0, 'Error messages: ' + errorStore.join(' | '));
-			});
+
 		});
 	}());
 
