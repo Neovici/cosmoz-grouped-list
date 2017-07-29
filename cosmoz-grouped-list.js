@@ -308,6 +308,7 @@
 		/**
 		 * Utility method that returns the element that displays the first visible item in the list.
 		 * This method is mainly aimed at `cosmoz-omnitable`.
+		 * @returns {HTMLElement|null} The first visible element or null
 		 */
 		getFirstVisibleItemElement: function () {
 			var i,
