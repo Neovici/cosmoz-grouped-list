@@ -116,45 +116,50 @@
 				assert.isNull(element.getItemGroup(items[2]));
 			});
 
-			test('selects an item', function () {
+			test('selects an item', function (done) {
 				element.selectItem(items[0]);
-				flush(function (done) {
-					expect(element.selectItems[0]).to.equal(items[0]);
+				flush(function () {
+					expect(element.selectedItems[0]).to.equal(items[0]);
 					done();
 				});
 			});
 
-			test('selects an item', function () {
+			test('deselects an item', function (done) {
 				element.selectItem(items[1]);
-				flush(function (done) {
-					assert.equal(element.selectedItems[1], items[1]);
+				flush(function () {
+					assert.equal(element.selectedItems[0], items[1]);
 					element.deselectItem(items[1]);
-					done();
+					flush(function () {
+						assert.equal(element.selectedItems.length, 0);
+						done();
+					});
 				});
-				flush(function (done) {
-					assert.equal(element.selectedItems.length, 0);
+
+			});
+
+			//Should fail because order is incorrect
+			test('selects all items', function (done) {
+				element.selectAll();
+				flush(function () {
+					assert.isNotNull(element.selectedItems[0]);
+					assert.equal(element.selectedItems.length, 4);
+					assert.equal(element.selectedItems[0], items[0].items[0]);
+					assert.equal(element.selectedItems[1], items[0].items[1]);
+					assert.equal(element.selectedItems[2], items[1].items[0]);
+					assert.equal(element.selectedItems[3], items[1].items[1]);
 					done();
 				});
 			});
 
-			test('selects all items', function () {
+			test('deselect all items', function (done) {
 				element.selectAll();
-				flush(function (done) {
-					assert.equal(element.selectedItems[0], items[0]);
-					done();
-				});
-			});
-
-			test('deselect all items', function () {
-				element.selectAll();
-				flush(function (done) {
-					assert.equal(element.selectedItems[0], items[0]);
+				flush(function () {
+					assert.equal(element.selectedItems[0], items[0].items[0]);
 					element.deselectAll();
-					done();
-				});
-				flush(function (done) {
-					assert.equal(element.selectedItems.length, 0);
-					done();
+					flush(function () {
+						assert.equal(element.selectedItems.length, 0);
+						done();
+					});
 				});
 			});
 		});
