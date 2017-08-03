@@ -124,19 +124,41 @@
 				});
 			});
 
-			// test('selects all items', function () {
-			// 	element.selectAllItems();
-			// 	flush(function (done) {
-			// 		expect(element.selectItems[0]).to.equal(items[1]);
-			// 		done();
-			// 	});
-			// });
+			test('selects an item', function () {
+				element.selectItem(items[1]);
+				flush(function (done) {
+					assert.equal(element.selectedItems[1], items[1]);
+					element.deselectItem(items[1]);
+					done();
+				});
+				flush(function (done) {
+					assert.equal(element.selectedItems.length, 0);
+					done();
+				});
+			});
 
+			test('selects all items', function () {
+				element.selectAll();
+				flush(function (done) {
+					assert.equal(element.selectedItems[0], items[0]);
+					done();
+				});
+			});
 
-
+			test('deselect all items', function () {
+				element.selectAll();
+				flush(function (done) {
+					assert.equal(element.selectedItems[0], items[0]);
+					element.deselectAll();
+					done();
+				});
+				flush(function (done) {
+					assert.equal(element.selectedItems.length, 0);
+					done();
+				});
+			});
 		});
 	}());
-
 	</script>
 </body>
 </html>
