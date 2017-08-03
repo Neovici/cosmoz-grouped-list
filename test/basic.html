@@ -109,6 +109,10 @@
 
 				assert.equal(element.getItemGroup(items[1].items[0]), items[1]);
 				assert.equal(element.getItemGroup(items[1].items[1]), items[1]);
+			});
+
+			test('ungrouped items should be dropped', function () {
+				assert.isNull(element.getItemGroup({}));
 				assert.isNull(element.getItemGroup(items[2]));
 			});
 
