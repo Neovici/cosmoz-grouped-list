@@ -111,7 +111,7 @@
 				assert.equal(element.getItemGroup(items[1].items[1]), items[1]);
 			});
 
-			test('ungrouped items should be dropped', function () {
+			test('ungrouped items are dropped', function () {
 				assert.isNull(element.getItemGroup({}));
 				assert.isNull(element.getItemGroup(items[2]));
 			});
@@ -138,6 +138,35 @@
 					element.deselectItem(item);
 					flush(function () {
 						assert.isFalse(element.isItemSelected(item));
+						assert.equal(element.selectedItems.length, 0);
+						done();
+					});
+				});
+			});
+
+			test('selects a group', function (done) {
+				var group = items[1];
+				element.selectGroup(group);
+				flush(function () {
+					assert.isTrue(element.isGroupSelected(group));
+					assert.equal(element.selectedItems.length, 2);
+					assert.equal(element.selectedItems[0], group.items[0]);
+					assert.equal(element.selectedItems[1], group.items[1]);
+					done();
+				});
+			});
+
+			test('deselects a group', function (done) {
+				var group = items[0];
+				element.selectGroup(group);
+				flush(function () {
+					assert.isTrue(element.isGroupSelected(group));
+					assert.equal(element.selectedItems.length, 2);
+					assert.equal(element.selectedItems[0], group.items[0]);
+					assert.equal(element.selectedItems[1], group.items[1]);
+					element.deselectGroup(group);
+					flush(function () {
+						assert.isFalse(element.isGroupSelected(group));
 						assert.equal(element.selectedItems.length, 0);
 						done();
 					});
