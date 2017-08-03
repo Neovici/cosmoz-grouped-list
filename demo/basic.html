@@ -101,7 +101,7 @@
 
 					attached: function () {
 						this.async(function () {
-							var data = [
+							var items = [
 								{
 									name	: 'Group 0',
 									id		: 'g0',
@@ -133,9 +133,13 @@
 											value   : 1
 										}
 									]
+								},
+								{
+									name: 'Element 1',
+									id: 'e1'
 								}
 							];
-							this.data = data;
+							this.data = items;
 						}.bind(this), 16);
 					},
 				});
