@@ -80,16 +80,53 @@
 								value   : 1
 							}
 						]
+					},
+					{
+						name: 'Element 1',
+						id: 'e1'
 					}
 				];
-
 				element.data = items;
-				done();
+				setTimeout(function () {
+					done();
+				}, 10);
 			});
 
 			test('instantiates a cosmoz-grouped-list element', function () {
-				expect(element.is).to.equal('cosmoz-grouped-list');
+				assert.equal(element.is, 'cosmoz-grouped-list');
+				assert.isTrue(element.hasRenderedData);
 			});
+
+			test('first item is a group', function () {
+				assert.isTrue(element.isGroup(items[0]));
+				assert.isTrue(element.isGroup(items[1]));
+				assert.isFalse(element.isGroup(items[2]));
+			});
+
+			test('item belongs to group', function () {
+				assert.equal(element.getItemGroup(items[0].items[0]), items[0]);
+				assert.equal(element.getItemGroup(items[0].items[1]), items[0]);
+
+				assert.equal(element.getItemGroup(items[1].items[0]), items[1]);
+				assert.equal(element.getItemGroup(items[1].items[1]), items[1]);
+				assert.isNull(element.getItemGroup(items[2]));
+			});
+
+			test('selects an item', function () {
+				element.selectItem(items[0]);
+				flush(function (done) {
+					expect(element.selectItems[0]).to.equal(items[0]);
+					done();
+				});
+			});
+
+			// test('selects all items', function () {
+			// 	element.selectAllItems();
+			// 	flush(function (done) {
+			// 		expect(element.selectItems[0]).to.equal(items[1]);
+			// 		done();
+			// 	});
+			// });
 
 
 

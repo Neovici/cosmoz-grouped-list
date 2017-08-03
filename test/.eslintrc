@@ -4,6 +4,7 @@
   },
   "globals": {
     "assert": false,
+    "flush": false,
     "fixture": false,
     "expect": false,
     "a11ySuite": false,
