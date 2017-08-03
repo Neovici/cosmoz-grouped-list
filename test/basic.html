@@ -117,24 +117,31 @@
 			});
 
 			test('selects an item', function (done) {
-				element.selectItem(items[0]);
+				var item = items[0].items[0];
+				element.selectItem(item);
 				flush(function () {
-					expect(element.selectedItems[0]).to.equal(items[0]);
+					assert.isTrue(element.isItemSelected(item));
+					assert.equal(element.selectedItems.length, 1);
+					assert.equal(element.selectedItems[0], item);
+					assert.isTrue(element._getModelFromItem(item).selected);
 					done();
 				});
 			});
 
 			test('deselects an item', function (done) {
-				element.selectItem(items[1]);
+				var item = items[1].items[0];
+				element.selectItem(item);
 				flush(function () {
-					assert.equal(element.selectedItems[0], items[1]);
-					element.deselectItem(items[1]);
+					assert.isTrue(element.isItemSelected(item));
+					assert.equal(element.selectedItems[0], item);
+					assert.isTrue(element._getModelFromItem(item).selected);
+					element.deselectItem(item);
 					flush(function () {
+						assert.isFalse(element.isItemSelected(item));
 						assert.equal(element.selectedItems.length, 0);
 						done();
 					});
 				});
-
 			});
 
 			//Should fail because order is incorrect
