@@ -524,8 +524,10 @@
 
 				this.data.forEach(function (group) {
 					var groupState = this._groupsMap.get(group);
-					groupState.selected = true;
-					this.splice.apply(this, ['selectedItems', this.selectedItems.length - 1, 0].concat(group.items));
+					if(groupState) {
+						groupState.selected = true;
+					}
+					this.splice.apply(this, ['selectedItems', this.selectedItems.length - 1, 0].concat(group.items || []));
 				}, this);
 			} else {
 				this.splice.apply(this, ['selectedItems', 0, 0].concat(this.data));
@@ -548,7 +550,9 @@
 
 				this.data.forEach(function (group) {
 					var groupState = this._groupsMap.get(group);
-					groupState.selected = false;
+					if(groupState) {
+						groupState.selected = false;
+					}
 				}, this);
 			}
 
