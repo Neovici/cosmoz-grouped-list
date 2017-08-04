@@ -97,6 +97,11 @@
 				assert.isTrue(element.hasRenderedData);
 			});
 
+			test('attaches cosmoz-grouped-list-template-selector', function () {
+				assert.equal(element._templateSelectors.length, 6);
+				// assert.isTrue(element.hasRenderedData);
+			});
+
 			test('top level items are groups', function () {
 				assert.isTrue(element.isGroup(items[0]));
 				assert.isTrue(element.isGroup(items[1]));
