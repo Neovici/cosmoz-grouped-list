@@ -193,6 +193,31 @@
 				});
 			});
 
+			test('selects all items', function (done) {
+				element.selectAll();
+				flush(function () {
+					assert.isNotNull(element.selectedItems[0]);
+					assert.equal(element.selectedItems.length, 4);
+					assert.equal(element.selectedItems[0], items[0].items[0]);
+					assert.equal(element.selectedItems[1], items[0].items[1]);
+					assert.equal(element.selectedItems[2], items[1].items[0]);
+					assert.equal(element.selectedItems[3], items[1].items[1]);
+					done();
+				});
+			});
+
+			test('deselect all items', function (done) {
+				element.selectAll();
+				flush(function () {
+					assert.equal(element.selectedItems[0], items[0].items[0]);
+					element.deselectAll();
+					flush(function () {
+						assert.equal(element.selectedItems.length, 0);
+						done();
+					});
+				});
+			});
+
 			test('folds a group', function (done) {
 				var group = items[1];
 
@@ -218,28 +243,13 @@
 				});
 			});
 
-			test('selects all items', function (done) {
-				element.selectAll();
-				flush(function () {
-					assert.isNotNull(element.selectedItems[0]);
-					assert.equal(element.selectedItems.length, 4);
-					assert.equal(element.selectedItems[0], items[0].items[0]);
-					assert.equal(element.selectedItems[1], items[0].items[1]);
-					assert.equal(element.selectedItems[2], items[1].items[0]);
-					assert.equal(element.selectedItems[3], items[1].items[1]);
-					done();
-				});
-			});
+			test('toggles collapse on an item', function (done) {
+				var item = items[1].items[1];
 
-			test('deselect all items', function (done) {
-				element.selectAll();
+				element.toggleCollapse(item);
 				flush(function () {
-					assert.equal(element.selectedItems[0], items[0].items[0]);
-					element.deselectAll();
-					flush(function () {
-						assert.equal(element.selectedItems.length, 0);
-						done();
-					});
+					assert.isTrue(element.isExpanded(item));
+					done();
 				});
 			});
 		});
