@@ -97,7 +97,7 @@
 				assert.isTrue(element.hasRenderedData);
 			});
 
-			test('first item is a group', function () {
+			test('top level items are groups', function () {
 				assert.isTrue(element.isGroup(items[0]));
 				assert.isTrue(element.isGroup(items[1]));
 				assert.isFalse(element.isGroup(items[2]));

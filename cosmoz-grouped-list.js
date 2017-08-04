@@ -491,9 +491,7 @@
 				model['selected'] = true;
 			}
 
-			group.items.forEach(function (item) {
-				this.selectItem(item);
-			}, this);
+			group.items.forEach(this.selectItem, this);
 		},
 
 		deselectGroup: function (group) {
@@ -506,9 +504,7 @@
 			if (model) {
 				model['selected'] = false;
 			}
-			group.items.forEach(function (item) {
-				this.deselectItem(item);
-			}, this);
+			group.items.forEach(this.deselectItem, this);
 		},
 
 		isGroupSelected: function (group) {
