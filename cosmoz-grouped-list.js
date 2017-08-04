@@ -565,9 +565,7 @@
 		},
 
 		updateSizes: function (group) {
-			group.items.forEach(function (item) {
-				this.updateSize(item);
-			}, this);
+			group.items.forEach(this.updateSize, this);
 		},
 
 		toggleCollapse: function (item) {
