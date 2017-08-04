@@ -517,21 +517,17 @@
 		},
 
 		selectAll: function () {
-			// First clear selection
-			this.splice('selectedItems', 0);
+			var groups = this._groupsMap,
+				selected = this.data;
 
-			if (this._groupsMap) {
-
-				this.data.forEach(function (group) {
-					var groupState = this._groupsMap.get(group);
-					if(groupState) {
-						groupState.selected = true;
-					}
-					this.splice.apply(this, ['selectedItems', this.selectedItems.length - 1, 0].concat(group.items || []));
-				}, this);
-			} else {
-				this.splice.apply(this, ['selectedItems', 0, 0].concat(this.data));
+			if(groups) {
+				selected = selected.reduce(function (all, group) {
+					var state = groups.get(group);
+					if(state) state.selected = true;
+					return all.concat(group.items || []);
+				}, []);
 			}
+			this.splice.apply(this, ['selectedItems', 0, this.selectedItems.length -1 ].concat(selected));
 
 			// Set the selected property to all visible items
 			this._templateSelectors.forEach(function (selector) {
