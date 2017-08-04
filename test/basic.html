@@ -134,7 +134,6 @@
 				flush(function () {
 					assert.isTrue(element.isItemSelected(item));
 					assert.equal(element.selectedItems[0], item);
-					assert.isTrue(element._getModelFromItem(item).selected);
 					element.deselectItem(item);
 					flush(function () {
 						assert.isFalse(element.isItemSelected(item));
@@ -168,6 +167,27 @@
 					flush(function () {
 						assert.isFalse(element.isGroupSelected(group));
 						assert.equal(element.selectedItems.length, 0);
+						done();
+					});
+				});
+			});
+
+			test('deselecting a item from group deselects the group', function (done) {
+				var group = items[1],
+					item =  group.items[1];
+
+				element.selectGroup(group);
+				flush(function () {
+					assert.isTrue(element.isGroupSelected(group));
+					assert.equal(element.selectedItems.length, 2);
+					assert.equal(element.selectedItems[0], group.items[0]);
+					assert.equal(element.selectedItems[1], group.items[1]);
+
+					element.deselectItem(item);
+
+					flush(function () {
+						assert.isFalse(element.isGroupSelected(group));
+						assert.equal(element.selectedItems.length, 1);
 						done();
 					});
 				});
