@@ -193,7 +193,31 @@
 				});
 			});
 
-			//Should fail because order is incorrect
+			test('folds a group', function (done) {
+				var group = items[1];
+
+				element.foldGroup(group);
+				flush(function () {
+					assert.isTrue(element.isFolded(group));
+					done();
+				});
+			});
+
+			test('unfolds a folded group', function (done) {
+				var group = items[1];
+
+				element.foldGroup(group);
+				flush(function () {
+					assert.isTrue(element.isFolded(group));
+					element.unfoldGroup(group);
+
+					flush(function () {
+						assert.isFalse(element.isFolded(group));
+						done();
+					});
+				});
+			});
+
 			test('selects all items', function (done) {
 				element.selectAll();
 				flush(function () {
