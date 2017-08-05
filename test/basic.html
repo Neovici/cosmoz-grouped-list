@@ -77,14 +77,22 @@
 					id: 'e1'
 				}];
 				element.data = groups;
-				setTimeout(function () {
-					done();
-				}, 10);
+				flush(function () {
+					setTimeout(function () {
+						done();
+					}, 100);
+				});
 			});
 
 			test('instantiates a cosmoz-grouped-list element', function () {
 				assert.equal(element.is, 'cosmoz-grouped-list');
 				assert.isTrue(element.hasRenderedData);
+			});
+
+			test('attaches a iron-list element', function () {
+				assert.equal(element.$.list.is, 'iron-list');
+				assert.equal(element.$.list.items.length, 6);
+				assert.equal(element.$.list.items[0], groups[0]);
 			});
 
 			test('attaches cosmoz-grouped-list-template-selector', function () {
