@@ -58,6 +58,7 @@
         ],
         "space-in-parens": 2,
         "valid-jsdoc": 1,
+        "curly": ["error", "all"],
         "keyword-spacing": ["error", { "before": true } ]
     },
     "plugins": [
