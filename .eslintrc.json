@@ -61,7 +61,8 @@
         "space-infix-ops" : 2,
         "curly": ["error", "all"],
         "keyword-spacing": ["error", { "before": true } ],
-        "array-bracket-spacing": ["error", "always", { "objectsInArrays": false }]
+        "array-bracket-spacing": ["error", "always", { "objectsInArrays": false }],
+        "comma-style": ["error", "last"]
     },
     "plugins": [
         "html"
