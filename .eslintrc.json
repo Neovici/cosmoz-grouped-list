@@ -60,7 +60,8 @@
         "valid-jsdoc": 1,
         "space-infix-ops" : 2,
         "curly": ["error", "all"],
-        "keyword-spacing": ["error", { "before": true } ]
+        "keyword-spacing": ["error", { "before": true } ],
+        "array-bracket-spacing": ["error", "always", { "objectsInArrays": false }]
     },
     "plugins": [
         "html"
