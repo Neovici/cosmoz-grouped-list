@@ -516,10 +516,10 @@
 			var groups = this._groupsMap,
 				selected = this.data;
 
-			if(groups) {
+			if (groups) {
 				selected = selected.reduce(function (all, group) {
 					var state = groups.get(group);
-					if(state) state.selected = true;
+					if (state) state.selected = true;
 					return all.concat(group.items || []);
 				}, []);
 			}
@@ -542,7 +542,7 @@
 
 				this.data.forEach(function (group) {
 					var groupState = this._groupsMap.get(group);
-					if(groupState) {
+					if (groupState) {
 						groupState.selected = false;
 					}
 				}, this);
