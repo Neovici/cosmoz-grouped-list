@@ -391,9 +391,9 @@
 			if (!this._groupsMap) {
 				return;
 			}
-			var foundGroup;
+			var foundGroup = null;
 			this.data.some(function (group) {
-				var found = group.items.indexOf(item) > -1;
+				var found = group.items && group.items.indexOf(item) > -1;
 				if (found) {
 					foundGroup = group;
 				}
@@ -500,9 +500,7 @@
 				model['selected'] = true;
 			}
 
-			group.items.forEach(function (item) {
-				this.selectItem(item);
-			}, this);
+			group.items.forEach(this.selectItem, this);
 		},
 
 		deselectGroup: function (group) {
@@ -515,9 +513,7 @@
 			if (model) {
 				model['selected'] = false;
 			}
-			group.items.forEach(function (item) {
-				this.deselectItem(item);
-			}, this);
+			group.items.forEach(this.deselectItem, this);
 		},
 
 		isGroupSelected: function (group) {
@@ -526,19 +522,19 @@
 		},
 
 		selectAll: function () {
-			// First clear selection
-			this.splice('selectedItems', 0);
+			var groups = this._groupsMap,
+				selected = this.data;
 
-			if (this._groupsMap) {
-
-				this.data.forEach(function (group) {
-					var groupState = this._groupsMap.get(group);
-					groupState.selected = true;
-					this.splice.apply(this, ['selectedItems', this.selectedItems.length - 1, 0].concat(group.items));
-				}, this);
-			} else {
-				this.splice.apply(this, ['selectedItems', 0, 0].concat(this.data));
+			if (groups) {
+				selected = selected.reduce(function (all, group) {
+					var state = groups.get(group);
+					if (state) {
+						state.selected = true;
+					}
+					return all.concat(group.items || []);
+				}, []);
 			}
+			this.splice.apply(this, ['selectedItems', 0, this.selectedItems.length - 1].concat(selected));
 
 			// Set the selected property to all visible items
 			this._templateSelectors.forEach(function (selector) {
@@ -557,7 +553,9 @@
 
 				this.data.forEach(function (group) {
 					var groupState = this._groupsMap.get(group);
-					groupState.selected = false;
+					if (groupState) {
+						groupState.selected = false;
+					}
 				}, this);
 			}
 
@@ -578,9 +576,7 @@
 		},
 
 		updateSizes: function (group) {
-			group.items.forEach(function (item) {
-				this.updateSize(item);
-			}, this);
+			group.items.forEach(this.updateSize, this);
 		},
 
 		toggleCollapse: function (item) {

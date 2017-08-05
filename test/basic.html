@@ -4,30 +4,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
 	<title>cosmoz-grouped-list basic test</title>
-	<script type="text/javascript">
-	var logStore = [],
-		errorStore = [],
-		warnStore = [],
-		oldLogFunc = console.log,
-		oldErrorFunc = console.error,
-		oldWarnFunc = console.warn;
 
-	console.log = function (logMessage) {
-		logStore.push(logMessage);
-		oldLogFunc.apply(console, arguments);
-	};
-
-	console.error = function (errorMessage) {
-		errorStore.push(errorMessage);
-		oldErrorFunc.apply(console, arguments);
-	};
-
-	console.warn = function (warnMessage) {
-		warnStore.push(warnMessage);
-		oldWarnFunc.apply(console, arguments);
-	};
-
-	</script>
 	<script src="../../web-component-tester/browser.js"></script>
 	<script src="../../webcomponentsjs/webcomponents-lite.js"></script>
 
@@ -36,36 +13,250 @@
 <body>
 	<test-fixture id="cosmoz-grouped-list-fixture">
 		<template>
-			<cosmoz-grouped-list></cosmoz-grouped-list>
+			<cosmoz-grouped-list>
+				<cosmoz-grouped-list-template id="itemTemplate">
+					<template>
+						<div class="item-template" style="border-bottom: 1px solid grey;">
+							<div>
+								ID:<span class="item-id">{{ item.id }}</span>
+								NAME:<span class="item-name">{{ item.name }}</span>
+								VALUE:<span class="item-value">{{ item.value }}</span>
+							</div>
+						</div>
+					</template>
+				</cosmoz-grouped-list-template>
+				<cosmoz-grouped-list-template id="groupTemplate">
+					<template>
+						<div class="group-template">
+							NAME:<span class="item-name">{{ item.name }}</span>
+							VALUE: <span class="item-value">{{ item.value }}</span>
+							SELECTED: <span class="item-selected">{{ selected }}</span>
+						</div>
+					</template>
+				</cosmoz-grouped-list-template>
+			</cosmoz-grouped-list>
 		</template>
 	</test-fixture>
 
 	<script>
-	/*global WCT, suite, fixture, setup, test, Polymer, assert, logStore, errorStore */
 	(function () {
 		'use strict';
 
 		suite('<cosmoz-grouped-list>', function () {
-			var myElement;
+			var element,
+				groups;
 
-			setup(function () {
-				myElement = fixture('cosmoz-grouped-list-fixture');
+			setup(function (done) {
+				element = fixture('cosmoz-grouped-list-fixture');
+				groups = [{
+					name: 'Group 0',
+					id: 'g0',
+					items: [{
+						id: 'g0-0',
+						name: 'Group 0 item 0',
+						value: 0
+					}, {
+						id: 'g0-1',
+						name: 'Group 0 item 1',
+						value: 1
+					}]
+				}, {
+					name: 'Group 1',
+					id: 'g1',
+					items: [{
+						id: 'g1-0',
+						name: 'Group 1 item 0',
+						value: 0
+					}, {
+						id: 'g1-1',
+						name: 'Group 1 item 1',
+						value: 1
+					}]
+				}, {
+					name: 'Element 1',
+					id: 'e1'
+				}];
+				element.data = groups;
+				flush(function () {
+					setTimeout(function () {
+						done();
+					}, 60);
+				});
 			});
 
-			test('No console logs should exist', function () {
-				assert.equal(logStore.length, 0, 'Log messages: ' + logStore.join(' | '));
+			test('instantiates a cosmoz-grouped-list element', function () {
+				assert.equal(element.is, 'cosmoz-grouped-list');
+				assert.isTrue(element.hasRenderedData);
 			});
 
-			test('No console warn should exist', function () {
-				assert.equal(warnStore.length, 0, 'Warn messages: ' + warnStore.join(' | '));
+			test('attaches a iron-list element', function () {
+				assert.equal(element.$.list.is, 'iron-list');
+				assert.equal(element.$.list.items.length, 6);
+				assert.equal(element.$.list.items[0], groups[0]);
 			});
 
-			test('No console errors should exist', function () {
-				assert.equal(errorStore.length, 0, 'Error messages: ' + errorStore.join(' | '));
+			test('attaches cosmoz-grouped-list-template-selector', function () {
+				assert.equal(element._templateSelectors.length, 6);
+				assert.isTrue(element.hasRenderedData);
+			});
+
+			test('top level items are groups', function () {
+				assert.isTrue(element.isGroup(groups[0]));
+				assert.isTrue(element.isGroup(groups[1]));
+				assert.isFalse(element.isGroup(groups[2]));
+			});
+
+			test('item belongs to group', function () {
+				assert.equal(element.getItemGroup(groups[0].items[0]), groups[0]);
+				assert.equal(element.getItemGroup(groups[0].items[1]), groups[0]);
+
+				assert.equal(element.getItemGroup(groups[1].items[0]), groups[1]);
+				assert.equal(element.getItemGroup(groups[1].items[1]), groups[1]);
+			});
+
+			test('ungrouped items are dropped', function () {
+				assert.isNull(element.getItemGroup({}));
+				assert.isNull(element.getItemGroup(groups[2]));
+			});
+
+			test('selects an item', function (done) {
+				var item = groups[0].items[0];
+				element.selectItem(item);
+				flush(function () {
+					assert.isTrue(element.isItemSelected(item));
+					assert.equal(element.selectedItems.length, 1);
+					assert.equal(element.selectedItems[0], item);
+					assert.isTrue(element._getModelFromItem(item).selected);
+					done();
+				});
+			});
+
+			test('deselects an item', function (done) {
+				var item = groups[1].items[0];
+				element.selectItem(item);
+				flush(function () {
+					assert.isTrue(element.isItemSelected(item));
+					assert.equal(element.selectedItems[0], item);
+					element.deselectItem(item);
+					flush(function () {
+						assert.isFalse(element.isItemSelected(item));
+						assert.equal(element.selectedItems.length, 0);
+						done();
+					});
+				});
+			});
+
+			test('selects a group', function (done) {
+				var group = groups[1];
+				element.selectGroup(group);
+				flush(function () {
+					assert.isTrue(element.isGroupSelected(group));
+					assert.equal(element.selectedItems.length, 2);
+					assert.equal(element.selectedItems[0], group.items[0]);
+					assert.equal(element.selectedItems[1], group.items[1]);
+					done();
+				});
+			});
+
+			test('deselects a group', function (done) {
+				var group = groups[0];
+				element.selectGroup(group);
+				flush(function () {
+					assert.isTrue(element.isGroupSelected(group));
+					assert.equal(element.selectedItems.length, 2);
+					assert.equal(element.selectedItems[0], group.items[0]);
+					assert.equal(element.selectedItems[1], group.items[1]);
+					element.deselectGroup(group);
+					flush(function () {
+						assert.isFalse(element.isGroupSelected(group));
+						assert.equal(element.selectedItems.length, 0);
+						done();
+					});
+				});
+			});
+
+			test('deselecting a item from group deselects the group', function (done) {
+				var group = groups[1],
+					item =  group.items[1];
+
+				element.selectGroup(group);
+				flush(function () {
+					assert.isTrue(element.isGroupSelected(group));
+					assert.equal(element.selectedItems.length, 2);
+					assert.equal(element.selectedItems[0], group.items[0]);
+					assert.equal(element.selectedItems[1], group.items[1]);
+
+					element.deselectItem(item);
+
+					flush(function () {
+						assert.isFalse(element.isGroupSelected(group));
+						assert.equal(element.selectedItems.length, 1);
+						done();
+					});
+				});
+			});
+
+			test('selects all items', function (done) {
+				element.selectAll();
+				flush(function () {
+					assert.isNotNull(element.selectedItems[0]);
+					assert.equal(element.selectedItems.length, 4);
+					assert.equal(element.selectedItems[0], groups[0].items[0]);
+					assert.equal(element.selectedItems[1], groups[0].items[1]);
+					assert.equal(element.selectedItems[2], groups[1].items[0]);
+					assert.equal(element.selectedItems[3], groups[1].items[1]);
+					done();
+				});
+			});
+
+			test('deselect all items', function (done) {
+				element.selectAll();
+				flush(function () {
+					assert.equal(element.selectedItems[0], groups[0].items[0]);
+					element.deselectAll();
+					flush(function () {
+						assert.equal(element.selectedItems.length, 0);
+						done();
+					});
+				});
+			});
+
+			test('folds a group', function (done) {
+				var group = groups[1];
+
+				element.foldGroup(group);
+				flush(function () {
+					assert.isTrue(element.isFolded(group));
+					done();
+				});
+			});
+
+			test('unfolds a folded group', function (done) {
+				var group = groups[1];
+
+				element.foldGroup(group);
+				flush(function () {
+					assert.isTrue(element.isFolded(group));
+					element.unfoldGroup(group);
+
+					flush(function () {
+						assert.isFalse(element.isFolded(group));
+						done();
+					});
+				});
+			});
+
+			test('toggles collapse on an item', function (done) {
+				var item = groups[1].items[1];
+
+				element.toggleCollapse(item);
+				flush(function () {
+					assert.isTrue(element.isExpanded(item));
+					done();
+				});
 			});
 		});
 	}());
-
 	</script>
 </body>
 </html>
