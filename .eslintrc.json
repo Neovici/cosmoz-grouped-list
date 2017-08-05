@@ -62,7 +62,8 @@
         "curly": ["error", "all"],
         "keyword-spacing": ["error", { "before": true } ],
         "array-bracket-spacing": ["error", "never"],
-        "comma-style": ["error", "last"]
+        "comma-style": ["error", "last"],
+        "key-spacing": ["error", { "beforeColon": false, "afterColon":true }]
     },
     "plugins": [
         "html"
