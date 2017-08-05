@@ -519,7 +519,9 @@
 			if (groups) {
 				selected = selected.reduce(function (all, group) {
 					var state = groups.get(group);
-					if (state) state.selected = true;
+					if (state) {
+						state.selected = true;
+					}
 					return all.concat(group.items || []);
 				}, []);
 			}
