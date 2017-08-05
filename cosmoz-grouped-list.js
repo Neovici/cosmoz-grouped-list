@@ -388,10 +388,19 @@
 		 * @returns {Object|null} The group the item is in or null
 		 */
 		getItemGroup: function (item) {
-			return this._groupsMap && this.data.find(function (group) {
-				var items = group && group.items;
-				return items && items.indexOf(item) > -1;
-			}) || null;
+			if (!this._groupsMap) {
+				return;
+			}
+			var foundGroup = null;
+			this.data.some(function (group) {
+				var found = group.items && group.items.indexOf(item) > -1;
+				if (found) {
+					foundGroup = group;
+				}
+				return found;
+			});
+
+			return foundGroup;
 		},
 
 		isFolded: function (group) {
