@@ -44,11 +44,11 @@
 
 		suite('<cosmoz-grouped-list>', function () {
 			var element,
-				items;
+				groups;
 
 			setup(function (done) {
 				element = fixture('cosmoz-grouped-list-fixture');
-				items = [{
+				groups = [{
 					name	: 'Group 0',
 					id		: 'g0',
 					items	: [{
@@ -80,7 +80,7 @@
 					name: 'Element 1',
 					id: 'e1'
 				}];
-				element.data = items;
+				element.data = groups;
 				setTimeout(function () {
 					done();
 				}, 10);
@@ -97,26 +97,26 @@
 			});
 
 			test('top level items are groups', function () {
-				assert.isTrue(element.isGroup(items[0]));
-				assert.isTrue(element.isGroup(items[1]));
-				assert.isFalse(element.isGroup(items[2]));
+				assert.isTrue(element.isGroup(groups[0]));
+				assert.isTrue(element.isGroup(groups[1]));
+				assert.isFalse(element.isGroup(groups[2]));
 			});
 
 			test('item belongs to group', function () {
-				assert.equal(element.getItemGroup(items[0].items[0]), items[0]);
-				assert.equal(element.getItemGroup(items[0].items[1]), items[0]);
+				assert.equal(element.getItemGroup(groups[0].items[0]), groups[0]);
+				assert.equal(element.getItemGroup(groups[0].items[1]), groups[0]);
 
-				assert.equal(element.getItemGroup(items[1].items[0]), items[1]);
-				assert.equal(element.getItemGroup(items[1].items[1]), items[1]);
+				assert.equal(element.getItemGroup(groups[1].items[0]), groups[1]);
+				assert.equal(element.getItemGroup(groups[1].items[1]), groups[1]);
 			});
 
 			test('ungrouped items are dropped', function () {
 				assert.isNull(element.getItemGroup({}));
-				assert.isNull(element.getItemGroup(items[2]));
+				assert.isNull(element.getItemGroup(groups[2]));
 			});
 
 			test('selects an item', function (done) {
-				var item = items[0].items[0];
+				var item = groups[0].items[0];
 				element.selectItem(item);
 				flush(function () {
 					assert.isTrue(element.isItemSelected(item));
@@ -128,7 +128,7 @@
 			});
 
 			test('deselects an item', function (done) {
-				var item = items[1].items[0];
+				var item = groups[1].items[0];
 				element.selectItem(item);
 				flush(function () {
 					assert.isTrue(element.isItemSelected(item));
@@ -143,7 +143,7 @@
 			});
 
 			test('selects a group', function (done) {
-				var group = items[1];
+				var group = groups[1];
 				element.selectGroup(group);
 				flush(function () {
 					assert.isTrue(element.isGroupSelected(group));
@@ -155,7 +155,7 @@
 			});
 
 			test('deselects a group', function (done) {
-				var group = items[0];
+				var group = groups[0];
 				element.selectGroup(group);
 				flush(function () {
 					assert.isTrue(element.isGroupSelected(group));
@@ -172,7 +172,7 @@
 			});
 
 			test('deselecting a item from group deselects the group', function (done) {
-				var group = items[1],
+				var group = groups[1],
 					item =  group.items[1];
 
 				element.selectGroup(group);
@@ -197,10 +197,10 @@
 				flush(function () {
 					assert.isNotNull(element.selectedItems[0]);
 					assert.equal(element.selectedItems.length, 4);
-					assert.equal(element.selectedItems[0], items[0].items[0]);
-					assert.equal(element.selectedItems[1], items[0].items[1]);
-					assert.equal(element.selectedItems[2], items[1].items[0]);
-					assert.equal(element.selectedItems[3], items[1].items[1]);
+					assert.equal(element.selectedItems[0], groups[0].items[0]);
+					assert.equal(element.selectedItems[1], groups[0].items[1]);
+					assert.equal(element.selectedItems[2], groups[1].items[0]);
+					assert.equal(element.selectedItems[3], groups[1].items[1]);
 					done();
 				});
 			});
@@ -208,7 +208,7 @@
 			test('deselect all items', function (done) {
 				element.selectAll();
 				flush(function () {
-					assert.equal(element.selectedItems[0], items[0].items[0]);
+					assert.equal(element.selectedItems[0], groups[0].items[0]);
 					element.deselectAll();
 					flush(function () {
 						assert.equal(element.selectedItems.length, 0);
@@ -218,7 +218,7 @@
 			});
 
 			test('folds a group', function (done) {
-				var group = items[1];
+				var group = groups[1];
 
 				element.foldGroup(group);
 				flush(function () {
@@ -228,7 +228,7 @@
 			});
 
 			test('unfolds a folded group', function (done) {
-				var group = items[1];
+				var group = groups[1];
 
 				element.foldGroup(group);
 				flush(function () {
@@ -243,7 +243,7 @@
 			});
 
 			test('toggles collapse on an item', function (done) {
-				var item = items[1].items[1];
+				var item = groups[1].items[1];
 
 				element.toggleCollapse(item);
 				flush(function () {
