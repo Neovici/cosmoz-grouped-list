@@ -57,7 +57,8 @@
             }
         ],
         "space-in-parens": 2,
-        "valid-jsdoc": 1
+        "valid-jsdoc": 1,
+        "keyword-spacing": ["error", { "before": true } ]
     },
     "plugins": [
         "html"
