@@ -153,7 +153,7 @@
 					item = this.data[groupIndex].items[itemIndex];
 					templateInstance = this._getModelFromItem(item);
 					if (templateInstance) {
-						itemPath = ['item'].concat(pathArray.slice(4));
+						itemPath = [ 'item' ].concat(pathArray.slice(4));
 						templateInstance.notifyPath(itemPath, value);
 						return true;
 					}
@@ -169,7 +169,7 @@
 				item = this.data[itemIndex];
 				templateInstance = this._getModelFromItem(item);
 				if (templateInstance) {
-					itemPath = ['item'].concat(pathArray.slice(2));
+					itemPath = [ 'item' ].concat(pathArray.slice(2));
 					templateInstance.notifyPath(itemPath, value);
 					return true;
 				}
@@ -420,7 +420,7 @@
 			if (groupState && groupState.folded) {
 				groupState.folded = false;
 				groupFlatIndex = this._flatData.indexOf(group);
-				this.splice.apply(this, ['_flatData', groupFlatIndex + 1, 0].concat(group.items));
+				this.splice.apply(this, [ '_flatData', groupFlatIndex + 1, 0 ].concat(group.items));
 			}
 
 		},
@@ -525,7 +525,7 @@
 					return all.concat(group.items || []);
 				}, []);
 			}
-			this.splice.apply(this, ['selectedItems', 0, this.selectedItems.length - 1 ].concat(selected));
+			this.splice.apply(this, [ 'selectedItems', 0, this.selectedItems.length - 1 ].concat(selected));
 
 			// Set the selected property to all visible items
 			this._templateSelectors.forEach(function (selector) {
