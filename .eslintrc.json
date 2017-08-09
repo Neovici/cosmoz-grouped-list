@@ -3,15 +3,56 @@
         "browser": true
     },
     "extends": "eslint:recommended",
+    "globals": {
+        "Cosmoz": false,
+        "CustomElements": false,
+        "HTMLImports": false,
+        "Polymer": false,
+        "WeakMap": false
+    },
+    "plugins": [
+        "html"
+    ],
     "rules": {
         "accessor-pairs": 1,
+        "array-bracket-spacing": [
+            "error",
+            "never"
+        ],
         "brace-style": 2,
         "camelcase": 2,
+        "comma-spacing": [
+            "error",
+            {
+                "after": true
+            }
+        ],
+        "comma-style": [
+            "error",
+            "last"
+        ],
+        "curly": [
+            "error",
+            "all"
+        ],
         "eqeqeq": 2,
         "guard-for-in": 2,
         "indent": [
             2,
             "tab"
+        ],
+        "key-spacing": [
+            "error",
+            {
+                "afterColon": true,
+                "beforeColon": false
+            }
+        ],
+        "keyword-spacing": [
+            "error",
+            {
+                "before": true
+            }
         ],
         "no-console": 0,
         "no-else-return": 2,
@@ -48,7 +89,6 @@
             2,
             "always"
         ],
-        // "sort-keys": 2,
         "space-before-function-paren": [
             2,
             {
@@ -57,23 +97,7 @@
             }
         ],
         "space-in-parens": 2,
-        "valid-jsdoc": 1,
-        "space-infix-ops" : 2,
-        "curly": ["error", "all"],
-        "keyword-spacing": ["error", { "before": true } ],
-        "array-bracket-spacing": ["error", "never"],
-        "comma-style": ["error", "last"],
-        "comma-spacing": ["error", { "after": true }],
-        "key-spacing": ["error", { "beforeColon": false, "afterColon":true }]
-    },
-    "plugins": [
-        "html"
-    ],
-    "globals": {
-        "Cosmoz": false,
-        "CustomElements": false,
-        "HTMLImports": false,
-        "Polymer": false,
-        "WeakMap": false
+        "space-infix-ops": 2,
+        "valid-jsdoc": 1
     }
 }
