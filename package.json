@@ -7,7 +7,6 @@
     "test": "test"
   },
   "devDependencies": {
-    "bower": "^1.8.0",
     "eslint": "^3.9.1",
     "eslint-plugin-html": "^3.1.1",
     "eslint-plugin-mocha": "^4.11.0",
@@ -15,8 +14,8 @@
   },
   "scripts": {
     "start": "polymer serve -o",
-    "postinstall": "bower i",
     "lint": "eslint --cache cosmoz-* item-template.html index.html demo/*.html test/*.html && polymer lint cosmoz-*.html",
+    "postinstall": "polymer install",
     "test": "polymer test"
   },
   "repository": {
