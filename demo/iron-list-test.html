@@ -67,89 +67,88 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed quis posuere turpis
 	<demo-page class="fit"></demo-page>
 
 	<script type="text/javascript">
-/*global Cosmoz,document, window */
-(function () {
-	'use strict';
+		/*global document, window */
+		(function () {
+			'use strict';
 
-	Polymer({
-		is: 'demo-page',
-		properties: {
-			data: {
-				type: Array,
-				notify: true
-			},
-			selectedItems: {
-				type: Array
-			},
-			outerValue: {
-				type: Number,
-				value: 0
-			},
-			groupIndex: {
-				type: Number,
-				value: 2
-			},
-			itemIndex: {
-				type: Number,
-				value: 0
-			},
-			itemValue: {
-				type: Number,
-				value: 100
-			}
+			Polymer({
+				is: 'demo-page',
+				properties: {
+					data: {
+						type: Array,
+						notify: true
+					},
+					selectedItems: {
+						type: Array
+					},
+					outerValue: {
+						type: Number,
+						value: 0
+					},
+					groupIndex: {
+						type: Number,
+						value: 2
+					},
+					itemIndex: {
+						type: Number,
+						value: 0
+					},
+					itemValue: {
+						type: Number,
+						value: 100
+					}
 
-		},
-		behaviors: [
-			Cosmoz.ListDemoBehavior
-		],
+				},
+				behaviors: [
+					Cosmoz.ListDemoBehavior
+				],
 
-		attached: function () {
-			this.async(function () {
-				this._newFlatData();
-			}.bind(this), 16);
-		},
+				attached: function () {
+					this.async(function () {
+						this._newFlatData();
+					}.bind(this), 16);
+				},
 
-		_emptySelectedItems: function () {
-			this.selectedItems = [];
-		},
+				_emptySelectedItems: function () {
+					this.selectedItems = [];
+				},
 
-		toggleCollapse: function (event) {
-			this.$.groupedList.toggleCollapse(event.model.item);
-		},
+				toggleCollapse: function (event) {
+					this.$.groupedList.toggleCollapse(event.model.item);
+				},
 
-		_computeExtraContentClass: function (expanded) {
-			return expanded ? 'extra-content expanded' : 'extra-content';
-		},
+				_computeExtraContentClass: function (expanded) {
+					return expanded ? 'extra-content expanded' : 'extra-content';
+				},
 
-		_changeItemValue: function () {
-			if (this.data[0].items) {
-				this.set('data.' + this.groupIndex + '.items.' + this.itemIndex + '.value', this.itemValue);
-			} else {
-				this.set('data.' + this.itemIndex + '.value', this.itemValue);
-			}
-		},
-		_changeOuterValue: function () {
-			this.outerValue += 1;
-		},
+				_changeItemValue: function () {
+					if (this.data[0].items) {
+						this.set('data.' + this.groupIndex + '.items.' + this.itemIndex + '.value', this.itemValue);
+					} else {
+						this.set('data.' + this.itemIndex + '.value', this.itemValue);
+					}
+				},
+				_changeOuterValue: function () {
+					this.outerValue += 1;
+				},
 
-		_emptyData: function () {
-			this.data = [];
-		},
+				_emptyData: function () {
+					this.data = [];
+				},
 
-		_newData: function () {
-			this.data = this.generateListDemoData(10, 15, 1, 11);
-		},
+				_newData: function () {
+					this.data = this.generateListDemoData(10, 15, 1, 11);
+				},
 
-		_newFlatData: function () {
-			var data = this.generateListDemoData(3, 3, 50, 80);
-			this.data = data[3].items;
-		}
+				_newFlatData: function () {
+					var data = this.generateListDemoData(3, 3, 50, 80);
+					this.data = data[3].items;
+				}
 
 
-	});
+			});
 
-}());
-
+		}());
 	</script>
 </body>
 </html>
