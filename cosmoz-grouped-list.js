@@ -27,6 +27,14 @@
 				notify: true
 			},
 
+			highlightedItems: {
+				type: Array,
+				value() {
+					return [];
+				},
+				notify: true
+			},
+
 			/**
 			 * Indicates wether this grouped-list should render groups without items.
 			 */
@@ -456,6 +464,29 @@
 			}
 		},
 
+		highlightItem(item) {
+			var model = this._getModelFromItem(item);
+
+			if (!this.isItemHighlighted(item)) {
+				this.push('highlightedItems', item);
+			}
+			if (model) {
+				model['highlighted'] = true;
+			}
+		},
+
+		playDownItem(item) {
+			var model = this._getModelFromItem(item),
+				highlightedIndex = this.highlightedItems.indexOf(item);
+
+			if (highlightedIndex >= 0) {
+				this.splice('highlightedItems', highlightedIndex, 1);
+			}
+			if (model) {
+				model['highlighted'] = false;
+			}
+		},
+
 		deselectItem: function (item) {
 			var selectedIndex = this.selectedItems.indexOf(item),
 				model = this._getModelFromItem(item),
@@ -486,6 +517,10 @@
 
 		isItemSelected: function (item) {
 			return this.selectedItems.indexOf(item) >= 0;
+		},
+
+		isItemHighlighted: function (item) {
+			return this.highlightedItems.indexOf(item) >= 0;
 		},
 
 		selectGroup: function (group) {
