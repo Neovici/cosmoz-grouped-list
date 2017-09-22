@@ -464,6 +464,13 @@
 			}
 		},
 
+		highlightItems(items) {
+			if (!items || !items.length > 0) {
+				return;
+			}
+			items.forEach(i => this.highlightItem(i));
+		},
+
 		highlightItem(item) {
 			var model = this._getModelFromItem(item);
 
