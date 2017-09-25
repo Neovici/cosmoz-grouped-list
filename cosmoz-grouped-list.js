@@ -577,7 +577,7 @@
 
 		deselectAll: function () {
 
-			this.splice('selectedItems', 0);
+			this.splice('selectedItems', 0, this.selectedItems.length);
 
 			if (this._groupsMap) {
 

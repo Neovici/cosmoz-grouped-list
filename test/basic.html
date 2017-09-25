@@ -15,7 +15,7 @@
 	<link rel="import" href="../cosmoz-grouped-list.html">
 </head>
 <body>
-	<test-fixture id="cosmoz-grouped-list-fixture">
+	<test-fixture id="basic">
 		<template>
 			<cosmoz-grouped-list>
 				<cosmoz-grouped-list-template id="itemTemplate">
@@ -51,7 +51,7 @@
 				groups;
 
 			setup(function (done) {
-				element = fixture('cosmoz-grouped-list-fixture');
+				element = fixture('basic');
 				groups = [{
 					name: 'Group 0',
 					id: 'g0',
@@ -95,7 +95,7 @@
 
 			test('attaches a iron-list element', function () {
 				assert.equal(element.$.list.is, 'iron-list');
-				assert.equal(element.$.list.items.length, 6);
+				assert.lengthOf(element.$.list.items, 6);
 				assert.equal(element.$.list.items[0], groups[0]);
 			});
 
@@ -204,7 +204,7 @@
 				element.selectAll();
 				flush(function () {
 					assert.isNotNull(element.selectedItems[0]);
-					assert.equal(element.selectedItems.length, 4);
+					assert.lengthOf(element.selectedItems, 4);
 					assert.equal(element.selectedItems[0], groups[0].items[0]);
 					assert.equal(element.selectedItems[1], groups[0].items[1]);
 					assert.equal(element.selectedItems[2], groups[1].items[0]);
@@ -219,7 +219,7 @@
 					assert.equal(element.selectedItems[0], groups[0].items[0]);
 					element.deselectAll();
 					flush(function () {
-						assert.equal(element.selectedItems.length, 0);
+						assert.lengthOf(element.selectedItems, 0);
 						done();
 					});
 				});
