@@ -464,26 +464,20 @@
 			}
 		},
 
-		highlightItem(item) {
-			var model = this._getModelFromItem(item);
-
-			if (!this.isItemHighlighted(item)) {
-				this.push('highlightedItems', item);
-			}
-			if (model) {
-				model['highlighted'] = true;
-			}
-		},
-
-		playDownItem(item) {
+		highlightItem(item, reverse) {
 			var model = this._getModelFromItem(item),
 				highlightedIndex = this.highlightedItems.indexOf(item);
 
-			if (highlightedIndex >= 0) {
+			if (!this.isItemHighlighted(item) && !reverse) {
+				this.push('highlightedItems', item);
+			}
+
+			if (highlightedIndex > -1 && reverse) {
 				this.splice('highlightedItems', highlightedIndex, 1);
 			}
+
 			if (model) {
-				model['highlighted'] = false;
+				model['highlighted'] = !reverse;
 			}
 		},
 
