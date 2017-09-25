@@ -295,6 +295,7 @@
 				templateInstance.expanded = this.isExpanded(item);
 				templateInstance.selected = this.isItemSelected(item);
 			}
+			templateInstance.highlighted = this.isItemHighlighted(item);
 
 			selector.show(element, newTemplate.id);
 		},
@@ -468,7 +469,7 @@
 			var model = this._getModelFromItem(item),
 				highlightedIndex = this.highlightedItems.indexOf(item);
 
-			if (!this.isItemHighlighted(item) && !reverse) {
+			if (highlightedIndex === -1 && !reverse) {
 				this.push('highlightedItems', item);
 			}
 
