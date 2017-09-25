@@ -45,6 +45,10 @@
 					@apply --layout-vertical;
 				}
 
+				.item-template[highlighted] {
+					background-color: #dcdcff;
+				}
+
 				.group-template {
 					@apply --layout-horizontal;
 					@apply --layout-center;
@@ -84,11 +88,14 @@
 				<cosmoz-grouped-list id="groupedList" data="{{ data }}" selected-items="{{selectedItems}}" class="flex">
 					<cosmoz-grouped-list-template id="itemTemplate">
 						<template>
-							<div class="item-template" style="border-bottom: 1px solid grey;">
-								<div>Outer binding: <span>[[outerValue]]</span></div>
-								<div>Id: <span>{{item.id}}</span></div>
-								<div>Name: <span>{{item.name}}</span></div>
-								<div>Value: <span>{{item.value}}</span></div>
+								<div highlighted$="[[highlighted]]" class="item-template" style="border-bottom: 1px solid grey;">
+									<div on-tap="highlight">
+									<div>Outer binding: <span>[[outerValue]]</span></div>
+									<div>Id: <span>{{item.id}}</span></div>
+									<div>Name: <span>{{item.name}}</span></div>
+									<div>Value: <span>{{item.value}}</span></div>
+									<div>Highlighted: <span>[[highlighted]]</span></div>
+								</div>
 								<div on-tap="select">Selected: <span>{{selected}}</span> (click to select/deselect)</div>
 								<div on-tap="toggleCollapse">[+]</div>
 								<div class$="{{_computeExtraContentClass(expanded)}}">
@@ -206,6 +213,14 @@
 			} else {
 				this.$.groupedList.selectItem(item);
 			}
+		},
+
+		highlight: function (event) {
+			var
+				model = event.model,
+				item = model.item,
+				highlighted = model.highlighted;
+			this.$.groupedList.highlightItem(item, highlighted);
 		},
 
 		selectAll: function (event) {
