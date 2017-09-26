@@ -27,6 +27,14 @@
 				notify: true
 			},
 
+			highlightedItems: {
+				type: Array,
+				value() {
+					return [];
+				},
+				notify: true
+			},
+
 			/**
 			 * Indicates wether this grouped-list should render groups without items.
 			 */
@@ -287,6 +295,7 @@
 				templateInstance.expanded = this.isExpanded(item);
 				templateInstance.selected = this.isItemSelected(item);
 			}
+			templateInstance.highlighted = this.isItemHighlighted(item);
 
 			selector.show(element, newTemplate.id);
 		},
@@ -456,6 +465,23 @@
 			}
 		},
 
+		highlightItem(item, reverse) {
+			var model = this._getModelFromItem(item),
+				highlightedIndex = this.highlightedItems.indexOf(item);
+
+			if (highlightedIndex === -1 && !reverse) {
+				this.push('highlightedItems', item);
+			}
+
+			if (highlightedIndex > -1 && reverse) {
+				this.splice('highlightedItems', highlightedIndex, 1);
+			}
+
+			if (model) {
+				model['highlighted'] = !reverse;
+			}
+		},
+
 		deselectItem: function (item) {
 			var selectedIndex = this.selectedItems.indexOf(item),
 				model = this._getModelFromItem(item),
@@ -486,6 +512,10 @@
 
 		isItemSelected: function (item) {
 			return this.selectedItems.indexOf(item) >= 0;
+		},
+
+		isItemHighlighted: function (item) {
+			return this.highlightedItems.indexOf(item) >= 0;
 		},
 
 		selectGroup: function (group) {
