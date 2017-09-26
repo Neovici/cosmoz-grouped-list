@@ -1,0 +1,117 @@
+<link rel="import" href="../../../polymer/polymer.html" />
+
+<link rel="import" href="../../../iron-flex-layout/iron-flex-layout.html" />
+<link rel="import" href="../../../iron-flex-layout/iron-flex-layout-classes.html" />
+
+<link rel="import" href="../../cosmoz-grouped-list.html" />
+<link rel="import" href="../../cosmoz-grouped-list-template.html" />
+
+<dom-module id="demo-basic">
+	<template>
+		<style include="iron-flex iron-flex-alignment iron-positioning">
+			.group-header {
+				padding: 5px;
+				background-color: #ccc;
+				font-weight: bold;
+			}
+
+			.extra-content.expanded {
+				display: block;
+			}
+
+			.extra-content {
+				display: none;
+			}
+
+			.action {
+				padding: 5px;
+				margin: 5px 5px 10px 5px;
+			}
+
+			.item-template {
+				@apply --layout-vertical;
+			}
+
+			.group-template {
+				@apply --layout-horizontal;
+				@apply --layout-center;
+				padding: 5px;
+				background-color: #ccc;
+				font-weight: bold;
+			}
+		</style>
+		<div class="layout vertical fit">
+			<h3>cosmoz-grouped-list demo</h3>
+			<cosmoz-grouped-list id="groupedList" data="{{ data }}" selected-items="{{ selectedItems }}" class="flex">
+				<cosmoz-grouped-list-template id="itemTemplate">
+					<template>
+						<div class="item-template" style="border-bottom: 1px solid grey;">
+							<div>
+								ID:<span class="item-id">{{ item.id }}</span>
+								NAME:<span class="item-name">{{ item.name }}</span>
+								VALUE:<span class="item-value">{{ item.value }}</span>
+							</div>
+						</div>
+					</template>
+				</cosmoz-grouped-list-template>
+				<cosmoz-grouped-list-template id="groupTemplate">
+					<template>
+						<div class="group-template">
+							NAME:<span class="item-name">{{ item.name }}</span>
+							VALUE: <span class="item-value">{{ item.value }}</span>
+							SELECTED: <span class="item-selected">{{ selected }}</span>
+						</div>
+					</template>
+				</cosmoz-grouped-list-template>
+			</cosmoz-grouped-list>
+		</div>
+	</template>
+	<script type="text/javascript">
+	(function () {
+		'use strict';
+
+		Polymer({
+			is: 'demo-basic',
+			properties: {
+				data: {
+					type: Array,
+					notify: true,
+					value: function () {
+						return  [{
+							name: 'Group 0',
+							id: 'g0',
+							items: [{
+								id: 'g0-0',
+								name: 'Group 0 item 0',
+								value: 0
+							}, {
+								id: 'g0-1',
+								name: 'Group 0 item 1',
+								value: 1
+							}]
+						}, {
+							name: 'Group 1',
+							id: 'g1',
+							items: [{
+								id: 'g1-0',
+								name: 'Group 1 item 0',
+								value: 0
+							}, {
+								id: 'g1-1',
+								name: 'Group 1 item 1',
+								value: 1
+							}]
+						}, {
+							name: 'Element 1',
+							id: 'e1'
+						}];
+					}
+				},
+				selectedItems: {
+					type: Array
+				},
+			}
+		});
+	}());
+	</script>
+</dom-module>
