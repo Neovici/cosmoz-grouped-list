@@ -1681,7 +1681,7 @@
       "demos": [
         {
           "url": "demo/index.html",
-          "description": "Demos"
+          "description": "All Demos"
         },
         {
           "url": "demo/full.html",
