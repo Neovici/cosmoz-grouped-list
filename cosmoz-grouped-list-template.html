@@ -1,5 +1,7 @@
 <link rel="import" href="../polymer/polymer.html"/>
-
+<!--
+@demo demo/full.html Full Demo
+-->
 <script>
 'use strict';
 Polymer({
@@ -36,7 +38,7 @@ Polymer({
 		instanceProps['highlighted'] = true;
 
 		this._instanceProps = instanceProps;
-
+		this._parentModel = true;
 		this._instancesInUse = [];
 		this._reusableInstances = [];
 	},

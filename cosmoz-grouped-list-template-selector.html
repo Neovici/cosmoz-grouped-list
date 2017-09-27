@@ -1,3 +1,7 @@
+<link rel="import" href="../polymer/polymer.html"/>
+<!--
+@demo demo/full.html Full Demo
+-->
 <dom-module id="cosmoz-grouped-list-template-selector">
 	<template>
 		<style>
@@ -7,71 +11,69 @@
 		</style>
 		<slot></slot>
 	</template>
-</dom-module>
+	<script>
+		'use strict';
+		Polymer({
 
-<script>
-	/*global Polymer*/
-	'use strict';
-	Polymer({
+			is: 'cosmoz-grouped-list-template-selector',
 
-		is: 'cosmoz-grouped-list-template-selector',
-
-		properties: {
-			item: {
-				type: Object,
-				observer: '_itemChanged'
+			properties: {
+				item: {
+					type: Object,
+					observer: '_itemChanged'
+				},
 			},
-		},
 
-		selectorId: null,
+			selectorId: null,
 
-		elements: null,
+			elements: null,
 
-		currentElement: null,
+			currentElement: null,
 
-		currentTemplateId: null,
+			currentTemplateId: null,
 
-		groupedList: null,
+			groupedList: null,
 
-		created: function () {
-			this.elements = {};
-		},
+			created: function () {
+				this.elements = {};
+			},
 
-		show: function (element, templateId) {
-			if (this.currentElement && element !== this.currentElement) {
-				this.currentElement.setAttribute('hidden', '');
-			}
-
-			element.removeAttribute('hidden');
-
-			this.currentElement = element;
-			this.currentTemplateId = templateId;
-		},
-
-		_itemChanged: function (newItem) {
-			var slot;
-
-			if (this.selectorId === null) {
-				// Notifies parent cosmoz-grouped-list that a new template-selector
-				// has been added so that it gets a selectorId
-				this.fire('template-selector-created', {
-					selector: this
-				}, {
-					bubbles: false
-				});
-
-				this.slotName = 'selectorSlot' + this.selectorId;
-				slot = Polymer.dom(this).querySelector('slot');
-				if (slot !== null) {
-					slot.setAttribute('name', this.slotName);
-				} else {
-					slot = Polymer.dom(this).querySelector('content');
-					slot.setAttribute('select', '[slot="' + this.slotName + '"]');
-					slot.setAttribute('name', this.slotName);
+			show: function (element, templateId) {
+				if (this.currentElement && element !== this.currentElement) {
+					this.currentElement.setAttribute('hidden', '');
 				}
-			}
 
-			this.groupedList.selectorItemChanged(this, newItem);
-		},
-	});
-</script>
+				element.removeAttribute('hidden');
+
+				this.currentElement = element;
+				this.currentTemplateId = templateId;
+			},
+
+			_itemChanged: function (newItem) {
+				var slot;
+
+				if (this.selectorId === null) {
+					// Notifies parent cosmoz-grouped-list that a new template-selector
+					// has been added so that it gets a selectorId
+					this.fire('template-selector-created', {
+						selector: this
+					}, {
+						bubbles: false
+					});
+
+					this.slotName = 'selectorSlot' + this.selectorId;
+					slot = Polymer.dom(this).querySelector('slot');
+					if (slot !== null) {
+						slot.setAttribute('name', this.slotName);
+					} else {
+						slot = Polymer.dom(this).querySelector('content');
+						slot.setAttribute('select', '[slot="' + this.slotName + '"]');
+						slot.setAttribute('name', this.slotName);
+					}
+				}
+
+				this.groupedList.selectorItemChanged(this, newItem);
+			},
+		});
+	</script>
+</dom-module>

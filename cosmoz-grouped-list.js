@@ -1,4 +1,3 @@
-/*global document, Polymer, window, WeakMap */
 (function () {
 
 	'use strict';
@@ -200,12 +199,14 @@
 		},
 
 		_scrollTargetChanged: function (scrollTarget, isAttached)  {
-			if (scrollTarget && isAttached) {
-				this.classList.add('has-scroll-target');
-				this.$.list.scrollTarget = scrollTarget;
-			} else {
-				this.$.list.scrollTarget = undefined;
-				this.classList.remove('has-scroll-target');
+			if (! (scrollTarget === undefined || isAttached === undefined)) {
+				if (scrollTarget && isAttached) {
+					this.classList.add('has-scroll-target');
+					this.$.list.scrollTarget = scrollTarget;
+				} else {
+					this.$.list.scrollTarget = undefined;
+					this.classList.remove('has-scroll-target');
+				}
 			}
 		},
 
@@ -577,7 +578,7 @@
 
 		deselectAll: function () {
 
-			this.splice('selectedItems', 0);
+			this.splice('selectedItems', 0, this.selectedItems.length);
 
 			if (this._groupsMap) {
 
