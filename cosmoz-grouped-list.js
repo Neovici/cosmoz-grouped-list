@@ -210,11 +210,11 @@
 			}
 		},
 
-		_prepareData: function (data) {
+		_prepareData(data = null) {
 
 			this.selectedItems = [];
 
-			if (!data || !data.length) {
+			if (data === null || data.length === 0 || data[0] === undefined) {
 				this._expandedItems = null;
 				this._foldedGroups = null;
 				this._groupsMap = null;
@@ -223,7 +223,7 @@
 
 			this._itemsMap = new WeakMap();
 
-			if (data.length === 0 || !data[0].items) {
+			if (!data[0].items) {
 				// no grouping, so render items as a standard list
 				this._groupsMap = null;
 				return data.slice();
@@ -613,6 +613,10 @@
 		toggleCollapse: function (item) {
 			var model = this._getModelFromItem(item),
 				itemState = this._itemsMap.get(item);
+
+			if (!model) {
+				return;
+			}
 
 			model.expanded = !model.expanded;
 

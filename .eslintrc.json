@@ -11,9 +11,6 @@
 		"Polymer": false,
 		"WeakMap": false
 	},
-	"parserOptions": {
-		"ecmaVersion": 6
-	},
 	"plugins": [
 		"html"
 	],
