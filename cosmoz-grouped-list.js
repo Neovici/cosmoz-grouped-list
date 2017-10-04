@@ -565,7 +565,7 @@
 					return all.concat(group.items || []);
 				}, []);
 			}
-			this.splice.apply(this, ['selectedItems', 0, this.selectedItems.length - 1].concat(selected));
+			this.splice.apply(this, ['selectedItems', 0, this.selectedItems.length].concat(selected));
 
 			// Set the selected property to all visible items
 			this._templateSelectors.forEach(function (selector) {
