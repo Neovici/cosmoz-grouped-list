@@ -2,6 +2,8 @@
 
 	'use strict';
 
+	const IS_V2 = Polymer.flush != null;
+
 	Polymer({
 
 		is: 'cosmoz-grouped-list',
@@ -161,7 +163,8 @@
 					templateInstance = this._getModelFromItem(item);
 					if (templateInstance) {
 						itemPath = ['item'].concat(pathArray.slice(4));
-						templateInstance.notifyPath(itemPath, value);
+						itemPath = IS_V2 ? itemPath.join('.') : itemPath;
+						this._forwardNotifyPath(templateInstance, itemPath, value, true, true);
 						return true;
 					}
 				}
@@ -177,9 +180,32 @@
 				templateInstance = this._getModelFromItem(item);
 				if (templateInstance) {
 					itemPath = ['item'].concat(pathArray.slice(2));
-					templateInstance.notifyPath(itemPath, value);
+					itemPath = IS_V2 ? itemPath.join('.') : itemPath;
+					this._forwardNotifyPath(templateInstance, itemPath, value, true, true);
 					return true;
 				}
+			}
+		},
+
+		_forwardProperty: function (instance, name, value, flush = false) {
+			if (IS_V2) {
+				instance._setPendingProperty(name, value);
+			} else {
+				instance[name] = value;
+			}
+			if (flush && instance._flushProperties) {
+				instance._flushProperties(true);
+			}
+		},
+
+		_forwardNotifyPath: function (instance, path, value, isPathNotification = false, flush = false) {
+			if (IS_V2) {
+				instance._setPendingPropertyOrPath(path, value, false, isPathNotification);
+			} else {
+				instance.notifyPath(path, value, isPathNotification);
+			}
+			if (flush && instance._flushProperties) {
+				instance._flushProperties(true);
 			}
 		},
 
@@ -287,16 +313,16 @@
 				templateInstance = element.__tmplInstance;
 			}
 
-			templateInstance.item = item;
+			this._forwardProperty(templateInstance, 'item', item);
 
 			if (isGroup) {
-				templateInstance.selected = this.isGroupSelected(item);
-				templateInstance.folded = this.isFolded(item);
+				this._forwardProperty(templateInstance, 'selected', this.isGroupSelected(item));
+				this._forwardProperty(templateInstance, 'folded', this.isFolded(item));
 			} else {
-				templateInstance.expanded = this.isExpanded(item);
-				templateInstance.selected = this.isItemSelected(item);
+				this._forwardProperty(templateInstance, 'expanded', this.isExpanded(item));
+				this._forwardProperty(templateInstance, 'selected', this.isItemSelected(item));
 			}
-			templateInstance.highlighted = this.isItemHighlighted(item);
+			this._forwardProperty(templateInstance, 'highlighted', this.isItemHighlighted(item), true);
 
 			selector.show(element, newTemplate.id);
 		},
@@ -640,6 +666,6 @@
 			if (physicalIndex >= 0) {
 				return this._templateSelectors[physicalIndex].currentElement.__tmplInstance;
 			}
-		}
+		},
 	});
 }());

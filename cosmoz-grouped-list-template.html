@@ -50,6 +50,15 @@ Polymer({
 		}
 	},
 
+
+	_forwardHostPropV2: function (prop, value) {
+		const forward =  instance => {
+			instance.forwardHostProp(prop, value);
+		};
+		this._instancesInUse.forEach(forward);
+		this._reusableInstances.forEach(forward);
+	},
+
 	_forwardParentProp: function (prop, value) {
 		this._instancesInUse.forEach(function (template) {
 			template[prop] = value;
