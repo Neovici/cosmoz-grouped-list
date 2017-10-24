@@ -138,16 +138,22 @@
 		},
 
 		_forwardItemPath: function (path, value) {
-			const match = path.match(/data(?:\.#?(\d+)\.items)?\.#?(\d+)(\..+)$/i),
+			const match = path.match(/data(?:\.#?(\d+)\.items)?\.#?(\d+)(\..+)$/i);
+
+			if (!match) {
+				return;
+			}
+
+			let
 				groupIndex = match[1],
-				itemIndex = match[2],
-				propertyPath = 'item' + match[3];
-			let item,
+				itemIndex =  match[2],
+				propertyPath = 'item' + match[3],
+				item,
 				instance;
 
 			if (groupIndex) {
 				item = this.data[groupIndex].items[itemIndex];
-			} else {
+			} else if (itemIndex) {
 				item = this.data[itemIndex];
 			}
 
@@ -155,6 +161,7 @@
 				console.warn('Item not found when forwarding path', path);
 				return;
 			}
+
 			instance = this._getModelFromItem(item);
 
 			if (!instance) {
@@ -175,14 +182,11 @@
 			return true;
 		},
 
-		_forwardProperty: function (instance, name, value, flush = false) {
+		_forwardProperty: function (instance, name, value) {
 			if (IS_V2) {
 				instance._setPendingProperty(name, value);
 			} else {
 				instance[name] = value;
-			}
-			if (flush && instance._flushProperties) {
-				instance._flushProperties(true);
 			}
 		},
 
@@ -291,15 +295,19 @@
 			}
 
 			this._forwardProperty(templateInstance, 'item', item);
+			this._forwardProperty(templateInstance, 'selected', isGroup ? this.isGroupSelected(item) : this.isItemSelected(item));
 
 			if (isGroup) {
-				this._forwardProperty(templateInstance, 'selected', this.isGroupSelected(item));
 				this._forwardProperty(templateInstance, 'folded', this.isFolded(item));
 			} else {
 				this._forwardProperty(templateInstance, 'expanded', this.isExpanded(item));
-				this._forwardProperty(templateInstance, 'selected', this.isItemSelected(item));
 			}
-			this._forwardProperty(templateInstance, 'highlighted', this.isItemHighlighted(item), true);
+
+			this._forwardProperty(templateInstance, 'highlighted', this.isItemHighlighted(item));
+
+			if (templateInstance._flushProperties) {
+				templateInstance._flushProperties(true);
+			}
 
 			selector.show(element, newTemplate.id);
 		},
