@@ -138,53 +138,41 @@
 		},
 
 		_forwardItemPath: function (path, value) {
-			var pathArray = path.split('.'),
-				itemPath,
-				groupIndex,
-				itemIndex,
-				templateInstance,
-				item;
+			const match = path.match(/data(?:\.#?(\d+)\.items)?\.#?(\d+)(\..+)$/i),
+				groupIndex = match[1],
+				itemIndex = match[2],
+				propertyPath = 'item' + match[3];
+			let item,
+				instance;
 
-			if (this._groupsMap !== null) {
-				if (pathArray.length === 5) {
-					// item property changed, path looks like data.#2.items.#0.value
-					if (pathArray[1][0] === '#') {
-						groupIndex = parseInt(pathArray[1].slice(1), 10);
-					} else {
-						groupIndex = parseInt(pathArray[1], 10);
-					}
-					if (pathArray[3][0] === '#') {
-						itemIndex = parseInt(pathArray[3].slice(1), 10);
-					} else {
-						itemIndex = parseInt(pathArray[3], 10);
-					}
-
-					item = this.data[groupIndex].items[itemIndex];
-					templateInstance = this._getModelFromItem(item);
-					if (templateInstance) {
-						itemPath = ['item'].concat(pathArray.slice(4));
-						itemPath = IS_V2 ? itemPath.join('.') : itemPath;
-						this._forwardNotifyPath(templateInstance, itemPath, value, true, true);
-						return true;
-					}
-				}
-			} else if (pathArray.length === 3) {
-				// item property change when no grouping
-				// path looks like data.#0.value
-				if (pathArray[1][0] === '#') {
-					itemIndex = parseInt(pathArray[1].slice(1), 10);
-				} else {
-					itemIndex = parseInt(pathArray[1], 10);
-				}
+			if (groupIndex) {
+				item = this.data[groupIndex].items[itemIndex];
+			} else {
 				item = this.data[itemIndex];
-				templateInstance = this._getModelFromItem(item);
-				if (templateInstance) {
-					itemPath = ['item'].concat(pathArray.slice(2));
-					itemPath = IS_V2 ? itemPath.join('.') : itemPath;
-					this._forwardNotifyPath(templateInstance, itemPath, value, true, true);
-					return true;
-				}
 			}
+
+			if (item == null) {
+				console.warn('Item not found when forwarding path', path);
+				return;
+			}
+			instance = this._getModelFromItem(item);
+
+			if (!instance) {
+				console.warn('Template instance for item not found when forwarding path', path);
+				return;
+			}
+
+			if (IS_V2) {
+				instance._setPendingPropertyOrPath(propertyPath, value, false, true);
+			} else {
+				instance.notifyPath(propertyPath, value, true);
+			}
+
+			if (instance._flushProperties) {
+				instance._flushProperties(true);
+			}
+
+			return true;
 		},
 
 		_forwardProperty: function (instance, name, value, flush = false) {
