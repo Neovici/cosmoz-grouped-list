@@ -7,10 +7,10 @@
 		"test": "test"
 	},
 	"devDependencies": {
-		"eslint": "^3.9.1",
+		"eslint": "^4.9.0",
 		"eslint-plugin-html": "^3.2.2",
 		"eslint-plugin-mocha": "^4.11.0",
-		"polymer-cli": "^1.5.5"
+		"polymer-cli": "^1.5.7"
 	},
 	"scripts": {
 		"start": "polymer serve -o",

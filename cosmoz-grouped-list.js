@@ -2,6 +2,8 @@
 
 	'use strict';
 
+	const IS_V2 = Polymer.flush != null;
+
 	Polymer({
 
 		is: 'cosmoz-grouped-list',
@@ -136,50 +138,55 @@
 		},
 
 		_forwardItemPath: function (path, value) {
-			var pathArray = path.split('.'),
-				itemPath,
-				groupIndex,
-				itemIndex,
-				templateInstance,
-				item;
+			const match = path.match(/data(?:\.#?(\d+)\.items)?\.#?(\d+)(\..+)$/i);
 
-			if (this._groupsMap !== null) {
-				if (pathArray.length === 5) {
-					// item property changed, path looks like data.#2.items.#0.value
-					if (pathArray[1][0] === '#') {
-						groupIndex = parseInt(pathArray[1].slice(1), 10);
-					} else {
-						groupIndex = parseInt(pathArray[1], 10);
-					}
-					if (pathArray[3][0] === '#') {
-						itemIndex = parseInt(pathArray[3].slice(1), 10);
-					} else {
-						itemIndex = parseInt(pathArray[3], 10);
-					}
+			if (!match) {
+				return;
+			}
 
-					item = this.data[groupIndex].items[itemIndex];
-					templateInstance = this._getModelFromItem(item);
-					if (templateInstance) {
-						itemPath = ['item'].concat(pathArray.slice(4));
-						templateInstance.notifyPath(itemPath, value);
-						return true;
-					}
-				}
-			} else if (pathArray.length === 3) {
-				// item property change when no grouping
-				// path looks like data.#0.value
-				if (pathArray[1][0] === '#') {
-					itemIndex = parseInt(pathArray[1].slice(1), 10);
-				} else {
-					itemIndex = parseInt(pathArray[1], 10);
-				}
+			let
+				groupIndex = match[1],
+				itemIndex =  match[2],
+				propertyPath = 'item' + match[3],
+				item,
+				instance;
+
+			if (groupIndex) {
+				item = this.data[groupIndex].items[itemIndex];
+			} else if (itemIndex) {
 				item = this.data[itemIndex];
-				templateInstance = this._getModelFromItem(item);
-				if (templateInstance) {
-					itemPath = ['item'].concat(pathArray.slice(2));
-					templateInstance.notifyPath(itemPath, value);
-					return true;
-				}
+			}
+
+			if (item == null) {
+				console.warn('Item not found when forwarding path', path);
+				return;
+			}
+
+			instance = this._getModelFromItem(item);
+
+			if (!instance) {
+				console.warn('Template instance for item not found when forwarding path', path);
+				return;
+			}
+
+			if (IS_V2) {
+				instance._setPendingPropertyOrPath(propertyPath, value, false, true);
+			} else {
+				instance.notifyPath(propertyPath, value, true);
+			}
+
+			if (instance._flushProperties) {
+				instance._flushProperties(true);
+			}
+
+			return true;
+		},
+
+		_forwardProperty: function (instance, name, value) {
+			if (IS_V2) {
+				instance._setPendingProperty(name, value);
+			} else {
+				instance[name] = value;
 			}
 		},
 
@@ -287,16 +294,20 @@
 				templateInstance = element.__tmplInstance;
 			}
 
-			templateInstance.item = item;
+			this._forwardProperty(templateInstance, 'item', item);
+			this._forwardProperty(templateInstance, 'selected', isGroup ? this.isGroupSelected(item) : this.isItemSelected(item));
 
 			if (isGroup) {
-				templateInstance.selected = this.isGroupSelected(item);
-				templateInstance.folded = this.isFolded(item);
+				this._forwardProperty(templateInstance, 'folded', this.isFolded(item));
 			} else {
-				templateInstance.expanded = this.isExpanded(item);
-				templateInstance.selected = this.isItemSelected(item);
+				this._forwardProperty(templateInstance, 'expanded', this.isExpanded(item));
 			}
-			templateInstance.highlighted = this.isItemHighlighted(item);
+
+			this._forwardProperty(templateInstance, 'highlighted', this.isItemHighlighted(item));
+
+			if (templateInstance._flushProperties) {
+				templateInstance._flushProperties(true);
+			}
 
 			selector.show(element, newTemplate.id);
 		},
@@ -640,6 +651,6 @@
 			if (physicalIndex >= 0) {
 				return this._templateSelectors[physicalIndex].currentElement.__tmplInstance;
 			}
-		}
+		},
 	});
 }());
