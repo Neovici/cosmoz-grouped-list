@@ -198,17 +198,6 @@
 			}
 		},
 
-		_forwardNotifyPath: function (instance, path, value, isPathNotification = false, flush = false) {
-			if (IS_V2) {
-				instance._setPendingPropertyOrPath(path, value, false, isPathNotification);
-			} else {
-				instance.notifyPath(path, value, isPathNotification);
-			}
-			if (flush && instance._flushProperties) {
-				instance._flushProperties(true);
-			}
-		},
-
 		_resetAllTemplates: function () {
 			if (this._templateSelectors.length > 0) {
 				this._templateSelectors.forEach(function (selector) {
