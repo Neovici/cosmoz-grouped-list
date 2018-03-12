@@ -259,7 +259,7 @@
 		},
 
 		_onTemplateSelectorCreated(event) {
-			var	selector = event.detail.selector;
+			let	selector = event.detail.selector;
 			selector.selectorId = this._templateSelectorsCount;
 			selector.groupedList = this;
 			this._templateSelectors[selector.selectorId] = selector;
@@ -267,7 +267,7 @@
 		},
 
 		selectorItemChanged(selector, item) {
-			var selectorId = selector.selectorId,
+			let selectorId = selector.selectorId,
 				isGroup = this.isGroup(item),
 				newTemplate,
 				element,
@@ -332,7 +332,7 @@
 		 * @returns {HTMLElement|null} The first visible element or null
 		 */
 		getFirstVisibleItemElement() {
-			var i,
+			let i,
 				selector,
 				item,
 				selectorIndex;
@@ -365,7 +365,7 @@
 		 */
 		get hasRenderedData() {
 			if (this._flatData && this._flatData.length > 0) {
-				return this._templateSelectors.some(function (selector) {
+				return this._templateSelectors.some(selector => {
 					if (selector.getAttribute('hidden') === null) {
 						return true;
 					}
@@ -385,14 +385,14 @@
 		removeItem(item) {
 			if (this._groupsMap) {
 				return this.data.some(function (group, groupIndex) {
-					var index = group.items.indexOf(item);
+					const index = group.items.indexOf(item);
 					if (index >= 0) {
 						this.splice('data.' + groupIndex + '.items', index, 1);
 						return true;
 					}
 				}, this);
 			}
-			var i = this.data.indexOf(item);
+			const i = this.data.indexOf(item);
 			if (i >= 0) {
 				this.splice('data', i, 1);
 			}
@@ -412,9 +412,9 @@
 			if (!this._groupsMap) {
 				return;
 			}
-			var foundGroup = null;
-			this.data.some(function (group) {
-				var found = group.items && group.items.indexOf(item) > -1;
+			let foundGroup = null;
+			this.data.some(group => {
+				const found = group.items && group.items.indexOf(item) > -1;
 				if (found) {
 					foundGroup = group;
 				}
@@ -425,12 +425,12 @@
 		},
 
 		isFolded(group) {
-			var groupState = this._groupsMap && this._groupsMap.get(group);
+			const groupState = this._groupsMap && this._groupsMap.get(group);
 			return groupState && groupState.folded;
 		},
 
 		toggleFold(templateInstance) {
-			var item = templateInstance.item,
+			const item = templateInstance.item,
 				group = this.isGroup(item) ? item : this.getItemGroup(item),
 				isFolded = this.isFolded(group);
 
@@ -444,7 +444,7 @@
 		},
 
 		unfoldGroup(group) {
-			var groupState = this._groupsMap && this._groupsMap.get(group),
+			let groupState = this._groupsMap && this._groupsMap.get(group),
 				groupFlatIndex;
 
 			if (groupState && groupState.folded) {
@@ -456,7 +456,7 @@
 		},
 
 		foldGroup(group) {
-			var groupState = this._groupsMap && this._groupsMap.get(group),
+			let groupState = this._groupsMap && this._groupsMap.get(group),
 				groupFlatIndex;
 
 			if (groupState && !groupState.folded) {
@@ -467,7 +467,7 @@
 		},
 
 		selectItem(item) {
-			var model = this._getModelFromItem(item);
+			let model = this._getModelFromItem(item);
 
 			if (!this.isItemSelected(item)) {
 				this.push('selectedItems', item);
@@ -478,7 +478,7 @@
 		},
 
 		highlightItem(item, reverse) {
-			var model = this._getModelFromItem(item),
+			let model = this._getModelFromItem(item),
 				highlightedIndex = this.highlightedItems.indexOf(item);
 
 			if (highlightedIndex === -1 && !reverse) {
@@ -495,7 +495,7 @@
 		},
 
 		deselectItem(item) {
-			var selectedIndex = this.selectedItems.indexOf(item),
+			let selectedIndex = this.selectedItems.indexOf(item),
 				model = this._getModelFromItem(item),
 				group = this.getItemGroup(item),
 				groupState,
@@ -531,7 +531,7 @@
 		},
 
 		selectGroup(group) {
-			var model = this._getModelFromItem(group),
+			let model = this._getModelFromItem(group),
 				groupState = this._groupsMap && this._groupsMap.get(group);
 
 			if (groupState) {
@@ -546,7 +546,7 @@
 		},
 
 		deselectGroup(group) {
-			var model = this._getModelFromItem(group),
+			let model = this._getModelFromItem(group),
 				groupState = this._groupsMap && this._groupsMap.get(group);
 
 			if (groupState) {
@@ -559,12 +559,12 @@
 		},
 
 		isGroupSelected(group) {
-			var groupState = this._groupsMap && this._groupsMap.get(group);
+			const groupState = this._groupsMap && this._groupsMap.get(group);
 			return groupState !== undefined && groupState.selected;
 		},
 
 		selectAll() {
-			var groups = this._groupsMap,
+			let groups = this._groupsMap,
 				selected = this.data;
 
 			if (groups) {
@@ -579,8 +579,8 @@
 			this.splice.apply(this, ['selectedItems', 0, this.selectedItems.length].concat(selected));
 
 			// Set the selected property to all visible items
-			this._templateSelectors.forEach(function (selector) {
-				var templateInstance = selector.currentElement && selector.currentElement.__tmplInstance;
+			this._templateSelectors.forEach(selector => {
+				let templateInstance = selector.currentElement && selector.currentElement.__tmplInstance;
 				if (templateInstance) {
 					templateInstance.selected = true;
 				}
@@ -594,7 +594,7 @@
 			if (this._groupsMap) {
 
 				this.data.forEach(function (group) {
-					var groupState = this._groupsMap.get(group);
+					let groupState = this._groupsMap.get(group);
 					if (groupState) {
 						groupState.selected = false;
 					}
@@ -602,8 +602,8 @@
 			}
 
 			// Set the selected property to all visible items
-			this._templateSelectors.forEach(function (selector) {
-				var templateInstance = selector.currentElement && selector.currentElement.__tmplInstance;
+			this._templateSelectors.forEach(selector => {
+				let templateInstance = selector.currentElement && selector.currentElement.__tmplInstance;
 				if (templateInstance) {
 					templateInstance.selected = false;
 				}
@@ -622,7 +622,7 @@
 		},
 
 		toggleCollapse(item) {
-			var model = this._getModelFromItem(item),
+			let model = this._getModelFromItem(item),
 				itemState = this._itemsMap.get(item);
 
 			if (!model) {
@@ -642,15 +642,15 @@
 		},
 
 		isExpanded(item) {
-			var itemState = this._itemsMap ? this._itemsMap.get(item) : undefined;
+			const itemState = this._itemsMap ? this._itemsMap.get(item) : undefined;
 			return itemState !== undefined && itemState.expanded;
 		},
 
 		_getModelFromItem(item) {
-			var	physicalIndex = this._renderedItems.indexOf(item);
+			const	physicalIndex = this._renderedItems.indexOf(item);
 			if (physicalIndex >= 0) {
 				return this._templateSelectors[physicalIndex].currentElement.__tmplInstance;
 			}
-		},
+		}
 	});
 }());

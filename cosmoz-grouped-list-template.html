@@ -28,7 +28,7 @@ Polymer({
 	_reusableInstances: null,
 
 	ready() {
-		var instanceProps = {};
+		let instanceProps = {};
 
 		instanceProps[this.as] = true;
 		instanceProps[this.indexAs] = true;
@@ -60,22 +60,22 @@ Polymer({
 	},
 
 	_forwardParentProp(prop, value) {
-		this._instancesInUse.forEach(function (template) {
+		this._instancesInUse.forEach(template => {
 			template[prop] = value;
 		});
 
 		// As reusable instances might be reused, we need to keep their bindings up to date
-		this._reusableInstances.forEach(function (template) {
+		this._reusableInstances.forEach(template => {
 			template[prop] = value;
 		});
 	},
 
 	_forwardParentPath(path, value) {
-		this._instancesInUse.forEach(function (template) {
+		this._instancesInUse.forEach(template => {
 			template.notifyPath(path, value, true);
 		});
 		// As reusable instances might be reused, we need to keep their bindings up to date
-		this._reusableInstances.forEach(function (template) {
+		this._reusableInstances.forEach(template => {
 			template.notifyPath(path, value, true);
 		});
 	},
@@ -91,7 +91,7 @@ Polymer({
 	// },
 
 	getInstance() {
-		var instance;
+		let instance;
 		if (this._reusableInstances.length > 0) {
 			instance = this._reusableInstances.pop();
 		} else {
@@ -103,7 +103,7 @@ Polymer({
 	},
 
 	releaseInstance(templateInstance) {
-		var index = this._instancesInUse.indexOf(templateInstance);
+		const index = this._instancesInUse.indexOf(templateInstance);
 		if (index >= 0) {
 			this._instancesInUse.splice(index, 1);
 			this._reusableInstances.push(templateInstance);
