@@ -222,12 +222,9 @@
 			this.selectedItems = [];
 
 			if (data === null || data.length === 0 || data[0] === undefined) {
-				this._expandedItems = null;
-				this._foldedGroups = null;
-				this._groupsMap = null;
+				this._expandedItems = this._foldedGroups = this._groupsMap = null;
 				return null;
 			}
-
 			this._itemsMap = new WeakMap();
 
 			if (!data[0].items) {
@@ -235,7 +232,6 @@
 				this._groupsMap = null;
 				return data.slice();
 			}
-
 			this._groupsMap = new WeakMap();
 
 			return data.reduce(function (flatData, group) {
@@ -275,11 +271,7 @@
 
 			this._renderedItems[selectorId] = item;
 
-			if (isGroup) {
-				newTemplate = this._getGroupTemplate();
-			} else {
-				newTemplate = this._getItemTemplate();
-			}
+			newTemplate = this._getTemplate(isGroup ? 'group' : 'item');
 
 			element = selector.elements[newTemplate.id];
 
@@ -312,18 +304,11 @@
 			selector.show(element, newTemplate.id);
 		},
 
-		_getItemTemplate() {
-			if (!this._itemTemplate) {
-				this._itemTemplate = Polymer.dom(this).querySelector('#itemTemplate');
+		_getTemplate(type) {
+			if (!this['_' + type + 'Template']) {
+				this['_' + type + 'Template'] = Polymer.dom(this).querySelector('#' + type + 'Template');
 			}
-			return this._itemTemplate;
-		},
-
-		_getGroupTemplate() {
-			if (!this._groupTemplate) {
-				this._groupTemplate = Polymer.dom(this).querySelector('#groupTemplate');
-			}
-			return this._groupTemplate;
+			return this['_' + type + 'Template'];
 		},
 
 		/**
@@ -531,7 +516,7 @@
 		},
 
 		selectGroup(group) {
-			let model = this._getModelFromItem(group),
+			var model = this._getModelFromItem(group),
 				groupState = this._groupsMap && this._groupsMap.get(group);
 
 			if (groupState) {
@@ -569,7 +554,7 @@
 
 			if (groups) {
 				selected = selected.reduce(function (all, group) {
-					var state = groups.get(group);
+					let state = groups.get(group);
 					if (state) {
 						state.selected = true;
 					}
