@@ -515,32 +515,19 @@
 			return this.highlightedItems.indexOf(item) >= 0;
 		},
 
-		selectGroup(group) {
-			var model = this._getModelFromItem(group),
-				groupState = this._groupsMap && this._groupsMap.get(group);
-
-			if (groupState) {
-				groupState.selected = true;
-			}
-
-			if (model) {
-				model['selected'] = true;
-			}
-
-			group.items.forEach(this.selectItem, this);
-		},
-
-		deselectGroup(group) {
+		toggleSelectGroup(group, selected) {
 			let model = this._getModelFromItem(group),
 				groupState = this._groupsMap && this._groupsMap.get(group);
 
 			if (groupState) {
-				groupState.selected = false;
+				groupState.selected = selected ? false : true;
 			}
+
 			if (model) {
-				model['selected'] = false;
+				model['selected'] = selected ? false : true;
 			}
-			group.items.forEach(this.deselectItem, this);
+			const temp = selected ? 'deselectItem' : 'selectItem';
+			group.items.forEach(this[temp], this);
 		},
 
 		isGroupSelected(group) {

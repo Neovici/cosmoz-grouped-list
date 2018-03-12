@@ -174,11 +174,8 @@
 					model = event.model,
 					group = model.item,
 					selected = model.selected;
-				if (selected) {
-					this.$.groupedList.deselectGroup(group);
-				} else {
-					this.$.groupedList.selectGroup(group);
-				}
+
+				this.$.groupedList.toggleSelectGroup(group, selected);
 			},
 
 			getFoldIcon: function (folded) {
