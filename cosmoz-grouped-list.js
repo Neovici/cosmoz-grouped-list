@@ -99,23 +99,23 @@
 		 */
 		_renderedItems: null,
 
-		created: function () {
+		created() {
 			this._templateSelectors = [];
 			this._renderedItems = [];
 			this._physicalItens = [];
 		},
 
-		attached: function () {
+		attached() {
 			this._isAttached = true;
 			this._debounceRender();
 		},
 
-		detached: function () {
+		detached() {
 			this._isAttached = false;
 			this.cancelDebouncer('render');
 		},
 
-		_dataChanged: function (change) {
+		_dataChanged(change) {
 			if (change.path === 'data' || change.path.slice(-8) === '.splices') {
 				this._debounceRender();
 			} else if (change.path.slice(-7) !== '.length') {
@@ -125,11 +125,11 @@
 			}
 		},
 
-		_debounceRender: function () {
+		_debounceRender() {
 			this.debounce('render', this._render);
 		},
 
-		_render: function () {
+		_render() {
 			if (!this._isAttached) {
 				return;
 			}
@@ -137,7 +137,7 @@
 			this._flatData = this._prepareData(this.data);
 		},
 
-		_forwardItemPath: function (path, value) {
+		_forwardItemPath(path, value) {
 			const match = path.match(/data(?:\.#?(\d+)\.items)?\.#?(\d+)(\..+)$/i);
 
 			if (!match) {
@@ -182,7 +182,7 @@
 			return true;
 		},
 
-		_forwardProperty: function (instance, name, value) {
+		_forwardProperty(instance, name, value) {
 			if (IS_V2) {
 				instance._setPendingProperty(name, value);
 			} else {
@@ -190,7 +190,7 @@
 			}
 		},
 
-		_resetAllTemplates: function () {
+		_resetAllTemplates() {
 			if (this._templateSelectors.length > 0) {
 				this._templateSelectors.forEach(function (selector) {
 					if (selector.element) {
@@ -205,7 +205,7 @@
 
 		},
 
-		_scrollTargetChanged: function (scrollTarget, isAttached)  {
+		_scrollTargetChanged(scrollTarget, isAttached)  {
 			if (! (scrollTarget === undefined || isAttached === undefined)) {
 				if (scrollTarget && isAttached) {
 					this.classList.add('has-scroll-target');
@@ -222,12 +222,9 @@
 			this.selectedItems = [];
 
 			if (data === null || data.length === 0 || data[0] === undefined) {
-				this._expandedItems = null;
-				this._foldedGroups = null;
-				this._groupsMap = null;
+				this._expandedItems = this._foldedGroups = this._groupsMap = null;
 				return null;
 			}
-
 			this._itemsMap = new WeakMap();
 
 			if (!data[0].items) {
@@ -235,7 +232,6 @@
 				this._groupsMap = null;
 				return data.slice();
 			}
-
 			this._groupsMap = new WeakMap();
 
 			return data.reduce(function (flatData, group) {
@@ -258,16 +254,16 @@
 			}.bind(this), []);
 		},
 
-		_onTemplateSelectorCreated: function (event) {
-			var	selector = event.detail.selector;
+		_onTemplateSelectorCreated(event) {
+			let	selector = event.detail.selector;
 			selector.selectorId = this._templateSelectorsCount;
 			selector.groupedList = this;
 			this._templateSelectors[selector.selectorId] = selector;
 			this._templateSelectorsCount += 1;
 		},
 
-		selectorItemChanged: function (selector, item) {
-			var selectorId = selector.selectorId,
+		selectorItemChanged(selector, item) {
+			let selectorId = selector.selectorId,
 				isGroup = this.isGroup(item),
 				newTemplate,
 				element,
@@ -275,11 +271,7 @@
 
 			this._renderedItems[selectorId] = item;
 
-			if (isGroup) {
-				newTemplate = this._getGroupTemplate();
-			} else {
-				newTemplate = this._getItemTemplate();
-			}
+			newTemplate = this._getTemplate(isGroup ? 'group' : 'item');
 
 			element = selector.elements[newTemplate.id];
 
@@ -312,18 +304,11 @@
 			selector.show(element, newTemplate.id);
 		},
 
-		_getItemTemplate: function () {
-			if (!this._itemTemplate) {
-				this._itemTemplate = Polymer.dom(this).querySelector('#itemTemplate');
+		_getTemplate(type) {
+			if (!this['_' + type + 'Template']) {
+				this['_' + type + 'Template'] = Polymer.dom(this).querySelector('#' + type + 'Template');
 			}
-			return this._itemTemplate;
-		},
-
-		_getGroupTemplate: function () {
-			if (!this._groupTemplate) {
-				this._groupTemplate = Polymer.dom(this).querySelector('#groupTemplate');
-			}
-			return this._groupTemplate;
+			return this['_' + type + 'Template'];
 		},
 
 		/**
@@ -331,8 +316,8 @@
 		 * This method is mainly aimed at `cosmoz-omnitable`.
 		 * @returns {HTMLElement|null} The first visible element or null
 		 */
-		getFirstVisibleItemElement: function () {
-			var i,
+		getFirstVisibleItemElement() {
+			let i,
 				selector,
 				item,
 				selectorIndex;
@@ -365,7 +350,7 @@
 		 */
 		get hasRenderedData() {
 			if (this._flatData && this._flatData.length > 0) {
-				return this._templateSelectors.some(function (selector) {
+				return this._templateSelectors.some(selector => {
 					if (selector.getAttribute('hidden') === null) {
 						return true;
 					}
@@ -382,24 +367,24 @@
 		 * @param {Object} item The item to remove
 		 * @returns {Boolean|undefined} true/false or null
 		 */
-		removeItem: function (item) {
+		removeItem(item) {
 			if (this._groupsMap) {
 				return this.data.some(function (group, groupIndex) {
-					var index = group.items.indexOf(item);
+					const index = group.items.indexOf(item);
 					if (index >= 0) {
 						this.splice('data.' + groupIndex + '.items', index, 1);
 						return true;
 					}
 				}, this);
 			}
-			var i = this.data.indexOf(item);
+			const i = this.data.indexOf(item);
 			if (i >= 0) {
 				this.splice('data', i, 1);
 			}
 
 		},
 
-		isGroup: function (item) {
+		isGroup(item) {
 			return this._groupsMap && this._groupsMap.get(item) !== undefined;
 		},
 
@@ -408,13 +393,13 @@
 		 * @param {Object} item The item to search for
 		 * @returns {Object|null} The group the item is in or null
 		 */
-		getItemGroup: function (item) {
+		getItemGroup(item) {
 			if (!this._groupsMap) {
 				return;
 			}
-			var foundGroup = null;
-			this.data.some(function (group) {
-				var found = group.items && group.items.indexOf(item) > -1;
+			let foundGroup = null;
+			this.data.some(group => {
+				const found = group.items && group.items.indexOf(item) > -1;
 				if (found) {
 					foundGroup = group;
 				}
@@ -424,13 +409,13 @@
 			return foundGroup;
 		},
 
-		isFolded: function (group) {
-			var groupState = this._groupsMap && this._groupsMap.get(group);
+		isFolded(group) {
+			const groupState = this._groupsMap && this._groupsMap.get(group);
 			return groupState && groupState.folded;
 		},
 
-		toggleFold: function (templateInstance) {
-			var item = templateInstance.item,
+		toggleFold(templateInstance) {
+			const item = templateInstance.item,
 				group = this.isGroup(item) ? item : this.getItemGroup(item),
 				isFolded = this.isFolded(group);
 
@@ -443,8 +428,8 @@
 			templateInstance.folded = !isFolded;
 		},
 
-		unfoldGroup: function (group) {
-			var groupState = this._groupsMap && this._groupsMap.get(group),
+		unfoldGroup(group) {
+			let groupState = this._groupsMap && this._groupsMap.get(group),
 				groupFlatIndex;
 
 			if (groupState && groupState.folded) {
@@ -455,8 +440,8 @@
 
 		},
 
-		foldGroup: function (group) {
-			var groupState = this._groupsMap && this._groupsMap.get(group),
+		foldGroup(group) {
+			let groupState = this._groupsMap && this._groupsMap.get(group),
 				groupFlatIndex;
 
 			if (groupState && !groupState.folded) {
@@ -466,8 +451,8 @@
 			}
 		},
 
-		selectItem: function (item) {
-			var model = this._getModelFromItem(item);
+		selectItem(item) {
+			let model = this._getModelFromItem(item);
 
 			if (!this.isItemSelected(item)) {
 				this.push('selectedItems', item);
@@ -478,7 +463,7 @@
 		},
 
 		highlightItem(item, reverse) {
-			var model = this._getModelFromItem(item),
+			let model = this._getModelFromItem(item),
 				highlightedIndex = this.highlightedItems.indexOf(item);
 
 			if (highlightedIndex === -1 && !reverse) {
@@ -494,8 +479,8 @@
 			}
 		},
 
-		deselectItem: function (item) {
-			var selectedIndex = this.selectedItems.indexOf(item),
+		deselectItem(item) {
+			let selectedIndex = this.selectedItems.indexOf(item),
 				model = this._getModelFromItem(item),
 				group = this.getItemGroup(item),
 				groupState,
@@ -522,54 +507,41 @@
 			}
 		},
 
-		isItemSelected: function (item) {
+		isItemSelected(item) {
 			return this.selectedItems.indexOf(item) >= 0;
 		},
 
-		isItemHighlighted: function (item) {
+		isItemHighlighted(item) {
 			return this.highlightedItems.indexOf(item) >= 0;
 		},
 
-		selectGroup: function (group) {
-			var model = this._getModelFromItem(group),
+		toggleSelectGroup(group, selected) {
+			let model = this._getModelFromItem(group),
 				groupState = this._groupsMap && this._groupsMap.get(group);
 
 			if (groupState) {
-				groupState.selected = true;
+				groupState.selected = selected ? false : true;
 			}
 
 			if (model) {
-				model['selected'] = true;
+				model['selected'] = selected ? false : true;
 			}
-
-			group.items.forEach(this.selectItem, this);
+			const temp = selected ? 'deselectItem' : 'selectItem';
+			group.items.forEach(this[temp], this);
 		},
 
-		deselectGroup: function (group) {
-			var model = this._getModelFromItem(group),
-				groupState = this._groupsMap && this._groupsMap.get(group);
-
-			if (groupState) {
-				groupState.selected = false;
-			}
-			if (model) {
-				model['selected'] = false;
-			}
-			group.items.forEach(this.deselectItem, this);
-		},
-
-		isGroupSelected: function (group) {
-			var groupState = this._groupsMap && this._groupsMap.get(group);
+		isGroupSelected(group) {
+			const groupState = this._groupsMap && this._groupsMap.get(group);
 			return groupState !== undefined && groupState.selected;
 		},
 
-		selectAll: function () {
-			var groups = this._groupsMap,
+		selectAll() {
+			let groups = this._groupsMap,
 				selected = this.data;
 
 			if (groups) {
 				selected = selected.reduce(function (all, group) {
-					var state = groups.get(group);
+					let state = groups.get(group);
 					if (state) {
 						state.selected = true;
 					}
@@ -579,22 +551,22 @@
 			this.splice.apply(this, ['selectedItems', 0, this.selectedItems.length].concat(selected));
 
 			// Set the selected property to all visible items
-			this._templateSelectors.forEach(function (selector) {
-				var templateInstance = selector.currentElement && selector.currentElement.__tmplInstance;
+			this._templateSelectors.forEach(selector => {
+				let templateInstance = selector.currentElement && selector.currentElement.__tmplInstance;
 				if (templateInstance) {
 					templateInstance.selected = true;
 				}
 			});
 		},
 
-		deselectAll: function () {
+		deselectAll() {
 
 			this.splice('selectedItems', 0, this.selectedItems.length);
 
 			if (this._groupsMap) {
 
 				this.data.forEach(function (group) {
-					var groupState = this._groupsMap.get(group);
+					let groupState = this._groupsMap.get(group);
 					if (groupState) {
 						groupState.selected = false;
 					}
@@ -602,27 +574,27 @@
 			}
 
 			// Set the selected property to all visible items
-			this._templateSelectors.forEach(function (selector) {
-				var templateInstance = selector.currentElement && selector.currentElement.__tmplInstance;
+			this._templateSelectors.forEach(selector => {
+				let templateInstance = selector.currentElement && selector.currentElement.__tmplInstance;
 				if (templateInstance) {
 					templateInstance.selected = false;
 				}
 			});
 		},
 
-		updateSize: function (item) {
+		updateSize(item) {
 			// Do not attempt to update size of item is not visible (for example when groups are folded)
 			if (this._flatData.indexOf(item) >= 0) {
 				this.$.list.updateSizeForItem(item);
 			}
 		},
 
-		updateSizes: function (group) {
+		updateSizes(group) {
 			group.items.forEach(this.updateSize, this);
 		},
 
-		toggleCollapse: function (item) {
-			var model = this._getModelFromItem(item),
+		toggleCollapse(item) {
+			let model = this._getModelFromItem(item),
 				itemState = this._itemsMap.get(item);
 
 			if (!model) {
@@ -641,16 +613,16 @@
 			this.$.list.updateSizeForItem(item);
 		},
 
-		isExpanded: function (item) {
-			var itemState = this._itemsMap ? this._itemsMap.get(item) : undefined;
+		isExpanded(item) {
+			const itemState = this._itemsMap ? this._itemsMap.get(item) : undefined;
 			return itemState !== undefined && itemState.expanded;
 		},
 
-		_getModelFromItem: function (item) {
-			var	physicalIndex = this._renderedItems.indexOf(item);
+		_getModelFromItem(item) {
+			const	physicalIndex = this._renderedItems.indexOf(item);
 			if (physicalIndex >= 0) {
 				return this._templateSelectors[physicalIndex].currentElement.__tmplInstance;
 			}
-		},
+		}
 	});
 }());

@@ -34,11 +34,11 @@
 
 			groupedList: null,
 
-			created: function () {
+			created() {
 				this.elements = {};
 			},
 
-			show: function (element, templateId) {
+			show(element, templateId) {
 				if (this.currentElement && element !== this.currentElement) {
 					this.currentElement.setAttribute('hidden', '');
 				}
@@ -49,8 +49,8 @@
 				this.currentTemplateId = templateId;
 			},
 
-			_itemChanged: function (newItem) {
-				var slot;
+			_itemChanged(newItem) {
+				let slot;
 
 				if (this.selectorId === null) {
 					// Notifies parent cosmoz-grouped-list that a new template-selector

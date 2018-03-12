@@ -27,8 +27,8 @@ Polymer({
 
 	_reusableInstances: null,
 
-	ready: function () {
-		var instanceProps = {};
+	ready() {
+		let instanceProps = {};
 
 		instanceProps[this.as] = true;
 		instanceProps[this.indexAs] = true;
@@ -43,7 +43,7 @@ Polymer({
 		this._reusableInstances = [];
 	},
 
-	_ensureTemplatized: function () {
+	_ensureTemplatized() {
 		if (!this.ctor) {
 			this._userTemplate = Polymer.dom(this).querySelector('template');
 			this.templatize(this._userTemplate);
@@ -51,7 +51,7 @@ Polymer({
 	},
 
 
-	_forwardHostPropV2: function (prop, value) {
+	_forwardHostPropV2(prop, value) {
 		const forward =  instance => {
 			instance.forwardHostProp(prop, value);
 		};
@@ -59,39 +59,39 @@ Polymer({
 		this._reusableInstances.forEach(forward);
 	},
 
-	_forwardParentProp: function (prop, value) {
-		this._instancesInUse.forEach(function (template) {
+	_forwardParentProp(prop, value) {
+		this._instancesInUse.forEach(template => {
 			template[prop] = value;
 		});
 
 		// As reusable instances might be reused, we need to keep their bindings up to date
-		this._reusableInstances.forEach(function (template) {
+		this._reusableInstances.forEach(template => {
 			template[prop] = value;
 		});
 	},
 
-	_forwardParentPath: function (path, value) {
-		this._instancesInUse.forEach(function (template) {
+	_forwardParentPath(path, value) {
+		this._instancesInUse.forEach(template => {
 			template.notifyPath(path, value, true);
 		});
 		// As reusable instances might be reused, we need to keep their bindings up to date
-		this._reusableInstances.forEach(function (template) {
+		this._reusableInstances.forEach(template => {
 			template.notifyPath(path, value, true);
 		});
 	},
 
-	// _forwardInstanceProp: function (inst, prop, value) {
+	// _forwardInstanceProp(inst, prop, value) {
 	// 	console.log('_forwardInstanceProp inst=', inst);
 	// 	console.log('_forwardInstanceProp prop=', prop);
 	// 	console.log('_forwardInstanceProp value=', value);
 	// },
-	// _forwardInstancePath: function (inst, path, value) {
+	// _forwardInstancePath(inst, path, value) {
 	// 	console.log('_forwardInstancePath', inst, path, value);
 
 	// },
 
-	getInstance: function () {
-		var instance;
+	getInstance() {
+		let instance;
 		if (this._reusableInstances.length > 0) {
 			instance = this._reusableInstances.pop();
 		} else {
@@ -102,8 +102,8 @@ Polymer({
 		return instance;
 	},
 
-	releaseInstance: function (templateInstance) {
-		var index = this._instancesInUse.indexOf(templateInstance);
+	releaseInstance(templateInstance) {
+		const index = this._instancesInUse.indexOf(templateInstance);
 		if (index >= 0) {
 			this._instancesInUse.splice(index, 1);
 			this._reusableInstances.push(templateInstance);
