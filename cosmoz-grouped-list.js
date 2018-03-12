@@ -99,23 +99,23 @@
 		 */
 		_renderedItems: null,
 
-		created: function () {
+		created() {
 			this._templateSelectors = [];
 			this._renderedItems = [];
 			this._physicalItens = [];
 		},
 
-		attached: function () {
+		attached() {
 			this._isAttached = true;
 			this._debounceRender();
 		},
 
-		detached: function () {
+		detached() {
 			this._isAttached = false;
 			this.cancelDebouncer('render');
 		},
 
-		_dataChanged: function (change) {
+		_dataChanged(change) {
 			if (change.path === 'data' || change.path.slice(-8) === '.splices') {
 				this._debounceRender();
 			} else if (change.path.slice(-7) !== '.length') {
@@ -125,11 +125,11 @@
 			}
 		},
 
-		_debounceRender: function () {
+		_debounceRender() {
 			this.debounce('render', this._render);
 		},
 
-		_render: function () {
+		_render() {
 			if (!this._isAttached) {
 				return;
 			}
@@ -137,7 +137,7 @@
 			this._flatData = this._prepareData(this.data);
 		},
 
-		_forwardItemPath: function (path, value) {
+		_forwardItemPath(path, value) {
 			const match = path.match(/data(?:\.#?(\d+)\.items)?\.#?(\d+)(\..+)$/i);
 
 			if (!match) {
@@ -182,7 +182,7 @@
 			return true;
 		},
 
-		_forwardProperty: function (instance, name, value) {
+		_forwardProperty(instance, name, value) {
 			if (IS_V2) {
 				instance._setPendingProperty(name, value);
 			} else {
@@ -190,7 +190,7 @@
 			}
 		},
 
-		_resetAllTemplates: function () {
+		_resetAllTemplates() {
 			if (this._templateSelectors.length > 0) {
 				this._templateSelectors.forEach(function (selector) {
 					if (selector.element) {
@@ -205,7 +205,7 @@
 
 		},
 
-		_scrollTargetChanged: function (scrollTarget, isAttached)  {
+		_scrollTargetChanged(scrollTarget, isAttached)  {
 			if (! (scrollTarget === undefined || isAttached === undefined)) {
 				if (scrollTarget && isAttached) {
 					this.classList.add('has-scroll-target');
@@ -258,7 +258,7 @@
 			}.bind(this), []);
 		},
 
-		_onTemplateSelectorCreated: function (event) {
+		_onTemplateSelectorCreated(event) {
 			var	selector = event.detail.selector;
 			selector.selectorId = this._templateSelectorsCount;
 			selector.groupedList = this;
@@ -266,7 +266,7 @@
 			this._templateSelectorsCount += 1;
 		},
 
-		selectorItemChanged: function (selector, item) {
+		selectorItemChanged(selector, item) {
 			var selectorId = selector.selectorId,
 				isGroup = this.isGroup(item),
 				newTemplate,
@@ -312,14 +312,14 @@
 			selector.show(element, newTemplate.id);
 		},
 
-		_getItemTemplate: function () {
+		_getItemTemplate() {
 			if (!this._itemTemplate) {
 				this._itemTemplate = Polymer.dom(this).querySelector('#itemTemplate');
 			}
 			return this._itemTemplate;
 		},
 
-		_getGroupTemplate: function () {
+		_getGroupTemplate() {
 			if (!this._groupTemplate) {
 				this._groupTemplate = Polymer.dom(this).querySelector('#groupTemplate');
 			}
@@ -331,7 +331,7 @@
 		 * This method is mainly aimed at `cosmoz-omnitable`.
 		 * @returns {HTMLElement|null} The first visible element or null
 		 */
-		getFirstVisibleItemElement: function () {
+		getFirstVisibleItemElement() {
 			var i,
 				selector,
 				item,
@@ -382,7 +382,7 @@
 		 * @param {Object} item The item to remove
 		 * @returns {Boolean|undefined} true/false or null
 		 */
-		removeItem: function (item) {
+		removeItem(item) {
 			if (this._groupsMap) {
 				return this.data.some(function (group, groupIndex) {
 					var index = group.items.indexOf(item);
@@ -399,7 +399,7 @@
 
 		},
 
-		isGroup: function (item) {
+		isGroup(item) {
 			return this._groupsMap && this._groupsMap.get(item) !== undefined;
 		},
 
@@ -408,7 +408,7 @@
 		 * @param {Object} item The item to search for
 		 * @returns {Object|null} The group the item is in or null
 		 */
-		getItemGroup: function (item) {
+		getItemGroup(item) {
 			if (!this._groupsMap) {
 				return;
 			}
@@ -424,12 +424,12 @@
 			return foundGroup;
 		},
 
-		isFolded: function (group) {
+		isFolded(group) {
 			var groupState = this._groupsMap && this._groupsMap.get(group);
 			return groupState && groupState.folded;
 		},
 
-		toggleFold: function (templateInstance) {
+		toggleFold(templateInstance) {
 			var item = templateInstance.item,
 				group = this.isGroup(item) ? item : this.getItemGroup(item),
 				isFolded = this.isFolded(group);
@@ -443,7 +443,7 @@
 			templateInstance.folded = !isFolded;
 		},
 
-		unfoldGroup: function (group) {
+		unfoldGroup(group) {
 			var groupState = this._groupsMap && this._groupsMap.get(group),
 				groupFlatIndex;
 
@@ -455,7 +455,7 @@
 
 		},
 
-		foldGroup: function (group) {
+		foldGroup(group) {
 			var groupState = this._groupsMap && this._groupsMap.get(group),
 				groupFlatIndex;
 
@@ -466,7 +466,7 @@
 			}
 		},
 
-		selectItem: function (item) {
+		selectItem(item) {
 			var model = this._getModelFromItem(item);
 
 			if (!this.isItemSelected(item)) {
@@ -494,7 +494,7 @@
 			}
 		},
 
-		deselectItem: function (item) {
+		deselectItem(item) {
 			var selectedIndex = this.selectedItems.indexOf(item),
 				model = this._getModelFromItem(item),
 				group = this.getItemGroup(item),
@@ -522,15 +522,15 @@
 			}
 		},
 
-		isItemSelected: function (item) {
+		isItemSelected(item) {
 			return this.selectedItems.indexOf(item) >= 0;
 		},
 
-		isItemHighlighted: function (item) {
+		isItemHighlighted(item) {
 			return this.highlightedItems.indexOf(item) >= 0;
 		},
 
-		selectGroup: function (group) {
+		selectGroup(group) {
 			var model = this._getModelFromItem(group),
 				groupState = this._groupsMap && this._groupsMap.get(group);
 
@@ -545,7 +545,7 @@
 			group.items.forEach(this.selectItem, this);
 		},
 
-		deselectGroup: function (group) {
+		deselectGroup(group) {
 			var model = this._getModelFromItem(group),
 				groupState = this._groupsMap && this._groupsMap.get(group);
 
@@ -558,12 +558,12 @@
 			group.items.forEach(this.deselectItem, this);
 		},
 
-		isGroupSelected: function (group) {
+		isGroupSelected(group) {
 			var groupState = this._groupsMap && this._groupsMap.get(group);
 			return groupState !== undefined && groupState.selected;
 		},
 
-		selectAll: function () {
+		selectAll() {
 			var groups = this._groupsMap,
 				selected = this.data;
 
@@ -587,7 +587,7 @@
 			});
 		},
 
-		deselectAll: function () {
+		deselectAll() {
 
 			this.splice('selectedItems', 0, this.selectedItems.length);
 
@@ -610,18 +610,18 @@
 			});
 		},
 
-		updateSize: function (item) {
+		updateSize(item) {
 			// Do not attempt to update size of item is not visible (for example when groups are folded)
 			if (this._flatData.indexOf(item) >= 0) {
 				this.$.list.updateSizeForItem(item);
 			}
 		},
 
-		updateSizes: function (group) {
+		updateSizes(group) {
 			group.items.forEach(this.updateSize, this);
 		},
 
-		toggleCollapse: function (item) {
+		toggleCollapse(item) {
 			var model = this._getModelFromItem(item),
 				itemState = this._itemsMap.get(item);
 
@@ -641,12 +641,12 @@
 			this.$.list.updateSizeForItem(item);
 		},
 
-		isExpanded: function (item) {
+		isExpanded(item) {
 			var itemState = this._itemsMap ? this._itemsMap.get(item) : undefined;
 			return itemState !== undefined && itemState.expanded;
 		},
 
-		_getModelFromItem: function (item) {
+		_getModelFromItem(item) {
 			var	physicalIndex = this._renderedItems.indexOf(item);
 			if (physicalIndex >= 0) {
 				return this._templateSelectors[physicalIndex].currentElement.__tmplInstance;

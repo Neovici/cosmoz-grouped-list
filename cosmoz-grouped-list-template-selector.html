@@ -34,11 +34,11 @@
 
 			groupedList: null,
 
-			created: function () {
+			created() {
 				this.elements = {};
 			},
 
-			show: function (element, templateId) {
+			show(element, templateId) {
 				if (this.currentElement && element !== this.currentElement) {
 					this.currentElement.setAttribute('hidden', '');
 				}
@@ -49,7 +49,7 @@
 				this.currentTemplateId = templateId;
 			},
 
-			_itemChanged: function (newItem) {
+			_itemChanged(newItem) {
 				var slot;
 
 				if (this.selectorId === null) {
