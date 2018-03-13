@@ -144,12 +144,11 @@
 				return;
 			}
 
-			let
+			const
 				groupIndex = match[1],
 				itemIndex =  match[2],
-				propertyPath = 'item' + match[3],
-				item,
-				instance;
+				propertyPath = 'item' + match[3];
+			let item;
 
 			if (groupIndex) {
 				item = this.data[groupIndex].items[itemIndex];
@@ -162,7 +161,7 @@
 				return;
 			}
 
-			instance = this._getModelFromItem(item);
+			const instance = this._getModelFromItem(item);
 
 			if (!instance) {
 				console.warn('Template instance for item not found when forwarding path', path);
@@ -192,7 +191,7 @@
 
 		_resetAllTemplates() {
 			if (this._templateSelectors.length > 0) {
-				this._templateSelectors.forEach(function (selector) {
+				this._templateSelectors.forEach(selector => {
 					if (selector.element) {
 						selector.element.setAttribute('slot', 'reusableTemplate');
 						selector.template.releaseInstance(selector.templateInstance);
@@ -263,15 +262,14 @@
 		},
 
 		selectorItemChanged(selector, item) {
-			let selectorId = selector.selectorId,
-				isGroup = this.isGroup(item),
-				newTemplate,
-				element,
+			const selectorId = selector.selectorId,
+				isGroup = this.isGroup(item);
+			let element,
 				templateInstance;
 
 			this._renderedItems[selectorId] = item;
 
-			newTemplate = this._getTemplate(isGroup ? 'group' : 'item');
+			const newTemplate = this._getTemplate(isGroup ? 'group' : 'item');
 
 			element = selector.elements[newTemplate.id];
 
@@ -429,30 +427,28 @@
 		},
 
 		unfoldGroup(group) {
-			let groupState = this._groupsMap && this._groupsMap.get(group),
-				groupFlatIndex;
+			const groupState = this._groupsMap && this._groupsMap.get(group);
 
 			if (groupState && groupState.folded) {
 				groupState.folded = false;
-				groupFlatIndex = this._flatData.indexOf(group);
+				const groupFlatIndex = this._flatData.indexOf(group);
 				this.splice.apply(this, ['_flatData', groupFlatIndex + 1, 0].concat(group.items));
 			}
 
 		},
 
 		foldGroup(group) {
-			let groupState = this._groupsMap && this._groupsMap.get(group),
-				groupFlatIndex;
+			const groupState = this._groupsMap && this._groupsMap.get(group);
 
 			if (groupState && !groupState.folded) {
 				groupState.folded = true;
-				groupFlatIndex = this._flatData.indexOf(group);
+				const groupFlatIndex = this._flatData.indexOf(group);
 				this.splice('_flatData', groupFlatIndex + 1, group.items.length);
 			}
 		},
 
 		selectItem(item) {
-			let model = this._getModelFromItem(item);
+			const model = this._getModelFromItem(item);
 
 			if (!this.isItemSelected(item)) {
 				this.push('selectedItems', item);
@@ -463,7 +459,7 @@
 		},
 
 		highlightItem(item, reverse) {
-			let model = this._getModelFromItem(item),
+			const model = this._getModelFromItem(item),
 				highlightedIndex = this.highlightedItems.indexOf(item);
 
 			if (highlightedIndex === -1 && !reverse) {
@@ -480,10 +476,10 @@
 		},
 
 		deselectItem(item) {
-			let selectedIndex = this.selectedItems.indexOf(item),
+			const selectedIndex = this.selectedItems.indexOf(item),
 				model = this._getModelFromItem(item),
-				group = this.getItemGroup(item),
-				groupState,
+				group = this.getItemGroup(item);
+			let	groupState,
 				groupModel;
 
 
@@ -516,7 +512,7 @@
 		},
 
 		toggleSelectGroup(group, selected) {
-			let model = this._getModelFromItem(group),
+			const model = this._getModelFromItem(group),
 				groupState = this._groupsMap && this._groupsMap.get(group);
 
 			if (groupState) {
@@ -536,12 +532,12 @@
 		},
 
 		selectAll() {
-			let groups = this._groupsMap,
-				selected = this.data;
+			const groups = this._groupsMap;
+			let	selected = this.data;
 
 			if (groups) {
 				selected = selected.reduce(function (all, group) {
-					let state = groups.get(group);
+					const state = groups.get(group);
 					if (state) {
 						state.selected = true;
 					}
@@ -552,7 +548,7 @@
 
 			// Set the selected property to all visible items
 			this._templateSelectors.forEach(selector => {
-				let templateInstance = selector.currentElement && selector.currentElement.__tmplInstance;
+				const templateInstance = selector.currentElement && selector.currentElement.__tmplInstance;
 				if (templateInstance) {
 					templateInstance.selected = true;
 				}
@@ -566,7 +562,7 @@
 			if (this._groupsMap) {
 
 				this.data.forEach(function (group) {
-					let groupState = this._groupsMap.get(group);
+					const groupState = this._groupsMap.get(group);
 					if (groupState) {
 						groupState.selected = false;
 					}
@@ -575,7 +571,7 @@
 
 			// Set the selected property to all visible items
 			this._templateSelectors.forEach(selector => {
-				let templateInstance = selector.currentElement && selector.currentElement.__tmplInstance;
+				const templateInstance = selector.currentElement && selector.currentElement.__tmplInstance;
 				if (templateInstance) {
 					templateInstance.selected = false;
 				}
@@ -594,8 +590,8 @@
 		},
 
 		toggleCollapse(item) {
-			let model = this._getModelFromItem(item),
-				itemState = this._itemsMap.get(item);
+			const model = this._getModelFromItem(item);
+			let itemState = this._itemsMap.get(item);
 
 			if (!model) {
 				return;
