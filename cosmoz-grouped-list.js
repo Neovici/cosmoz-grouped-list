@@ -395,16 +395,9 @@
 			if (!this._groupsMap) {
 				return;
 			}
-			let foundGroup = null;
-			this.data.some(group => {
-				const found = group.items && group.items.indexOf(item) > -1;
-				if (found) {
-					foundGroup = group;
-				}
-				return found;
-			});
-
-			return foundGroup;
+			return this.data.find(group => {
+				return Array.isArray(group.items) && group.items.indexOf(item) > -1;
+			}) || null;
 		},
 
 		isFolded(group) {
