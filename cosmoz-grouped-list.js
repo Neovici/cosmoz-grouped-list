@@ -147,14 +147,8 @@
 			const
 				groupIndex = match[1],
 				itemIndex =  match[2],
-				propertyPath = 'item' + match[3];
-			let item;
-
-			if (groupIndex) {
-				item = this.data[groupIndex].items[itemIndex];
-			} else if (itemIndex) {
-				item = this.data[itemIndex];
-			}
+				propertyPath = 'item' + match[3],
+				item =  groupIndex ? this.data[groupIndex].items[itemIndex] : itemIndex ? this.data[itemIndex] : null;
 
 			if (item == null) {
 				console.warn('Item not found when forwarding path', path);
