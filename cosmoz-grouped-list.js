@@ -248,7 +248,7 @@
 		},
 
 		_onTemplateSelectorCreated(event) {
-			let	selector = event.detail.selector;
+			const	selector = event.detail.selector;
 			selector.selectorId = this._templateSelectorsCount;
 			selector.groupedList = this;
 			this._templateSelectors[selector.selectorId] = selector;
@@ -361,7 +361,7 @@
 		 */
 		removeItem(item) {
 			if (this._groupsMap) {
-				return this.data.some(function (group, groupIndex) {
+				return this.data.some((group, groupIndex) => {
 					const index = group.items.indexOf(item);
 					if (index >= 0) {
 						this.splice('data.' + groupIndex + '.items', index, 1);
@@ -523,7 +523,7 @@
 			let	selected = this.data;
 
 			if (groups) {
-				selected = selected.reduce(function (all, group) {
+				selected = selected.reduce((all, group) =>  {
 					const state = groups.get(group);
 					if (state) {
 						state.selected = true;
@@ -548,7 +548,7 @@
 
 			if (this._groupsMap) {
 
-				this.data.forEach(function (group) {
+				this.data.forEach(group => {
 					const groupState = this._groupsMap.get(group);
 					if (groupState) {
 						groupState.selected = false;
