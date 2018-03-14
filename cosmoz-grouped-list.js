@@ -463,26 +463,20 @@
 		},
 
 		deselectItem(item) {
-			const selectedIndex = this.selectedItems.indexOf(item),
-				model = this._getModelFromItem(item),
-				group = this.getItemGroup(item);
-			let	groupState,
-				groupModel;
-
-
+			const selectedIndex = this.selectedItems.indexOf(item);
 			if (selectedIndex >= 0) {
 				this.splice('selectedItems', selectedIndex, 1);
 			}
-
+			const model = this._getModelFromItem(item);
 			if (model) {
 				model['selected'] = false;
 			}
-
 			// If the containing group was selected, then deselect it
 			// as all items are not selected anymore
+			const group = this.getItemGroup(item);
 			if (group && this.isGroupSelected(group)) {
-				groupState = this._groupsMap.get(group);
-				groupModel = this._getModelFromItem(group);
+				const groupState = this._groupsMap.get(group),
+					groupModel = this._getModelFromItem(group);
 				if (groupModel) {
 					groupModel['selected'] = false;
 				}
@@ -557,7 +551,7 @@
 					if (groupState) {
 						groupState.selected = false;
 					}
-				}, this);
+				});
 			}
 
 			// Set the selected property to all visible items
@@ -577,21 +571,17 @@
 
 		toggleCollapse(item) {
 			const model = this._getModelFromItem(item);
-			let itemState = this._itemsMap.get(item);
-
 			if (!model) {
 				return;
 			}
-
 			model.expanded = !model.expanded;
 
+			let itemState = this._itemsMap.get(item);
 			if (!itemState) {
 				itemState = { selected: false, expanded: false };
 				this._itemsMap.set(item, itemState);
 			}
-
 			itemState.expanded = model.expanded;
-
 			this.$.list.updateSizeForItem(item);
 		},
 
