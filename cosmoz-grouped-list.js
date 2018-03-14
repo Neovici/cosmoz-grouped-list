@@ -518,6 +518,15 @@
 			return groupState !== undefined && groupState.selected;
 		},
 
+		_toggleSelected(value) {
+			this._templateSelectors.forEach(selector => {
+				const templateInstance = selector.currentElement && selector.currentElement.__tmplInstance;
+				if (templateInstance) {
+					templateInstance.selected = value;
+				}
+			});
+		},
+
 		selectAll() {
 			const groups = this._groupsMap;
 			let	selected = this.data;
@@ -534,12 +543,7 @@
 			this.splice.apply(this, ['selectedItems', 0, this.selectedItems.length].concat(selected));
 
 			// Set the selected property to all visible items
-			this._templateSelectors.forEach(selector => {
-				const templateInstance = selector.currentElement && selector.currentElement.__tmplInstance;
-				if (templateInstance) {
-					templateInstance.selected = true;
-				}
-			});
+			this._toggleSelected(true);
 		},
 
 		deselectAll() {
@@ -557,12 +561,7 @@
 			}
 
 			// Set the selected property to all visible items
-			this._templateSelectors.forEach(selector => {
-				const templateInstance = selector.currentElement && selector.currentElement.__tmplInstance;
-				if (templateInstance) {
-					templateInstance.selected = false;
-				}
-			});
+			this._toggleSelected(false);
 		},
 
 		updateSize(item) {
