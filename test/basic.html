@@ -46,11 +46,11 @@
 	(function () {
 		'use strict';
 
-		suite('<cosmoz-grouped-list>', function () {
+		suite('<cosmoz-grouped-list>', () => {
 			var element,
 				groups;
 
-			setup(function (done) {
+			setup(done => {
 				element = fixture('basic');
 				groups = [{
 					name: 'Group 0',
@@ -81,36 +81,36 @@
 					id: 'e1'
 				}];
 				element.data = groups;
-				flush(function () {
-					setTimeout(function () {
+				flush(() => {
+					setTimeout(() => {
 						done();
 					}, 120);
 				});
 			});
 
-			test('instantiates a cosmoz-grouped-list element', function () {
+			test('instantiates a cosmoz-grouped-list element', () => {
 				assert.equal(element.is, 'cosmoz-grouped-list');
 				assert.isTrue(element.hasRenderedData);
 			});
 
-			test('attaches a iron-list element', function () {
+			test('attaches a iron-list element', () => {
 				assert.equal(element.$.list.is, 'iron-list');
 				assert.lengthOf(element.$.list.items, 6);
 				assert.equal(element.$.list.items[0], groups[0]);
 			});
 
-			test('attaches cosmoz-grouped-list-template-selector', function () {
+			test('attaches cosmoz-grouped-list-template-selector', () => {
 				assert.equal(element._templateSelectors.length, 6);
 				assert.isTrue(element.hasRenderedData);
 			});
 
-			test('top level items are groups', function () {
+			test('top level items are groups', () => {
 				assert.isTrue(element.isGroup(groups[0]));
 				assert.isTrue(element.isGroup(groups[1]));
 				assert.isFalse(element.isGroup(groups[2]));
 			});
 
-			test('item belongs to group', function () {
+			test('item belongs to group', () => {
 				assert.equal(element.getItemGroup(groups[0].items[0]), groups[0]);
 				assert.equal(element.getItemGroup(groups[0].items[1]), groups[0]);
 
@@ -118,15 +118,15 @@
 				assert.equal(element.getItemGroup(groups[1].items[1]), groups[1]);
 			});
 
-			test('ungrouped items are dropped', function () {
-				assert.isNull(element.getItemGroup({}));
-				assert.isNull(element.getItemGroup(groups[2]));
+			test('ungrouped items are dropped', () => {
+				assert.isUndefined(element.getItemGroup({}));
+				assert.isUndefined(element.getItemGroup(groups[2]));
 			});
 
-			test('selects an item', function (done) {
-				var item = groups[0].items[0];
+			test('selects an item', done => {
+				const item = groups[0].items[0];
 				element.selectItem(item);
-				flush(function () {
+				flush(() => {
 					assert.isTrue(element.isItemSelected(item));
 					assert.equal(element.selectedItems.length, 1);
 					assert.equal(element.selectedItems[0], item);
@@ -135,14 +135,14 @@
 				});
 			});
 
-			test('deselects an item', function (done) {
-				var item = groups[1].items[0];
+			test('deselects an item', done => {
+				const item = groups[1].items[0];
 				element.selectItem(item);
-				flush(function () {
+				flush(() => {
 					assert.isTrue(element.isItemSelected(item));
 					assert.equal(element.selectedItems[0], item);
 					element.deselectItem(item);
-					flush(function () {
+					flush(() => {
 						assert.isFalse(element.isItemSelected(item));
 						assert.equal(element.selectedItems.length, 0);
 						done();
@@ -150,10 +150,10 @@
 				});
 			});
 
-			test('selects a group', function (done) {
-				var group = groups[1];
+			test('selects a group', done => {
+				const group = groups[1];
 				element.toggleSelectGroup(group, false);
-				flush(function () {
+				flush(() => {
 					assert.isTrue(element.isGroupSelected(group));
 					assert.equal(element.selectedItems.length, 2);
 					assert.equal(element.selectedItems[0], group.items[0]);
@@ -162,16 +162,16 @@
 				});
 			});
 
-			test('deselects a group', function (done) {
-				var group = groups[0];
+			test('deselects a group', done => {
+				const group = groups[0];
 				element.toggleSelectGroup(group, false);
-				flush(function () {
+				flush(() => {
 					assert.isTrue(element.isGroupSelected(group));
 					assert.equal(element.selectedItems.length, 2);
 					assert.equal(element.selectedItems[0], group.items[0]);
 					assert.equal(element.selectedItems[1], group.items[1]);
 					element.toggleSelectGroup(group, true);
-					flush(function () {
+					flush(() => {
 						assert.isFalse(element.isGroupSelected(group));
 						assert.equal(element.selectedItems.length, 0);
 						done();
@@ -179,12 +179,12 @@
 				});
 			});
 
-			test('deselecting a item from group deselects the group', function (done) {
-				var group = groups[1],
+			test('deselecting a item from group deselects the group', done => {
+				const group = groups[1],
 					item =  group.items[1];
 
 				element.toggleSelectGroup(group, false);
-				flush(function () {
+				flush(() => {
 					assert.isTrue(element.isGroupSelected(group));
 					assert.equal(element.selectedItems.length, 2);
 					assert.equal(element.selectedItems[0], group.items[0]);
@@ -192,7 +192,7 @@
 
 					element.deselectItem(item);
 
-					flush(function () {
+					flush(() => {
 						assert.isFalse(element.isGroupSelected(group));
 						assert.equal(element.selectedItems.length, 1);
 						done();
@@ -200,9 +200,9 @@
 				});
 			});
 
-			test('selects all items', function (done) {
+			test('selects all items', done => {
 				element.selectAll();
-				flush(function () {
+				flush(() => {
 					assert.isNotNull(element.selectedItems[0]);
 					assert.lengthOf(element.selectedItems, 4);
 					assert.equal(element.selectedItems[0], groups[0].items[0]);
@@ -213,48 +213,48 @@
 				});
 			});
 
-			test('deselect all items', function (done) {
+			test('deselect all items', done => {
 				element.selectAll();
-				flush(function () {
+				flush(() => {
 					assert.equal(element.selectedItems[0], groups[0].items[0]);
 					element.deselectAll();
-					flush(function () {
+					flush(() => {
 						assert.lengthOf(element.selectedItems, 0);
 						done();
 					});
 				});
 			});
 
-			test('folds a group', function (done) {
-				var group = groups[1];
+			test('folds a group', done => {
+				const group = groups[1];
 
 				element.foldGroup(group);
-				flush(function () {
+				flush(() => {
 					assert.isTrue(element.isFolded(group));
 					done();
 				});
 			});
 
-			test('unfolds a folded group', function (done) {
-				var group = groups[1];
+			test('unfolds a folded group', done => {
+				const group = groups[1];
 
 				element.foldGroup(group);
-				flush(function () {
+				flush(() => {
 					assert.isTrue(element.isFolded(group));
 					element.unfoldGroup(group);
 
-					flush(function () {
+					flush(() => {
 						assert.isFalse(element.isFolded(group));
 						done();
 					});
 				});
 			});
 
-			test('toggles collapse on an item', function (done) {
-				var item = groups[1].items[1];
+			test('toggles collapse on an item', done => {
+				const item = groups[1].items[1];
 
 				element.toggleCollapse(item);
-				flush(function () {
+				flush(() => {
 					assert.isTrue(element.isExpanded(item));
 					done();
 				});
