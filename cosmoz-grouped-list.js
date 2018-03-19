@@ -389,9 +389,7 @@
 			if (!this._groupsMap) {
 				return;
 			}
-			return this.data.find(group => {
-				return Array.isArray(group.items) && group.items.indexOf(item) > -1;
-			}) || null;
+			return this.data.find(group => Array.isArray(group.items) && group.items.indexOf(item) > -1);
 		},
 
 		isFolded(group) {
