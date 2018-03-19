@@ -119,8 +119,8 @@
 			});
 
 			test('ungrouped items are dropped', function () {
-				assert.isNull(element.getItemGroup({}));
-				assert.isNull(element.getItemGroup(groups[2]));
+				assert.isUndefined(element.getItemGroup({}));
+				assert.isUndefined(element.getItemGroup(groups[2]));
 			});
 
 			test('selects an item', function (done) {
