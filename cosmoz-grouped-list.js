@@ -7,7 +7,6 @@
 	Polymer({
 
 		is: 'cosmoz-grouped-list',
-
 		properties: {
 
 			data: {
@@ -103,6 +102,7 @@
 			this._templateSelectors = [];
 			this._renderedItems = [];
 			this._physicalItens = [];
+
 		},
 
 		attached() {
@@ -113,6 +113,21 @@
 		detached() {
 			this._isAttached = false;
 			this.cancelDebouncer('render');
+			this._debouncers = {};
+			Array
+				.from(Polymer.dom(this).querySelectorAll('cosmoz-grouped-list-template'))
+				.forEach(tpl => tpl.release());
+
+			Array.from(this.$.list.$.items.childNodes)
+				.forEach(i => i._templateInstance = null);
+			this._templateSelectors = [];
+
+			//Cleanup decorated listeners
+			if (Array.isArray(this._decoratedListeners)) {
+				this._decoratedListeners.splice(0).forEach(ev => {
+					this._unlisten(ev.node, ev.eventName, ev.decorated);
+				});
+			}
 		},
 
 		_dataChanged(change) {
@@ -593,6 +608,14 @@
 			if (physicalIndex >= 0) {
 				return this._templateSelectors[physicalIndex].currentElement.__tmplInstance;
 			}
+		},
+
+		_listen(node, eventName, decorated) {
+			if (decorated != null && decorated.name === 'decorated') {
+				this._decoratedListeners = this._decoratedListeners || [];
+				this._decoratedListeners.push({node, eventName, decorated });
+			}
+			return Polymer.Base._listen.apply(this, arguments);
 		}
 	});
 }());
