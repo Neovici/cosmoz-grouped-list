@@ -3,155 +3,157 @@
 @demo demo/full.html Full Demo
 -->
 <script>
-'use strict';
-const IS_V2 = Polymer.flush != null;
-Polymer({
+(function () {
+	'use strict';
+	const IS_V2 = Polymer.flush != null;
+	Polymer({
 
-	is: 'cosmoz-grouped-list-template',
+		is: 'cosmoz-grouped-list-template',
 
-	properties: {
-		as: {
-			type: String,
-			value: 'item'
-		},
-		indexAs: {
-			type: String,
-			value: 'index'
-		}
-	},
-
-	behaviors: [
-		Polymer.Templatizer
-	],
-
-	_instancesInUse: null,
-
-	_reusableInstances: null,
-
-	ready() {
-		const instanceProps = {};
-
-		instanceProps[this.as] = true;
-		instanceProps[this.indexAs] = true;
-		instanceProps['folded'] = true;
-		instanceProps['expanded'] = true;
-		instanceProps['selected'] = true;
-		instanceProps['highlighted'] = true;
-
-		this._instanceProps = instanceProps;
-		this._parentModel = true;
-		this._instancesInUse = [];
-		this._reusableInstances = [];
-	},
-
-	release() {
-		const instances = this._instancesInUse.splice(0)
-			.concat(this._reusableInstances.splice(0));
-		if (IS_V2) {
-			return;
-		}
-		const doV1Release = instance => {
-			const children = instance._children,
-				events = instance._decoratedEvents,
-				listener = instance._decoratedListener,
-				host = instance._rootDataHost;
-
-			for (let i = 0; i < children.length; i++) {
-				children[i]._templateInstance = null;
-				children[i].dataHost = null;
+		properties: {
+			as: {
+				type: String,
+				value: 'item'
+			},
+			indexAs: {
+				type: String,
+				value: 'index'
 			}
-			instance._decoratedEvents = instance._decoratedListener = null;
-			instance._rootDataHost = instance._children = instance._nodes = null;
+		},
 
-			if (!Array.isArray(events)) {
+		behaviors: [
+			Polymer.Templatizer
+		],
+
+		_instancesInUse: null,
+
+		_reusableInstances: null,
+
+		ready() {
+			const instanceProps = {};
+
+			instanceProps[this.as] = true;
+			instanceProps[this.indexAs] = true;
+			instanceProps['folded'] = true;
+			instanceProps['expanded'] = true;
+			instanceProps['selected'] = true;
+			instanceProps['highlighted'] = true;
+
+			this._instanceProps = instanceProps;
+			this._parentModel = true;
+			this._instancesInUse = [];
+			this._reusableInstances = [];
+		},
+
+		release() {
+			const instances = this._instancesInUse.splice(0)
+				.concat(this._reusableInstances.splice(0));
+			if (IS_V2) {
 				return;
 			}
-			events.forEach(e => host._unlisten(e.node, e.eventName, listener));
-		};
+			const doV1Release = instance => {
+				const children = instance._children,
+					events = instance._decoratedEvents,
+					listener = instance._decoratedListener,
+					host = instance._rootDataHost;
 
-		instances.forEach(doV1Release);
-	},
+				for (let i = 0; i < children.length; i++) {
+					children[i]._templateInstance = null;
+					children[i].dataHost = null;
+				}
+				instance._decoratedEvents = instance._decoratedListener = null;
+				instance._rootDataHost = instance._children = instance._nodes = null;
 
-	_ensureTemplatized() {
-		if (!this.ctor) {
-			this._userTemplate = Polymer.dom(this).querySelector('template');
-			this.templatize(this._userTemplate);
+				if (!Array.isArray(events)) {
+					return;
+				}
+				events.forEach(e => host._unlisten(e.node, e.eventName, listener));
+			};
+
+			instances.forEach(doV1Release);
+		},
+
+		_ensureTemplatized() {
+			if (!this.ctor) {
+				this._userTemplate = Polymer.dom(this).querySelector('template');
+				this.templatize(this._userTemplate);
+			}
+		},
+
+		_forwardHostPropV2(prop, value) {
+			const forward =  instance => {
+				instance.forwardHostProp(prop, value);
+			};
+			this._instancesInUse.forEach(forward);
+			this._reusableInstances.forEach(forward);
+		},
+
+		_forwardParentProp(prop, value) {
+			this._instancesInUse.forEach(template => {
+				template[prop] = value;
+			});
+
+			// As reusable instances might be reused, we need to keep their bindings up to date
+			this._reusableInstances.forEach(template => {
+				template[prop] = value;
+			});
+		},
+
+		_forwardParentPath(path, value) {
+			this._instancesInUse.forEach(template => {
+				template.notifyPath(path, value, true);
+			});
+			// As reusable instances might be reused, we need to keep their bindings up to date
+			this._reusableInstances.forEach(template => {
+				template.notifyPath(path, value, true);
+			});
+		},
+
+		// _forwardInstanceProp(inst, prop, value) {
+		// 	console.log('_forwardInstanceProp inst=', inst);
+		// 	console.log('_forwardInstanceProp prop=', prop);
+		// 	console.log('_forwardInstanceProp value=', value);
+		// },
+		// _forwardInstancePath(inst, path, value) {
+		// 	console.log('_forwardInstancePath', inst, path, value);
+
+		// },
+
+		getInstance() {
+			let instance;
+			if (this._reusableInstances.length > 0) {
+				instance = this._reusableInstances.pop();
+			} else {
+				this._ensureTemplatized();
+				instance = this.stamp({});
+			}
+			this._instancesInUse.push(instance);
+			return instance;
+		},
+
+		releaseInstance(templateInstance) {
+			const index = this._instancesInUse.indexOf(templateInstance);
+			if (index >= 0) {
+				this._instancesInUse.splice(index, 1);
+				this._reusableInstances.push(templateInstance);
+			}
+		},
+
+		_listenImpl: function (node, eventName, methodName) {
+			this._decoratedEvents = this._decoratedEvents || [];
+
+			let model = this,
+				host = this._rootDataHost,
+				handler = host._createEventHandler(node, eventName, methodName);
+
+
+			this._decoratedListener = this._decoratedListener || function (e) {
+				e.model = model;
+				handler(e);
+			};
+			this._decoratedEvents.push({eventName, node});
+			host._listen(node, eventName, this._decoratedEvents);
 		}
-	},
-
-	_forwardHostPropV2(prop, value) {
-		const forward =  instance => {
-			instance.forwardHostProp(prop, value);
-		};
-		this._instancesInUse.forEach(forward);
-		this._reusableInstances.forEach(forward);
-	},
-
-	_forwardParentProp(prop, value) {
-		this._instancesInUse.forEach(template => {
-			template[prop] = value;
-		});
-
-		// As reusable instances might be reused, we need to keep their bindings up to date
-		this._reusableInstances.forEach(template => {
-			template[prop] = value;
-		});
-	},
-
-	_forwardParentPath(path, value) {
-		this._instancesInUse.forEach(template => {
-			template.notifyPath(path, value, true);
-		});
-		// As reusable instances might be reused, we need to keep their bindings up to date
-		this._reusableInstances.forEach(template => {
-			template.notifyPath(path, value, true);
-		});
-	},
-
-	// _forwardInstanceProp(inst, prop, value) {
-	// 	console.log('_forwardInstanceProp inst=', inst);
-	// 	console.log('_forwardInstanceProp prop=', prop);
-	// 	console.log('_forwardInstanceProp value=', value);
-	// },
-	// _forwardInstancePath(inst, path, value) {
-	// 	console.log('_forwardInstancePath', inst, path, value);
-
-	// },
-
-	getInstance() {
-		let instance;
-		if (this._reusableInstances.length > 0) {
-			instance = this._reusableInstances.pop();
-		} else {
-			this._ensureTemplatized();
-			instance = this.stamp({});
-		}
-		this._instancesInUse.push(instance);
-		return instance;
-	},
-
-	releaseInstance(templateInstance) {
-		const index = this._instancesInUse.indexOf(templateInstance);
-		if (index >= 0) {
-			this._instancesInUse.splice(index, 1);
-			this._reusableInstances.push(templateInstance);
-		}
-	},
-
-	_listenImpl: function (node, eventName, methodName) {
-		this._decoratedEvents = this._decoratedEvents || [];
-
-		let model = this,
-			host = this._rootDataHost,
-			handler = host._createEventHandler(node, eventName, methodName);
-
-
-		this._decoratedListener = this._decoratedListener || function (e) {
-			e.model = model;
-			handler(e);
-		};
-		this._decoratedEvents.push({eventName, node});
-		host._listen(node, eventName, this._decoratedEvents);
-	}
-});
+	});
+})();
 </script>
