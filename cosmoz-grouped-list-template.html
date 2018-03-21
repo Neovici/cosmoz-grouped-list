@@ -58,8 +58,14 @@
 					host = instance._rootDataHost;
 
 				for (let i = 0; i < children.length; i++) {
-					children[i]._templateInstance = null;
-					children[i].dataHost = null;
+					let child = children[i];
+					child._templateInstance = null;
+					child.dataHost = null;
+					Array.from(Polymer.dom(child).querySelectorAll('*'))
+						.filter(e => e.dataHost === instance)
+						.forEach(e => {
+							e.dataHost = e._templateInstance = null;
+						});
 				}
 				instance._decoratedEvents = instance._decoratedListener = null;
 				instance._rootDataHost = instance._children = instance._nodes = null;
