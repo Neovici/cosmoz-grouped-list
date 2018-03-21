@@ -71,9 +71,29 @@
 						slot.setAttribute('name', this.slotName);
 					}
 				}
-
 				this.groupedList.selectorItemChanged(this, newItem);
 			},
+
+			detached() {
+				this.dataHost = null;
+				this.groupedList = null;
+				this._templateInstance = null;
+
+				if (!this.elements) {
+					return;
+				}
+
+				Object
+					.keys(this.elements)
+					.forEach(key => {
+						const el = this.elements[key];
+						el.__tmplInstance = null;
+						el._templateInstance = null;
+						el.dataHost = null;
+					});
+				this.elements = {};
+			},
+
 		});
 	</script>
 </dom-module>
