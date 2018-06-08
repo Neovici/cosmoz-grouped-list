@@ -57,7 +57,8 @@
 
 		observers: [
 			'_dataChanged(data.*)',
-			'_scrollTargetChanged(scrollTarget, _isAttached)'
+			'_scrollTargetChanged(scrollTarget, _isAttached)',
+			'_selectedItemsChanged(selectedItems.*)'
 		],
 
 		/**
@@ -433,14 +434,7 @@
 		},
 
 		selectItem(item) {
-			const model = this._getModelFromItem(item);
-
-			if (!this.isItemSelected(item)) {
-				this.push('selectedItems', item);
-			}
-			if (model) {
-				model['selected'] = true;
-			}
+			this._changeItemSelection(item, true);
 		},
 
 		highlightItem(item, reverse) {
@@ -461,25 +455,7 @@
 		},
 
 		deselectItem(item) {
-			const selectedIndex = this.selectedItems.indexOf(item);
-			if (selectedIndex >= 0) {
-				this.splice('selectedItems', selectedIndex, 1);
-			}
-			const model = this._getModelFromItem(item);
-			if (model) {
-				model['selected'] = false;
-			}
-			// If the containing group was selected, then deselect it
-			// as all items are not selected anymore
-			const group = this.getItemGroup(item);
-			if (group && this.isGroupSelected(group)) {
-				const groupState = this._groupsMap.get(group),
-					groupModel = this._getModelFromItem(group);
-				if (groupModel) {
-					groupModel['selected'] = false;
-				}
-				groupState.selected = false;
-			}
+			this._changeItemSelection(item, false);
 		},
 
 		isItemSelected(item) {
@@ -490,19 +466,30 @@
 			return this.highlightedItems.indexOf(item) >= 0;
 		},
 
-		toggleSelectGroup(group, selected) {
+		_changeGroupSelection(group, select) {
 			const model = this._getModelFromItem(group),
 				groupState = this._groupsMap && this._groupsMap.get(group);
 
 			if (groupState) {
-				groupState.selected = selected ? false : true;
+				groupState.selected = select ? true : false;
 			}
 
 			if (model) {
-				model['selected'] = selected ? false : true;
+				model['selected'] = select ? true : false;
 			}
-			const temp = selected ? 'deselectItem' : 'selectItem';
+		},
+
+		_changeGroupItemsSelection(group, select) {
+			if (!group || !group.items) {
+				return;
+			}
+			const temp = select ? 'selectItem' : 'deselectItem';
 			group.items.forEach(this[temp], this);
+		},
+
+		toggleSelectGroup(group, selected) {
+			this._changeGroupSelection(group, !selected);
+			this._changeGroupItemsSelection(group, !selected);
 		},
 
 		isGroupSelected(group) {
@@ -593,6 +580,82 @@
 			if (physicalIndex >= 0) {
 				return this._templateSelectors[physicalIndex].currentElement.__tmplInstance;
 			}
-		}
+		},
+		/**
+		 * Selects/Deselects an item.
+		 * @param {Object} item - The item.
+		 * @param {Boolean} state - True if the item should get selected.
+		 * @returns {undefined}
+		 */
+		_changeItemSelection(item, state) {
+			const model = this._getModelFromItem(item);
+			const setModelState = () => model && (model['selected'] = state);
+
+			if (state && !this.isItemSelected(item)) {
+				this.push('selectedItems', item);
+				setModelState();
+				return;
+			}
+
+			if (state) {
+				return;
+			}
+
+			const idx = this.selectedItems.indexOf(item);
+			if (idx < 0) {
+				return;
+			}
+			this.splice('selectedItems', idx, 1);
+			setModelState();
+		},
+		/**
+		 * Returns the group of an item.
+		 * @param {Object} item - The item.
+		 * @returns {Object} - The group of an item.
+		 */
+		_getGroupOfItem(item) {
+			const groupState = this._groupsMap;
+			if (!groupState) {
+				return;
+			}
+			return this.data.find(group => group.items.find(i => i === item));
+		},
+		/**
+		 * Checks if all items of a group are selected.
+		 * @param {Object} group - The group to make the check on.
+		 * @returns {Boolean} - True if all items of a group are selected.
+		 */
+		_allGroupItemsSelected(group) {
+			if (!group || !group.items) {
+				return;
+			}
+			return group.items.every(item => {
+				const model = this._getModelFromItem(item);
+				return model && model['selected'];
+			});
+		},
+
+		_selectedItemsChanged() {
+			this._debounceValidateGroupSelectionState();
+		},
+
+		_debounceValidateGroupSelectionState() {
+			this.debounce('_validateGroupSelectionState', this._validateGroupSelectionState, 10);
+		},
+		/**
+		 * Selects a group if all items of a group are selected.
+		 * Deselects a group if not all items of a group are selected.
+		 * @returns {undefined}
+		 */
+		_validateGroupSelectionState() {
+			const groupState = this._groupsMap;
+			if (!groupState) {
+				return;
+			}
+			this.selectedItems.forEach(item => {
+				const group = this._getGroupOfItem(item);
+				this._changeGroupSelection(group, this._allGroupItemsSelected(group));
+			});
+		},
 	});
 }());
