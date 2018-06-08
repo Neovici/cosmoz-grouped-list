@@ -193,9 +193,11 @@
 					element.deselectItem(item);
 
 					flush(() => {
-						assert.isFalse(element.isGroupSelected(group));
 						assert.equal(element.selectedItems.length, 1);
-						done();
+						setTimeout(() => {
+							assert.isFalse(element.isGroupSelected(group));
+							done();
+						}, 100);
 					});
 				});
 			});
