@@ -465,7 +465,12 @@
 		isItemHighlighted(item) {
 			return this.highlightedItems.indexOf(item) >= 0;
 		},
-
+		/**
+		 * Selects/Deselects an group without its items.
+		 * @param {Object} group - The group.
+		 * @param {Boolean} select - True if the group should get selected.
+		 * @returns {undefined}
+		 */
 		_changeGroupSelection(group, select) {
 			const model = this._getModelFromItem(group),
 				groupState = this._groupsMap && this._groupsMap.get(group);
@@ -478,7 +483,12 @@
 				model['selected'] = select ? true : false;
 			}
 		},
-
+		/**
+		 * Selects/Deselects items of a group.
+		 * @param {Object} group - The group.
+		 * @param {Boolean} select - True if the group items should get selected.
+		 * @returns {undefined}
+		 */
 		_changeGroupItemsSelection(group, select) {
 			if (!group || !group.items) {
 				return;
@@ -584,20 +594,20 @@
 		/**
 		 * Selects/Deselects an item.
 		 * @param {Object} item - The item.
-		 * @param {Boolean} state - True if the item should get selected.
+		 * @param {Boolean} select - True if the item should get selected.
 		 * @returns {undefined}
 		 */
-		_changeItemSelection(item, state) {
+		_changeItemSelection(item, select) {
 			const model = this._getModelFromItem(item);
-			const setModelState = () => model && (model['selected'] = state);
+			const setModelState = () => model && (model['selected'] = select);
 
-			if (state && !this.isItemSelected(item)) {
+			if (select && !this.isItemSelected(item)) {
 				this.push('selectedItems', item);
 				setModelState();
 				return;
 			}
 
-			if (state) {
+			if (select) {
 				return;
 			}
 
