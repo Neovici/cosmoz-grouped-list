@@ -22,6 +22,7 @@
 	],
 	"dependencies": {
 		"polymer": "Polymer/polymer#1.9 - 2",
+		"cosmoz-templatize": "Neovici/cosmoz-templatize#^1.0.0",
 		"iron-flex-layout": "PolymerElements/iron-flex-layout#1 - 2",
 		"iron-list": "PolymerElements/iron-list#1 - 2"
 	},
@@ -38,6 +39,7 @@
 		"1.x": {
 			"dependencies": {
 				"polymer": "Polymer/polymer#^1.9",
+				"cosmoz-templatize": "Neovici/cosmoz-templatize#^1.0.0",
 				"iron-flex-layout": "PolymerElements/iron-flex-layout#^1.3.0",
 				"iron-list": "PolymerElements/iron-list#^1.3.0"
 			},
