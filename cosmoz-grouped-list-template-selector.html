@@ -50,7 +50,6 @@
 			},
 
 			_itemChanged(newItem) {
-				let slot;
 
 				if (this.selectorId === null) {
 					// Notifies parent cosmoz-grouped-list that a new template-selector
@@ -61,19 +60,17 @@
 						bubbles: false
 					});
 
-					this.slotName = 'selectorSlot' + this.selectorId;
-					slot = Polymer.dom(this).querySelector('slot');
-					if (slot !== null) {
-						slot.setAttribute('name', this.slotName);
-					} else {
+					const slotName = this.slotName = 'selectorSlot' + this.selectorId;
+					let slot = Polymer.dom(this).querySelector('slot');
+					if (slot == null) {
 						slot = Polymer.dom(this).querySelector('content');
-						slot.setAttribute('select', '[slot="' + this.slotName + '"]');
-						slot.setAttribute('name', this.slotName);
+						slot.setAttribute('select', '[slot="' + slotName + '"]');
 					}
+					slot.setAttribute('name', slotName);
 				}
 
 				this.groupedList.selectorItemChanged(this, newItem);
-			},
+			}
 		});
 	</script>
 </dom-module>
