@@ -8,7 +8,6 @@
 
 <link rel="import" href="./demo-list-behavior.html" />
 <link rel="import" href="../../cosmoz-grouped-list.html" />
-<link rel="import" href="../../cosmoz-grouped-list-template.html" />
 
 <dom-module id="demo-full">
 	<template>
@@ -77,33 +76,29 @@
 				<button class="action" class="action" on-tap="_changeItemValue">change item value</button>
 			</div>-->
 			<cosmoz-grouped-list id="groupedList" data="{{ data }}" selected-items="{{ selectedItems }}" class="flex">
-				<cosmoz-grouped-list-template id="itemTemplate">
-					<template>
-						<div highlighted$="[[highlighted]]" class="item-template" style="border-bottom: 1px solid grey;">
-							<div on-tap="highlight">
-								<div>Outer binding: <span>[[outerValue]]</span></div>
-								<div>Id: <span>{{item.id}}</span></div>
-								<div>Name: <span>{{item.name}}</span></div>
-								<div>Value: <span>{{item.value}}</span></div>
-								<div>Highlighted: <span>[[highlighted]]</span></div>
-							</div>
-							<div on-tap="select">Selected: <span>{{ selected }}</span> (click to select/deselect)</div>
-							<div on-tap="toggleCollapse">[+]</div>
-							<div class$="{{_computeExtraContentClass(expanded)}}">
-								Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed quis posuere turpis, quis commodo neque. Aenean dapibus consequat dolor, et vestibulum enim volutpat a. Donec vel dui at diam tristique condimentum dapibus ac elit. Sed consequat nibh id nibh posuere egestas. Phasellus blandit convallis tellus, nec pharetra orci viverra ut. In at arcu consectetur, tempus velit sit amet, congue diam. Suspendisse potenti. In ac tristique nulla, quis elementum nisi.
-							</div>
+				<template slot="templates" type="item">
+					<div highlighted$="[[highlighted]]" class="item-template" style="border-bottom: 1px solid grey;">
+						<div on-tap="highlight">
+							<div>Outer binding: <span>[[outerValue]]</span></div>
+							<div>Id: <span>{{item.id}}</span></div>
+							<div>Name: <span>{{item.name}}</span></div>
+							<div>Value: <span>{{item.value}}</span></div>
+							<div>Highlighted: <span>[[highlighted]]</span></div>
 						</div>
-					</template>
-				</cosmoz-grouped-list-template>
-				<cosmoz-grouped-list-template id="groupTemplate">
-					<template>
-						<div class="group-template">
-							<div class="flex" on-tap="toggleSelect"><span>[[item.name]]</span>(selected=<span>{{selected}}</span>)</div>
-							<div>[[ item.items.length ]]</div>
-							<iron-icon icon="[[ getFoldIcon(folded) ]]" on-tap="toggleFold"></iron-icon>
+						<div on-tap="select">Selected: <span>{{ selected }}</span> (click to select/deselect)</div>
+						<div on-tap="toggleCollapse">[+]</div>
+						<div class$="{{_computeExtraContentClass(expanded)}}">
+							Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed quis posuere turpis, quis commodo neque. Aenean dapibus consequat dolor, et vestibulum enim volutpat a. Donec vel dui at diam tristique condimentum dapibus ac elit. Sed consequat nibh id nibh posuere egestas. Phasellus blandit convallis tellus, nec pharetra orci viverra ut. In at arcu consectetur, tempus velit sit amet, congue diam. Suspendisse potenti. In ac tristique nulla, quis elementum nisi.
 						</div>
-					</template>
-				</cosmoz-grouped-list-template>
+					</div>
+				</template>
+				<template slot="templates" type="group">
+					<div class="group-template">
+						<div class="flex" on-tap="toggleSelect"><span>[[item.name]]</span>(selected=<span>{{selected}}</span>)</div>
+						<div>[[ item.items.length ]]</div>
+						<iron-icon icon="[[ getFoldIcon(folded) ]]" on-tap="toggleFold"></iron-icon>
+					</div>
+				</template>
 			</cosmoz-grouped-list>
 		</div>
 	</template>
