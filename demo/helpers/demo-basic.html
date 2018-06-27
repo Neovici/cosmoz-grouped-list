@@ -42,7 +42,7 @@
 		<div class="layout vertical fit">
 			<h3>cosmoz-grouped-list demo</h3>
 			<cosmoz-grouped-list id="groupedList" data="{{ data }}" selected-items="{{ selectedItems }}" class="flex">
-				<template slot="templates" type="item">
+				<template slot="templates" class="item">
 					<div class="item-template" style="border-bottom: 1px solid grey;">
 						<div>
 							ID:<span class="item-id">{{ item.id }}</span>
@@ -51,7 +51,7 @@
 						</div>
 					</div>
 				</template>
-				<template slot="templates" type="group">
+				<template slot="templates" class="group">
 					<div class="group-template">
 						NAME:<span class="item-name">{{ item.name }}</span>
 						VALUE: <span class="item-value">{{ item.value }}</span>

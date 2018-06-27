@@ -153,7 +153,7 @@
 		_onTemplatesChange(change) {
 			if (!Array.isArray(this._ctors) || this._ctors.length === 0) {
 				const templates = Array.from(change.addedNodes)
-					.filter(n => n.nodeType === Node.ELEMENT_NODE && n.tagName === 'TEMPLATE' && n.matches('[type]'));
+					.filter(n => n.nodeType === Node.ELEMENT_NODE && n.tagName === 'TEMPLATE' && n.matches('[class]'));
 
 				if (templates.length === 0) {
 					console.warn('cosmoz-grouped-list requires templates');
@@ -169,7 +169,7 @@
 				};
 
 				this._ctors = templates.reduce((ctors, template) => {
-					ctors[template.getAttribute('type')] = Cosmoz.Templatize.templatize(template, this, {
+					ctors[template.getAttribute('class')] = Cosmoz.Templatize.templatize(template, this, {
 						instanceProps: Object.assign({[this.as]: true}, baseProps),
 						parentModel: true,
 						forwardParentProp: this._forwardHostProp,
