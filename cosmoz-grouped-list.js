@@ -58,7 +58,7 @@
 		observers: [
 			'_dataChanged(data.*)',
 			'_scrollTargetChanged(scrollTarget, _isAttached)',
-			'_selectedItemsChanged(selectedItems.*)'
+			'_selectedItemsChanged(selectedItems.splices)'
 		],
 
 		/**
@@ -437,6 +437,13 @@
 			this._changeItemSelection(item, true);
 		},
 
+		selectItems(items) {
+			if (!items || !Array.isArray(items)) {
+				return;
+			}
+			items.forEach(i => this.selectItem(i));
+		},
+
 		highlightItem(item, reverse) {
 			const model = this._getModelFromItem(item),
 				highlightedIndex = this.highlightedItems.indexOf(item);
@@ -465,6 +472,7 @@
 		isItemHighlighted(item) {
 			return this.highlightedItems.indexOf(item) >= 0;
 		},
+
 		/**
 		 * Selects/Deselects an group without its items.
 		 * @param {Object} group - The group.
@@ -639,10 +647,7 @@
 			if (!group || !group.items) {
 				return;
 			}
-			return group.items.every(item => {
-				const model = this._getModelFromItem(item);
-				return model && model['selected'];
-			});
+			return group.items.every(item => this.isItemSelected(item));
 		},
 
 		_selectedItemsChanged() {
@@ -652,6 +657,7 @@
 		_debounceValidateGroupSelectionState() {
 			this.debounce('_validateGroupSelectionState', this._validateGroupSelectionState, 10);
 		},
+
 		/**
 		 * Selects a group if all items of a group are selected.
 		 * Deselects a group if not all items of a group are selected.
@@ -662,9 +668,12 @@
 			if (!groupState) {
 				return;
 			}
-			this.selectedItems.forEach(item => {
-				const group = this._getGroupOfItem(item);
-				this._changeGroupSelection(group, this._allGroupItemsSelected(group));
+
+			const groups = [...new Set(this.selectedItems.map(item => this._getGroupOfItem(item)))];
+
+			groups.forEach(group => {
+				const select = this._allGroupItemsSelected(group);
+				this._changeGroupSelection(group, select);
 			});
 		},
 	});
