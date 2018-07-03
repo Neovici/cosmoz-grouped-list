@@ -100,8 +100,10 @@
 			});
 
 			test('attaches cosmoz-grouped-list-template-selector', () => {
-				assert.equal(element._templateSelectors.length, 6);
-				assert.isTrue(element.hasRenderedData);
+				flush(() => {
+					assert.equal(element._templateSelectors.length, 6);
+					assert.isTrue(element.hasRenderedData);
+				});
 			});
 
 			test('top level items are groups', () => {
@@ -131,6 +133,22 @@
 					assert.equal(element.selectedItems.length, 1);
 					assert.equal(element.selectedItems[0], item);
 					assert.isTrue(element._getModelFromItem(item).selected);
+					done();
+				});
+			});
+
+			test('selects items', done => {
+				const items = [groups[0].items[0], groups[1].items[0]];
+				element.selectItems(items);
+				flush(() => {
+					const assertItem = item => {
+						assert.isTrue(element.isItemSelected(item));
+						assert.isTrue(element._getModelFromItem(item).selected);
+					};
+					items.forEach(item => assertItem(item));
+
+					assert.equal(element.selectedItems.length, items.length);
+					assert.equal(element.selectedItems[0], items[0]);
 					done();
 				});
 			});
