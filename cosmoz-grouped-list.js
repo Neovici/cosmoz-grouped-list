@@ -153,7 +153,7 @@
 		_onTemplatesChange(change) {
 			if (!Array.isArray(this._ctors) || this._ctors.length === 0) {
 				const templates = Array.from(change.addedNodes)
-					.filter(n => n.nodeType === Node.ELEMENT_NODE && n.tagName === 'TEMPLATE' && n.matches('[class]'));
+					.filter(n => n.nodeType === Node.ELEMENT_NODE && n.tagName === 'TEMPLATE' && n.matches('.item,.group'));
 
 				if (templates.length === 0) {
 					console.warn('cosmoz-grouped-list requires templates');
@@ -169,7 +169,9 @@
 				};
 
 				this._ctors = templates.reduce((ctors, template) => {
-					ctors[template.getAttribute('class')] = Cosmoz.Templatize.templatize(template, this, {
+					const templateType = template.classList.contains('item') ? 'item' : 'group';
+
+					ctors[templateType] = Cosmoz.Templatize.templatize(template, this, {
 						instanceProps: Object.assign({[this.as]: true}, baseProps),
 						parentModel: true,
 						forwardParentProp: this._forwardHostProp,
@@ -271,11 +273,11 @@
 		},
 
 		releaseInstance(templateInstance) {
-			const type = templateInstance.__type,
-				index = this._instancesInUse[type].indexOf(templateInstance);
+			const klass = templateInstance.__class,
+				index = this._instancesInUse[klass].indexOf(templateInstance);
 			if (index >= 0) {
-				this._instancesInUse[type].splice(index, 1);
-				this._reusableInstances[type].push(templateInstance);
+				this._instancesInUse[klass].splice(index, 1);
+				this._reusableInstances[klass].push(templateInstance);
 			}
 		},
 
@@ -310,7 +312,7 @@
 
 			return data.reduce(function (flatData, group) {
 				if (!group.items) {
-					console.warn('Incorrect data');
+					console.warn('Incorrect data, group does not have items');
 					return flatData;
 				}
 
@@ -383,15 +385,20 @@
 		/**
 		 * Reuse an existing Instance or create a new one if there is not any available
 		 *
-		 * @param  {String} type Can be 'item' or 'group'
+		 * @param  {String} klass Can be 'item' or 'group'
 		 * @returns {type}      Instance of Cosmoz.Templatize
 		 */
-		_getInstance(type) {
+		_getInstance(klass) {
+			if (this._ctors == null) {
+				console.warn('cosmoz-grouped-list templates for item, group are required.');
+			} else if (this._ctors[klass] == null) {
+				console.warn(`cosmoz-grouped-list ${klass} template is required.`);
+			}
 			const reusableInstances = this._reusableInstances,
-				reusableIndex = reusableInstances.findIndex(({__type}) => __type === type),
+				reusableIndex = reusableInstances.findIndex(({__class}) => __class === klass),
 				instance = reusableIndex > -1
 					?  reusableInstances.splice(reusableIndex, 1)
-					: new this._ctors[type]({});
+					: new this._ctors[klass]({});
 
 			this._usedInstances.push(instance);
 			return instance;
