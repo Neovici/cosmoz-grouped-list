@@ -18,26 +18,22 @@
 	<test-fixture id="basic">
 		<template>
 			<cosmoz-grouped-list>
-				<cosmoz-grouped-list-template id="itemTemplate">
-					<template>
-						<div class="item-template" style="border-bottom: 1px solid grey;">
-							<div>
-								ID:<span class="item-id">{{ item.id }}</span>
-								NAME:<span class="item-name">{{ item.name }}</span>
-								VALUE:<span class="item-value">{{ item.value }}</span>
-							</div>
-						</div>
-					</template>
-				</cosmoz-grouped-list-template>
-				<cosmoz-grouped-list-template id="groupTemplate">
-					<template>
-						<div class="group-template">
+				<template slot="templates" class="item">
+					<div class="item-template" style="border-bottom: 1px solid grey;">
+						<div>
+							ID:<span class="item-id">{{ item.id }}</span>
 							NAME:<span class="item-name">{{ item.name }}</span>
-							VALUE: <span class="item-value">{{ item.value }}</span>
-							SELECTED: <span class="item-selected">{{ selected }}</span>
+							VALUE:<span class="item-value">{{ item.value }}</span>
 						</div>
-					</template>
-				</cosmoz-grouped-list-template>
+					</div>
+				</template>
+				<template slot="templates" class="group">
+					<div class="group-template">
+						NAME:<span class="item-name">{{ item.name }}</span>
+						VALUE: <span class="item-value">{{ item.value }}</span>
+						SELECTED: <span class="item-selected">{{ selected }}</span>
+					</div>
+				</template>
 			</cosmoz-grouped-list>
 		</template>
 	</test-fixture>

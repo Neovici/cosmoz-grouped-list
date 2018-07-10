@@ -19,6 +19,11 @@
 				value: 'item'
 			},
 
+			indexAs: {
+				type: String,
+				value: 'index'
+			},
+
 			scrollTarget: {
 				type: HTMLElement
 			},
@@ -47,17 +52,13 @@
 
 			_flatData: {
 				type: Array,
-			},
-
-			_isAttached: {
-				type: Boolean
 			}
 
 		},
 
 		observers: [
 			'_dataChanged(data.*)',
-			'_scrollTargetChanged(scrollTarget, _isAttached)'
+			'_scrollTargetChanged(scrollTarget, isAttached)'
 		],
 
 		/**
@@ -84,7 +85,7 @@
 
 		/**
 		 * The number of <cosmoz-grouped-list-template-selector> currently used by iron-list.
-		 * This number should grows until the viewport is filled by iron-list, then it should not change anymoer.
+		 * This number should grows until the viewport is filled by iron-list, then it should not change anymore.
 		 */
 		_templateSelectorsCount: 0,
 
@@ -99,20 +100,95 @@
 		 */
 		_renderedItems: null,
 
+		/**
+		 * Instances of Template that are NOT available for reuse at the moment.
+		 */
+		_usedInstances: [],
+
+		/**
+		 *  Instances of Template that are available for reuse at the moment.
+		 */
+		_reusableInstances: [],
+
+		/**
+		 * Polymer `created` livecycle function.
+		 *
+		 * @return {void}
+		 */
 		created() {
 			this._templateSelectors = [];
 			this._renderedItems = [];
-			this._physicalItens = [];
 		},
 
+		/**
+		 * Polymer `attached` livecycle function.
+		 *
+		 * @return {void}
+		 */
 		attached() {
-			this._isAttached = true;
+			this._templatesObserver = Polymer.dom(this.$.templates)
+				.observeNodes(this._onTemplatesChange.bind(this));
 			this._debounceRender();
 		},
 
+		/**
+		 * Polymer `detached` livecycle function.
+		 *
+		 * @return {void}
+		 */
 		detached() {
-			this._isAttached = false;
+			if (this._templatesObserver) {
+				Polymer.dom(this).unobserveNodes(this._templatesObserver);
+				this._templatesObserver = null;
+			}
 			this.cancelDebouncer('render');
+
+
+			this._resetAllTemplates();
+
+			this._usedInstances = [];
+			this._reusableInstances = [];
+
+		},
+		_onTemplatesChange(change) {
+			if (!Array.isArray(this._ctors) || this._ctors.length === 0) {
+				const templates = Array.from(change.addedNodes)
+					.filter(n => n.nodeType === Node.ELEMENT_NODE && n.tagName === 'TEMPLATE' && n.matches('.item,.group'));
+
+				if (templates.length === 0) {
+					console.warn('cosmoz-grouped-list requires templates');
+					return;
+				}
+				const baseProps = {
+					[this.as]: true,
+					[this.indexAs]: true,
+					folded: true,
+					expanded: true,
+					selected: true,
+					highlighted: true
+				};
+
+				this._ctors = templates.reduce((ctors, template) => {
+					const templateType = template.classList.contains('item') ? 'item' : 'group';
+
+					ctors[templateType] = Cosmoz.Templatize.templatize(template, this, {
+						instanceProps: Object.assign({[this.as]: true}, baseProps),
+						parentModel: true,
+						forwardParentProp: this._forwardHostProp,
+						// forwardParentPath: this._forwardParentPath,
+						forwardHostProp: this._forwardHostProp,
+						forwardInstanceProp: this._notifyInstanceProp,
+						notifyInstanceProp: this._notifyInstanceProp
+					});
+					return ctors;
+				}, {});
+			}
+		},
+
+		_forwardHostProp(prop, value) {
+			const forward = instance => IS_V2 ? instance.forwardHostProp(prop, value) : instance[prop] = value;
+			this._usedInstances.forEach(forward);
+			this._reusableInstances.forEach(forward);
 		},
 
 		_dataChanged(change) {
@@ -130,10 +206,9 @@
 		},
 
 		_render() {
-			if (!this._isAttached) {
+			if (!this.isAttached) {
 				return;
 			}
-
 			this._flatData = this._prepareData(this.data);
 		},
 
@@ -195,7 +270,15 @@
 					}
 				});
 			}
+		},
 
+		releaseInstance(templateInstance) {
+			const klass = templateInstance.__class,
+				index = this._instancesInUse[klass].indexOf(templateInstance);
+			if (index >= 0) {
+				this._instancesInUse[klass].splice(index, 1);
+				this._reusableInstances[klass].push(templateInstance);
+			}
 		},
 
 		_scrollTargetChanged(scrollTarget, isAttached)  {
@@ -229,7 +312,7 @@
 
 			return data.reduce(function (flatData, group) {
 				if (!group.items) {
-					console.warn('Incorrect data');
+					console.warn('Incorrect data, group does not have items');
 					return flatData;
 				}
 
@@ -263,17 +346,19 @@
 
 			this._renderedItems[selectorId] = item;
 
-			const newTemplate = this._getTemplate(isGroup ? 'group' : 'item');
-
-			element = selector.elements[newTemplate.id];
+			const type = isGroup ? 'group' : 'item';
+			element = selector.elements[type];
 
 			if (!element) {
-				templateInstance =  newTemplate.getInstance();
-				element = templateInstance.root.querySelector('*');
+				templateInstance = this._getInstance(type);
+
+				const root = templateInstance.root;
+				element = root.querySelector('*');
 				element.__tmplInstance = templateInstance;
 				element.setAttribute('slot', selector.slotName);
-				Polymer.dom(this).appendChild(templateInstance.root);
-				selector.elements[newTemplate.id] = element;
+
+				Polymer.dom(this).appendChild(root);
+				selector.elements[type] = element;
 			} else {
 				templateInstance = element.__tmplInstance;
 			}
@@ -293,14 +378,30 @@
 				templateInstance._flushProperties(true);
 			}
 
-			selector.show(element, newTemplate.id);
+			selector.show(element, type);
 		},
 
-		_getTemplate(type) {
-			if (!this['_' + type + 'Template']) {
-				this['_' + type + 'Template'] = Polymer.dom(this).querySelector('#' + type + 'Template');
+
+		/**
+		 * Reuse an existing Instance or create a new one if there is not any available
+		 *
+		 * @param  {String} klass Can be 'item' or 'group'
+		 * @returns {type}      Instance of Cosmoz.Templatize
+		 */
+		_getInstance(klass) {
+			if (this._ctors == null) {
+				console.warn('cosmoz-grouped-list templates for item, group are required.');
+			} else if (this._ctors[klass] == null) {
+				console.warn(`cosmoz-grouped-list ${klass} template is required.`);
 			}
-			return this['_' + type + 'Template'];
+			const reusableInstances = this._reusableInstances,
+				reusableIndex = reusableInstances.findIndex(({__class}) => __class === klass),
+				instance = reusableIndex > -1
+					?  reusableInstances.splice(reusableIndex, 1)
+					: new this._ctors[klass]({});
+
+			this._usedInstances.push(instance);
+			return instance;
 		},
 
 		/**
@@ -373,7 +474,6 @@
 			if (i >= 0) {
 				this.splice('data', i, 1);
 			}
-
 		},
 
 		isGroup(item) {
