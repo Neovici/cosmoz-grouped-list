@@ -76,7 +76,7 @@
 				<button class="action" class="action" on-tap="_changeItemValue">change item value</button>
 			</div>-->
 			<cosmoz-grouped-list id="groupedList" data="{{ data }}" selected-items="{{ selectedItems }}" class="flex">
-				<template slot="templates" class="item">
+				<template slot="templates" data-type="item">
 					<div highlighted$="[[highlighted]]" class="item-template" style="border-bottom: 1px solid grey;">
 						<div on-tap="highlight">
 							<div>Outer binding: <span>[[outerValue]]</span></div>
@@ -92,7 +92,7 @@
 						</div>
 					</div>
 				</template>
-				<template slot="templates" class="group">
+				<template slot="templates" data-type="group">
 					<div class="group-template">
 						<div class="flex" on-tap="toggleSelect"><span>[[item.name]]</span>(selected=<span>{{selected}}</span>)</div>
 						<div>[[ item.items.length ]]</div>

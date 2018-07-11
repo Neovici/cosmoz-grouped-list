@@ -9,6 +9,7 @@
 				display: none !important;
 			}
 		</style>
+		<span>[[index]]</span>
 		<slot></slot>
 	</template>
 	<script>
@@ -20,56 +21,40 @@
 			properties: {
 				item: {
 					type: Object,
-					observer: '_itemChanged'
 				},
-			},
-
-			selectorId: null,
-
-			elements: null,
-
-			currentElement: null,
-
-			currentTemplateId: null,
-
-			groupedList: null,
-
-			created() {
-				this.elements = {};
-			},
-
-			show(element, templateId) {
-				if (this.currentElement && element !== this.currentElement) {
-					this.currentElement.setAttribute('hidden', '');
+				hidden: {
+					type: Boolean,
+					reflectToAttribute: true
+				},
+				index: {
+					type: Number
 				}
-
-				element.removeAttribute('hidden');
-
-				this.currentElement = element;
-				this.currentTemplateId = templateId;
 			},
 
-			_itemChanged(newItem) {
+			observers: [
+				'_onChange(item, hidden)'
+			],
 
-				if (this.selectorId === null) {
-					// Notifies parent cosmoz-grouped-list that a new template-selector
-					// has been added so that it gets a selectorId
-					this.fire('template-selector-created', {
-						selector: this
-					}, {
-						bubbles: false
-					});
+			attached() {
+				//console.log('attached');
+			},
 
-					const slotName = this.slotName = 'selectorSlot' + this.selectorId;
-					let slot = Polymer.dom(this).querySelector('slot');
-					if (slot == null) {
-						slot = Polymer.dom(this).querySelector('content');
-						slot.setAttribute('select', '[slot="' + slotName + '"]');
-					}
-					slot.setAttribute('name', slotName);
+			detached() {
+				console.error('detached');
+			},
+
+			_onChange(item, hidden) {
+				if (item == null && hidden == null) {
+					return;
 				}
+				console.log('selector change', item, hidden);
+				this.fire('cosmoz-selector-changed', {
+					item: this.item,
+					index: this.index,
+					hidden: this.hidden,
+					selector: this
+				});
 
-				this.groupedList.selectorItemChanged(this, newItem);
 			}
 		});
 	</script>

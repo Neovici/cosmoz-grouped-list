@@ -55,7 +55,9 @@
 			}
 
 		},
-
+		behaviors: [
+			Cosmoz.GroupedListTemplatizeBehaviorImpl
+		],
 		observers: [
 			'_dataChanged(data.*)',
 			'_scrollTargetChanged(scrollTarget, isAttached)'
@@ -73,15 +75,6 @@
 		 */
 		_itemsMap: null,
 
-		/**
-		 * The <cosmoz-grouped-list-template> used to render items.
-		 */
-		_itemTemplate: null,
-
-		/**
-		 * The <cosmoz-grouped-list-template> used to render groups.
-		 */
-		_groupTemplate: null,
 
 		/**
 		 * The number of <cosmoz-grouped-list-template-selector> currently used by iron-list.
@@ -89,26 +82,6 @@
 		 */
 		_templateSelectorsCount: 0,
 
-		/**
-		 * Array of <cosmoz-grouped-list-template-selector> instantiated by <iron-list>
-		 */
-		_templateSelectors: null,
-
-		/**
-		 * Array of items currently rendered.
-		 * Note that an item might be a 'real' item, or a group.
-		 */
-		_renderedItems: null,
-
-		/**
-		 * Instances of Template that are NOT available for reuse at the moment.
-		 */
-		_usedInstances: [],
-
-		/**
-		 *  Instances of Template that are available for reuse at the moment.
-		 */
-		_reusableInstances: [],
 
 		/**
 		 * Polymer `created` livecycle function.
@@ -126,8 +99,7 @@
 		 * @return {void}
 		 */
 		attached() {
-			this._templatesObserver = Polymer.dom(this.$.templates)
-				.observeNodes(this._onTemplatesChange.bind(this));
+			//this.listen(this, 'cosmoz-template-selector-changed', '_onTemplateSelectorChanged');
 			this._debounceRender();
 		},
 
@@ -137,52 +109,8 @@
 		 * @return {void}
 		 */
 		detached() {
-			if (this._templatesObserver) {
-				Polymer.dom(this).unobserveNodes(this._templatesObserver);
-				this._templatesObserver = null;
-			}
+			//this.unlisten(this, 'cosmoz-template-selector-changed', '_onTemplateSelectorChanged');
 			this.cancelDebouncer('render');
-
-
-			this._resetAllTemplates();
-
-			this._usedInstances = [];
-			this._reusableInstances = [];
-
-		},
-		_onTemplatesChange(change) {
-			if (!Array.isArray(this._ctors) || this._ctors.length === 0) {
-				const templates = Array.from(change.addedNodes)
-					.filter(n => n.nodeType === Node.ELEMENT_NODE && n.tagName === 'TEMPLATE' && n.matches('.item,.group'));
-
-				if (templates.length === 0) {
-					console.warn('cosmoz-grouped-list requires templates');
-					return;
-				}
-				const baseProps = {
-					[this.as]: true,
-					[this.indexAs]: true,
-					folded: true,
-					expanded: true,
-					selected: true,
-					highlighted: true
-				};
-
-				this._ctors = templates.reduce((ctors, template) => {
-					const templateType = template.classList.contains('item') ? 'item' : 'group';
-
-					ctors[templateType] = Cosmoz.Templatize.templatize(template, this, {
-						instanceProps: Object.assign({[this.as]: true}, baseProps),
-						parentModel: true,
-						forwardParentProp: this._forwardHostProp,
-						// forwardParentPath: this._forwardParentPath,
-						forwardHostProp: this._forwardHostProp,
-						forwardInstanceProp: this._notifyInstanceProp,
-						notifyInstanceProp: this._notifyInstanceProp
-					});
-					return ctors;
-				}, {});
-			}
 		},
 
 		_forwardHostProp(prop, value) {
@@ -250,37 +178,6 @@
 			return true;
 		},
 
-		_forwardProperty(instance, name, value) {
-			if (IS_V2) {
-				instance._setPendingProperty(name, value);
-			} else {
-				instance[name] = value;
-			}
-		},
-
-		_resetAllTemplates() {
-			if (this._templateSelectors.length > 0) {
-				this._templateSelectors.forEach(selector => {
-					if (selector.element) {
-						selector.element.setAttribute('slot', 'reusableTemplate');
-						selector.template.releaseInstance(selector.templateInstance);
-						selector.element = null;
-						selector.template = null;
-						selector.templateInstance = null;
-					}
-				});
-			}
-		},
-
-		releaseInstance(templateInstance) {
-			const klass = templateInstance.__class,
-				index = this._instancesInUse[klass].indexOf(templateInstance);
-			if (index >= 0) {
-				this._instancesInUse[klass].splice(index, 1);
-				this._reusableInstances[klass].push(templateInstance);
-			}
-		},
-
 		_scrollTargetChanged(scrollTarget, isAttached)  {
 			if (! (scrollTarget === undefined || isAttached === undefined)) {
 				if (scrollTarget && isAttached) {
@@ -330,79 +227,29 @@
 			}.bind(this), []);
 		},
 
-		_onTemplateSelectorCreated(event) {
-			const	selector = event.detail.selector;
-			selector.selectorId = this._templateSelectorsCount;
-			selector.groupedList = this;
-			this._templateSelectors[selector.selectorId] = selector;
-			this._templateSelectorsCount += 1;
+		_onTemplateSelectorChanged(e, {item, index, hidden, selector}) {
+			if (hidden && selector.__cinstance !== null) {
+				this._reuseInstance(selector.__cinstance);
+				selector.__instance = null;
+				return;
+			}
+			const slot = this._getSlotByIndex(index),
+				isGroup = this.isGroup(item),
+				type = this._getItemType(item, isGroup),
+				props =  {
+					[this.as]: item,
+					[this.indexAs]: index,
+					selected: isGroup ? this.isGroupSelected(item) : this.isItemSelected(item),
+					folded: isGroup ? this.isFolded(item) : undefined,
+					expanded: !isGroup ? this.isExpanded(item) : undefined,
+					highlighted: this.isItemHighlighted(item),
+				},
+				instance = this._getInstance(type, props, selector.__cinstance);
+			instance.element.setAttribute('slot', slot);
+			selector.__cinstance = instance;
+			Polymer.dom(this).appendChild(instance.root);
 		},
 
-		selectorItemChanged(selector, item) {
-			const selectorId = selector.selectorId,
-				isGroup = this.isGroup(item);
-			let element,
-				templateInstance;
-
-			this._renderedItems[selectorId] = item;
-
-			const type = isGroup ? 'group' : 'item';
-			element = selector.elements[type];
-
-			if (!element) {
-				templateInstance = this._getInstance(type);
-
-				const root = templateInstance.root;
-				element = root.querySelector('*');
-				element.__tmplInstance = templateInstance;
-				element.setAttribute('slot', selector.slotName);
-
-				Polymer.dom(this).appendChild(root);
-				selector.elements[type] = element;
-			} else {
-				templateInstance = element.__tmplInstance;
-			}
-
-			this._forwardProperty(templateInstance, 'item', item);
-			this._forwardProperty(templateInstance, 'selected', isGroup ? this.isGroupSelected(item) : this.isItemSelected(item));
-
-			if (isGroup) {
-				this._forwardProperty(templateInstance, 'folded', this.isFolded(item));
-			} else {
-				this._forwardProperty(templateInstance, 'expanded', this.isExpanded(item));
-			}
-
-			this._forwardProperty(templateInstance, 'highlighted', this.isItemHighlighted(item));
-
-			if (templateInstance._flushProperties) {
-				templateInstance._flushProperties(true);
-			}
-
-			selector.show(element, type);
-		},
-
-
-		/**
-		 * Reuse an existing Instance or create a new one if there is not any available
-		 *
-		 * @param  {String} klass Can be 'item' or 'group'
-		 * @returns {type}      Instance of Cosmoz.Templatize
-		 */
-		_getInstance(klass) {
-			if (this._ctors == null) {
-				console.warn('cosmoz-grouped-list templates for item, group are required.');
-			} else if (this._ctors[klass] == null) {
-				console.warn(`cosmoz-grouped-list ${klass} template is required.`);
-			}
-			const reusableInstances = this._reusableInstances,
-				reusableIndex = reusableInstances.findIndex(({__class}) => __class === klass),
-				instance = reusableIndex > -1
-					?  reusableInstances.splice(reusableIndex, 1)
-					: new this._ctors[klass]({});
-
-			this._usedInstances.push(instance);
-			return instance;
-		},
 
 		/**
 		 * Utility method that returns the element that displays the first visible item in the list.
@@ -693,6 +540,14 @@
 			if (physicalIndex >= 0) {
 				return this._templateSelectors[physicalIndex].currentElement.__tmplInstance;
 			}
+		},
+
+		_getSlotByIndex(index) {
+			return `cosmoz-glts-${index}`;
+		},
+
+		_getItemType(item, isGroup = this.isGroup(item)) {
+			return isGroup ? 'group' : 'item';
 		}
 	});
 }());
