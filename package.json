@@ -7,10 +7,10 @@
 		"test": "test"
 	},
 	"devDependencies": {
-		"eslint": "^4.10.0",
-		"eslint-plugin-html": "^3.2.2",
-		"eslint-plugin-mocha": "^4.11.0",
-		"polymer-cli": "^1.6.0",
+		"eslint": "^5.1.0",
+		"eslint-plugin-html": "^4.0.5",
+		"eslint-plugin-mocha": "^5.1.0",
+		"polymer-cli": "^1.7.7",
 		"web-component-tester-istanbul": "Neovici/web-component-tester-istanbul"
 	},
 	"scripts": {
