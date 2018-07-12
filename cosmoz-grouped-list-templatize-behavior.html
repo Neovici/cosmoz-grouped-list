@@ -32,7 +32,7 @@
 		 */
 		created() {
 			this._reusableInstances = [];
-			this._usedInstances = [];
+			this._instances = [];
 		},
 		/**
 		 * Polymer `attached` livecycle function.
@@ -53,6 +53,7 @@
 				Polymer.dom(this).unobserveNodes(this._templatesObserver);
 				this._templatesObserver = null;
 			}
+			this._removeInstances();
 		},
 
 		_getInstanceDefaultProps() {
@@ -67,7 +68,9 @@
 		},
 
 		_onTemplatesChange({addedNodes}) {
-			if (Array.isArray(this._ctors) && this._ctors.length > 0) {
+			const ctors = this._ctors;
+
+			if (Array.isArray(ctors) && ctors.length > 0) {
 				return;
 			}
 
@@ -121,59 +124,33 @@
 				this._reuseInstance(prevInstance);
 			}
 
-			const {
-				_reusableInstances: reusable,
-				_usedInstances: used
-			} = this;
-			let instance = reusable.find(({_type: t}) => t === type);
+			const {_reusableInstances: reusable, _instances: instances} = this;
+
+			let instance = reusable.find(({__type}) => __type === type);
+
 			if (instance) {
-				//console.log('reusing instance', type);
 				reusable.splice(reusable.indexOf(instance), 1);
 				this._forwardProperties(instance, props);
 			} else {
-				console.log('creating a new instance');
 				instance = new ctors[type](props);
-				instance._type = type;
+				instance.__type = type;
 				instance.element = instance.root.querySelector('*');
 			}
-			used.push(instance);
+			instances.push(instance);
 			return instance;
 		},
 
-		_detachInstance(instance, reuse = false) {
-			if (!instance) {
-				return;
-			}
-			instance.element.setAttribute('slot', '');
-			const children = IS_V2 ? instance.children : instance._children,
-				root = instance.root,
-				dom = Polymer.dom;
-
-			for (let i = 0; i < children.length; i++) {
-				const child = children[i],
-					parent = child.parentNode;
-				if (reuse) {
-					dom(root).appendChild(child);
-				} else if (parent !== null) {
-					dom(parent).removeChild(child);
-				}
-			}
+		_getInstanceByProperty(prop, value) {
+			return this._instances
+				.find(instance =>
+					(IS_V2 ? instance._getProperty(prop) : instance[prop]) === value
+				);
 		},
 
-		_reuseInstance(instance) {
-			if (!instance) {
-				return;
-			}
-			const {
-				_reusableInstances: reusable,
-				_usedInstances: used
-			} = this;
-			const index = used.indexOf(instance);
-			if (index > -1) {
-				used.splice(index, 1);
-			}
-			reusable.push(instance);
-			this._detachInstance(instance, true);
+		_forwardHostProp(prop, value) {
+			const forward = instance => IS_V2 ? instance.forwardHostProp(prop, value) : instance[prop] = value;
+			this._instances.forEach(forward);
+			this._reusableInstances.forEach(forward);
 		},
 
 		_forwardProperty(instance, name, value) {
@@ -190,6 +167,65 @@
 			if (instance._flushProperties) {
 				instance._flushProperties(true);
 			}
+		},
+
+		_detachInstance(instance, reuse = false) {
+			if (!instance) {
+				return;
+			}
+			const children = IS_V2 ? instance.children : instance._children,
+				root = instance.root,
+				dom = Polymer.dom;
+
+			for (let i = 0; i < children.length; i++) {
+				const child = children[i],
+					parent = child.parentNode;
+				if (reuse) {
+					dom(root).appendChild(child);
+				} else if (parent !== null) {
+					dom(parent).removeChild(child);
+				}
+			}
+
+			if (!reuse) {
+				instance.element = null;
+			}
+		},
+
+		_reuseInstance(instance) {
+			if (!instance) {
+				return;
+			}
+			const {_reusableInstances: reusable, _instances: instances} = this;
+			const index = instances.indexOf(instance);
+			if (index < 0) {
+				return;
+			}
+			instances.splice(index, 1);
+			reusable.push(instance);
+			this._detachInstance(instance, true);
+		},
+
+		_removeInstance(instance) {
+			if (!instance) {
+				return;
+			}
+
+			const {_reusableInstances: reusable, _instances: instances} = this;
+			const ridx = reusable.indexOf(instance),
+				uidx = instances.indexOf(instance);
+			if (ridx) {
+				reusable.splice(ridx, 1);
+			}
+			if (uidx) {
+				instances.splice(uidx, 1);
+			}
+			this._detachInstance(instance);
+		},
+
+		_removeInstances() {
+			this._reusableInstances.splice(0).forEach(this._detachInstance);
+			this._instances.splice(0).forEach(this._detachInstance);
 		}
 	};
 
