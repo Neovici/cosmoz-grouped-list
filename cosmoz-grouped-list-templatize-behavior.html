@@ -111,12 +111,9 @@
 			if (ctors[type] == null) {
 				console.warn(`cosmoz-grouped-list template for ${type} type not found.`);
 			}
-			if (props.item.name === 'Group 0') {
-				console.warn('o item');
-			}
 
 			if (prevInstance && prevInstance.type === type) {
-				this._forwardProperties(props);
+				this._forwardProperties(prevInstance, props);
 				return prevInstance;
 			}
 
