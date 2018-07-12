@@ -14,16 +14,6 @@
 				type: Array
 			},
 
-			as: {
-				type: String,
-				value: 'item'
-			},
-
-			indexAs: {
-				type: String,
-				value: 'index'
-			},
-
 			scrollTarget: {
 				type: HTMLElement
 			},
@@ -58,6 +48,7 @@
 		behaviors: [
 			Cosmoz.GroupedListTemplatizeBehaviorImpl
 		],
+
 		observers: [
 			'_dataChanged(data.*)',
 			'_scrollTargetChanged(scrollTarget, isAttached)'
@@ -75,14 +66,6 @@
 		 */
 		_itemsMap: null,
 
-
-		/**
-		 * The number of <cosmoz-grouped-list-template-selector> currently used by iron-list.
-		 * This number should grows until the viewport is filled by iron-list, then it should not change anymore.
-		 */
-		_templateSelectorsCount: 0,
-
-
 		/**
 		 * Polymer `created` livecycle function.
 		 *
@@ -90,7 +73,6 @@
 		 */
 		created() {
 			this._templateSelectors = [];
-			this._renderedItems = [];
 		},
 
 		/**
@@ -99,7 +81,6 @@
 		 * @return {void}
 		 */
 		attached() {
-			//this.listen(this, 'cosmoz-template-selector-changed', '_onTemplateSelectorChanged');
 			this._debounceRender();
 		},
 
@@ -109,14 +90,7 @@
 		 * @return {void}
 		 */
 		detached() {
-			//this.unlisten(this, 'cosmoz-template-selector-changed', '_onTemplateSelectorChanged');
 			this.cancelDebouncer('render');
-		},
-
-		_forwardHostProp(prop, value) {
-			const forward = instance => IS_V2 ? instance.forwardHostProp(prop, value) : instance[prop] = value;
-			this._usedInstances.forEach(forward);
-			this._reusableInstances.forEach(forward);
 		},
 
 		_dataChanged(change) {
@@ -228,15 +202,16 @@
 		},
 
 		_onTemplateSelectorChanged(e, {item, index, hidden, selector}) {
-			if (hidden && selector.__cinstance !== null) {
-				this._reuseInstance(selector.__cinstance);
+			const prevInstance = selector.__instance;
+			if (hidden && prevInstance !== null) {
+				this._reuseInstance(prevInstance);
 				selector.__instance = null;
 				return;
 			}
-			const slot = this._getSlotByIndex(index),
+			const slot = this._getSlotByIndex(index) + Date.now(),
 				isGroup = this.isGroup(item),
 				type = this._getItemType(item, isGroup),
-				props =  {
+				props = {
 					[this.as]: item,
 					[this.indexAs]: index,
 					selected: isGroup ? this.isGroupSelected(item) : this.isItemSelected(item),
@@ -244,10 +219,12 @@
 					expanded: !isGroup ? this.isExpanded(item) : undefined,
 					highlighted: this.isItemHighlighted(item),
 				},
-				instance = this._getInstance(type, props, selector.__cinstance);
+				instance = this._getInstance(type, props, prevInstance);
+
+			Polymer.dom(selector).querySelector('slot').setAttribute('name', slot);
 			instance.element.setAttribute('slot', slot);
-			selector.__cinstance = instance;
 			Polymer.dom(this).appendChild(instance.root);
+			selector.__instance = instance;
 		},
 
 
@@ -257,28 +234,15 @@
 		 * @returns {HTMLElement|null} The first visible element or null
 		 */
 		getFirstVisibleItemElement() {
-			let i,
-				selector,
-				item,
-				selectorIndex;
-
-			if (!this._flatData || !this._renderedItems) {
+			const {_instances: instances} = this;
+			if (!this._flatData || instances.length === 0) {
 				return;
 			}
 
-			i = this.$.list.firstVisibleIndex;
-			for (; i < this._flatData.length ; i += 1) {
-				item = this._flatData[i];
-				if (!this.isGroup(item)) {
-					selectorIndex = this._renderedItems.indexOf(item);
-					if (selectorIndex >= 0) {
-						selector = this._templateSelectors[selectorIndex];
-						// iron-list sets the hidden attribute on its reusable children when there are not used anymore
-						if (selector.getAttribute('hidden') === null) {
-							return selector.currentElement;
-						}
-					}
-				}
+			const {firstVisibleIndex} = this.$.list;
+			const firstVisibleInstance = this._getInstanceByProperty('index', firstVisibleIndex);
+			if (firstVisibleInstance) {
+				return firstVisibleInstance.element;
 			}
 		},
 
@@ -536,10 +500,7 @@
 		},
 
 		_getModelFromItem(item) {
-			const	physicalIndex = this._renderedItems.indexOf(item);
-			if (physicalIndex >= 0) {
-				return this._templateSelectors[physicalIndex].currentElement.__tmplInstance;
-			}
+			return this._getInstanceByProperty('item', item);
 		},
 
 		_getSlotByIndex(index) {
