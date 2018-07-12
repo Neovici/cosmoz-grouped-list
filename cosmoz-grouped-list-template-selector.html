@@ -9,53 +9,50 @@
 				display: none !important;
 			}
 		</style>
-		<span>[[index]]</span>
 		<slot></slot>
 	</template>
 	<script>
 		'use strict';
 		Polymer({
-
 			is: 'cosmoz-grouped-list-template-selector',
-
 			properties: {
+				index: {
+					type: Number
+				},
 				item: {
 					type: Object,
+					observer: '_onItemChanged'
 				},
 				hidden: {
 					type: Boolean,
-					reflectToAttribute: true
+					observer: '_onHiddenChanged'
 				},
-				index: {
-					type: Number
-				}
-			},
-
-			observers: [
-				'_onChange(item, hidden)'
-			],
-
-			attached() {
-				//console.log('attached');
 			},
 
 			detached() {
-				console.error('detached');
+				this._fireChange({hidden: true});
 			},
 
-			_onChange(item, hidden) {
-				if (item == null && hidden == null) {
+			_onItemChanged(item) {
+				const {index, hidden} = this;
+
+				if (item == null || hidden) {
 					return;
 				}
-				console.log('selector change', item, hidden);
-				this.fire('cosmoz-selector-changed', {
-					item: this.item,
-					index: this.index,
-					hidden: this.hidden,
-					selector: this
-				});
+				this._fireChange({index, item});
 
+			},
+			_onHiddenChanged(hidden) {
+				const {index, item} = this;
+				this._fireChange({index, hidden, item});
+			},
+
+			_fireChange(props = {}) {
+				this.fire('cosmoz-selector-changed', Object.assign({
+					selector: this,
+				}, props));
 			}
+
 		});
 	</script>
 </dom-module>
