@@ -208,7 +208,7 @@
 				selector.__instance = null;
 				return;
 			}
-			const slot = this._getSlotByIndex(index) + Date.now(),
+			const slotName = this._getSlotByIndex(index) + Date.now(),
 				isGroup = this.isGroup(item),
 				type = this._getItemType(item, isGroup),
 				props = {
@@ -221,8 +221,15 @@
 				},
 				instance = this._getInstance(type, props, prevInstance);
 
-			Polymer.dom(selector).querySelector('slot').setAttribute('name', slot);
-			instance.element.setAttribute('slot', slot);
+			let slot = Polymer.dom(selector).querySelector('slot');
+
+			if (slot == null) {
+				slot = Polymer.dom(selector).querySelector('content');
+				slot.setAttribute('select', '[slot="' + slotName + '"]');
+			} else {
+				slot.setAttribute('name', slotName);
+			}
+			instance.element.setAttribute('slot', slotName);
 			Polymer.dom(this).appendChild(instance.root);
 			selector.__instance = instance;
 		},
@@ -501,7 +508,7 @@
 		},
 
 		_getSlotByIndex(index) {
-			return `cosmoz-glts-${index}`;
+			return `cosmoz-glts-${index || ''}`;
 		},
 
 		_getItemType(item, isGroup = this.isGroup(item)) {

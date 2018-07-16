@@ -183,7 +183,11 @@
 				if (reuse) {
 					dom(root).appendChild(child);
 				} else if (parent !== null) {
-					dom(parent).removeChild(child);
+					try {
+						Polymer.dom(parent).removeChild(child);
+					} catch (e) {
+						// console.log(e);
+					}
 				}
 			}
 
