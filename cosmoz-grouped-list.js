@@ -234,9 +234,9 @@
 		 * @returns {HTMLElement|null} The first visible element or null
 		 */
 		getFirstVisibleItemElement() {
-			const {_instances: instances} = this;
-			if (!this._flatData || instances.length === 0) {
-				return;
+			const {_flatData: flat} = this;
+			if (!Array.isArray(flat) || flat.length === 0) {
+				return false;
 			}
 
 			const {firstVisibleIndex} = this.$.list;
@@ -253,14 +253,11 @@
 		 * this means we are displaying only group templates.
 		 */
 		get hasRenderedData() {
-			if (this._flatData && this._flatData.length > 0) {
-				return this._templateSelectors.some(selector => {
-					if (selector.getAttribute('hidden') === null) {
-						return true;
-					}
-				});
+			const {_flatData: flat, _instances: instances} = this;
+			if (!Array.isArray(flat) || flat.length === 0) {
+				return false;
 			}
-			return false;
+			return instances.some(instance => instance !== null);
 		},
 
 		/**
