@@ -201,7 +201,7 @@
 			}.bind(this), []);
 		},
 
-		_onTemplateSelectorChanged(e, {item, index, hidden, selector}) {
+		_onTemplateSelectorChanged(e, {item, index = this._flatData.indexOf(item), hidden, selector}) {
 			const prevInstance = selector.__instance;
 			if (hidden && prevInstance !== null) {
 				this._reuseInstance(prevInstance);

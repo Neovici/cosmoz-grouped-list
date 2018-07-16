@@ -12,7 +12,10 @@
 		<slot></slot>
 	</template>
 	<script>
+	(function () {
 		'use strict';
+		const IS_V2 = Polymer.flush != null;
+
 		Polymer({
 			is: 'cosmoz-grouped-list-template-selector',
 			properties: {
@@ -29,11 +32,23 @@
 				},
 			},
 
+			attached() {
+				if (!this._fireChangeOnAttach) {
+					return;
+				}
+				this._fireChangeOnAttach = false;
+				const {index, item, hidden} = this;
+				this._fireChange({index, item, hidden});
+			},
 			detached() {
 				this._fireChange({hidden: true});
 			},
 
 			_onItemChanged(item) {
+				if (!IS_V2 && !this.isAttached) {
+					this._fireChangeOnAttach = true;
+					return;
+				}
 				const {index, hidden} = this;
 
 				if (item == null || hidden) {
@@ -54,5 +69,6 @@
 			}
 
 		});
+	})();
 	</script>
 </dom-module>

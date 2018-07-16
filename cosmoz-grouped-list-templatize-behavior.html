@@ -180,14 +180,10 @@
 			for (let i = 0; i < children.length; i++) {
 				const child = children[i],
 					parent = child.parentNode;
-				if (reuse) {
+				if (reuse || !IS_V2) {
 					dom(root).appendChild(child);
 				} else if (parent !== null) {
-					try {
-						Polymer.dom(parent).removeChild(child);
-					} catch (e) {
-						// console.log(e);
-					}
+					dom(parent).removeChild(child);
 				}
 			}
 
