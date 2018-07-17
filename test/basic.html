@@ -256,6 +256,35 @@
 					done();
 				});
 			});
+
+			test('_onTemplatesChange does not return constructors if they already exist', () => {
+				element._ctors = {item: {}, group: {}};
+				assert.isUndefined(element._onTemplatesChange({addedNodes: []}));
+			});
+
+			test('_getInstance types are item, group', done => {
+				assert.equal(element._getInstance('item').__type, 'item');
+				assert.equal(element._getInstance('group').__type, 'group');
+				done();
+			});
+
+			test('_getInstance returns prevInstance if it exists and has the required type', done => {
+				const itemInstance = element._getInstance('item');
+				assert.deepEqual(element._getInstance('item',{}, itemInstance), itemInstance);
+				done();
+			});
+
+			test('_getInstance calls _reuseInstance if instance with same type already exists', done => {
+				const itemInstance = element._getInstance('item'),
+					spy = sinon.spy(element, '_reuseInstance');
+				element._getInstance('item', {}, itemInstance);
+				sinon.assert.calledOnce(spy);
+				done();
+			});
+
+			test('_removeInstance handles null instance parameter', () => {
+				assert.isUndefined(element._removeInstance());
+			});
 		});
 	}());
 	</script>

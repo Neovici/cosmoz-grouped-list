@@ -70,7 +70,7 @@
 		_onTemplatesChange({addedNodes}) {
 			const ctors = this._ctors;
 
-			if (Array.isArray(ctors) && ctors.length > 0) {
+			if(ctors && Object.keys(ctors) > 0) {
 				return;
 			}
 
