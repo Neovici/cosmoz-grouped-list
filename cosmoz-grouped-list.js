@@ -201,19 +201,21 @@
 			}.bind(this), []);
 		},
 
-		_onTemplateSelectorChanged(e, {item, index = this._flatData.indexOf(item), hidden, selector}) {
+		_onTemplateSelectorChanged(e, {item, index, hidden, selector}) {
+			let idx = index !== null ? index : this._flatData ? this._flatData.indexOf(item) : '';
+
 			const prevInstance = selector.__instance;
 			if (hidden && prevInstance !== null) {
 				this._reuseInstance(prevInstance);
 				selector.__instance = null;
 				return;
 			}
-			const slotName = this._getSlotByIndex(index) + Date.now(),
+			const slotName = this._getSlotByIndex(idx) + Date.now(),
 				isGroup = this.isGroup(item),
 				type = this._getItemType(item, isGroup),
 				props = {
 					[this.as]: item,
-					[this.indexAs]: index,
+					[this.indexAs]: idx,
 					selected: isGroup ? this.isGroupSelected(item) : this.isItemSelected(item),
 					folded: isGroup ? this.isFolded(item) : undefined,
 					expanded: !isGroup ? this.isExpanded(item) : undefined,
@@ -221,8 +223,7 @@
 				},
 				instance = this._getInstance(type, props, prevInstance);
 
-			let slot = Polymer.dom(selector).querySelector('slot');
-
+			let slot = Polymer.dom(selector).querySelector('slot'); //eslint-disable-line one-var
 			if (slot == null) {
 				slot = Polymer.dom(selector).querySelector('content');
 				slot.setAttribute('select', '[slot="' + slotName + '"]');
