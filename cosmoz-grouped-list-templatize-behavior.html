@@ -196,8 +196,8 @@
 			if (!instance) {
 				return;
 			}
-			const {_reusableInstances: reusable, _instances: instances} = this;
-			const index = instances.indexOf(instance);
+			const {_reusableInstances: reusable, _instances: instances} = this,
+				index = instances.indexOf(instance);
 			if (index < 0) {
 				return;
 			}
@@ -211,8 +211,8 @@
 				return;
 			}
 
-			const {_reusableInstances: reusable, _instances: instances} = this;
-			const ridx = reusable.indexOf(instance),
+			const {_reusableInstances: reusable, _instances: instances} = this,
+				ridx = reusable.indexOf(instance),
 				uidx = instances.indexOf(instance);
 			if (ridx) {
 				reusable.splice(ridx, 1);
