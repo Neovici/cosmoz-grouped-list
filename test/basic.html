@@ -17,7 +17,7 @@
 <body>
 	<test-fixture id="basic">
 		<template>
-			<cosmoz-grouped-list>
+			<cosmoz-grouped-list style="min-height: 300px">
 				<template slot="templates" data-type="item">
 					<div class="item-template" style="border-bottom: 1px solid grey;">
 						<div>
@@ -270,7 +270,7 @@
 
 			test('_getInstance returns prevInstance if it exists and has the required type', done => {
 				const itemInstance = element._getInstance('item');
-				assert.deepEqual(element._getInstance('item',{}, itemInstance), itemInstance);
+				assert.deepEqual(element._getInstance('item', {}, itemInstance), itemInstance);
 				done();
 			});
 
@@ -284,6 +284,22 @@
 
 			test('_removeInstance handles null instance parameter', () => {
 				assert.isUndefined(element._removeInstance());
+			});
+
+			test('getFirstVisibleItemElement calls _getInstanceByProperty', done => {
+				const spy = sinon.spy(element, '_getInstanceByProperty');
+				Polymer.Base.async(() => {
+					const first = element.getFirstVisibleItemElement();
+					console.log(typeof first);
+					sinon.assert.calledOnce(spy);
+					done();
+				}, 200);
+			});
+
+			test('getFirstVisibleItemElement handles null _flatData', done => {
+				element._flatData = null;
+				assert.isFalse(element.getFirstVisibleItemElement());
+				done();
 			});
 		});
 	}());
