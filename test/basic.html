@@ -301,6 +301,68 @@
 				assert.isFalse(element.getFirstVisibleItemElement());
 				done();
 			});
+
+			test('_dataChanged calls _debounceRender for splices changes', done => {
+				const spy = sinon.spy(element, '_debounceRender'),
+					newData = [{
+						name: 'Group 0',
+						id: 'g0',
+						items: [{
+							id: 'g0-0',
+							name: 'Group 0 item 0',
+							value: 0
+						}]
+					}];
+				element.data = newData;
+				sinon.assert.calledOnce(spy);
+				done();
+			});
+
+			test('_dataChanged calls _debounceRender for other changes in data', done => {
+				const spy = sinon.spy(element, '_debounceRender'),
+					newData = [{
+						name: 'Group 0',
+						id: 'g0',
+						items: [{
+							id: 'g0-0',
+							name: 'Group 0 item 0',
+							value: 0
+						}]
+					}],
+					change = {path: 'other', value: newData, base: newData};
+				element._dataChanged(change);
+				sinon.assert.calledOnce(spy);
+				done();
+			});
+
+			test('_render does not set _flatData if element is not attached', done => {
+				const flatData = element._flatData,
+					newData = [{
+						name: 'Group 0',
+						id: 'g0',
+						items: [{
+							id: 'g0-0',
+							name: 'Group 0 item 0',
+							value: 0
+						}]
+					}];
+				element.isAttached = null;
+				element.data = newData;
+				Polymer.Base.async(() => {
+					assert.equal(flatData, element._flatData);
+					done();
+				}, 200);
+			});
+
+			test('removeItem removes one item from data', done => {
+				const first = element.data[0].items[0],
+					length = element.data[0].items.length;
+				element.removeItem(first);
+				Polymer.Base.async(() => {
+					assert.equal(element.data[0].items.length, length - 1);
+					done();
+				}, 200);
+			});
 		});
 	}());
 	</script>
