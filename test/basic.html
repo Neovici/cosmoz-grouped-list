@@ -290,8 +290,8 @@
 				const spy = sinon.spy(element, '_getInstanceByProperty');
 				Polymer.Base.async(() => {
 					const first = element.getFirstVisibleItemElement();
-					console.log(typeof first);
-					sinon.assert.calledOnce(spy);
+					console.log(first);
+					sinon.assert.called(spy);
 					done();
 				}, 200);
 			});

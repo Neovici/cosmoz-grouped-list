@@ -246,10 +246,19 @@
 				return false;
 			}
 
-			const {firstVisibleIndex} = this.$.list;
-			const firstVisibleInstance = this._getInstanceByProperty('index', firstVisibleIndex);
-			if (firstVisibleInstance) {
-				return firstVisibleInstance.element;
+			let {firstVisibleIndex: index} = this.$.list,
+				instance = null;
+
+			while (index < flat.length && !instance) {
+				instance =  this._getInstanceByProperty('index', index);
+				if (instance) {
+					instance = instance.__type === 'item' && instance;
+				}
+				index++;
+			}
+
+			if (instance) {
+				return instance.element;
 			}
 		},
 
