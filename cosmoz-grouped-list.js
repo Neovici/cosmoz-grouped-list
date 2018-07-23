@@ -202,7 +202,7 @@
 		},
 
 		_onTemplateSelectorChanged(e, {item, index, hidden, selector}) {
-			const idx = index !== null ? index : this._flatData ? this._flatData.indexOf(item) : '',
+			const idx = index != null ? index : this._flatData ? this._flatData.indexOf(item) : '',
 				prevInstance = selector.__instance;
 			if (hidden && prevInstance !== null) {
 				this._reuseInstance(prevInstance);
@@ -358,12 +358,11 @@
 
 		selectItem(item) {
 			const model = this._getModelFromItem(item);
-
 			if (!this.isItemSelected(item)) {
 				this.push('selectedItems', item);
 			}
 			if (model) {
-				model['selected'] = true;
+				this._forwardProperty(model, 'selected', true, true);
 			}
 		},
 
@@ -380,7 +379,7 @@
 			}
 
 			if (model) {
-				model['highlighted'] = !reverse;
+				this._forwardProperty(model, 'highlighted', !reverse, true);
 			}
 		},
 
@@ -391,7 +390,7 @@
 			}
 			const model = this._getModelFromItem(item);
 			if (model) {
-				model['selected'] = false;
+				this._forwardProperty(model, 'selected', false, true);
 			}
 			// If the containing group was selected, then deselect it
 			// as all items are not selected anymore
@@ -423,7 +422,7 @@
 			}
 
 			if (model) {
-				model['selected'] = selected ? false : true;
+				this._forwardProperty(model, 'selected', selected ? false : true, true);
 			}
 			const temp = selected ? 'deselectItem' : 'selectItem';
 			group.items.forEach(this[temp], this);

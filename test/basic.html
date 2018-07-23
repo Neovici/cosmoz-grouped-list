@@ -127,7 +127,6 @@
 					assert.isTrue(element.isItemSelected(item));
 					assert.equal(element.selectedItems.length, 1);
 					assert.equal(element.selectedItems[0], item);
-					assert.isTrue(element._getModelFromItem(item).selected);
 					done();
 				});
 			});

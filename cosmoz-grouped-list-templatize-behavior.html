@@ -153,11 +153,14 @@
 			this._reusableInstances.forEach(forward);
 		},
 
-		_forwardProperty(instance, name, value) {
+		_forwardProperty(instance, name, value, flush = false) {
 			if (IS_V2) {
 				instance._setPendingProperty(name, value);
 			} else {
 				instance[name] = value;
+			}
+			if (flush && instance._flushProperties) {
+				instance._flushProperties(true);
 			}
 		},
 
