@@ -5,6 +5,9 @@
 
 <link rel="import" href="../../../iron-icons/iron-icons.html" />
 <link rel="import" href="../../../iron-icon/iron-icon.html" />
+<link rel="import" href="../../../paper-dropdown-menu/paper-dropdown-menu-light.html" />
+<link rel="import" href="../../../paper-listbox/paper-listbox.html" />
+<link rel="import" href="../../../paper-item/paper-item.html" />
 
 <link rel="import" href="./demo-list-behavior.html" />
 <link rel="import" href="../../cosmoz-grouped-list.html" />
@@ -76,14 +79,29 @@
 				<button class="action" class="action" on-tap="_changeItemValue">change item value</button>
 			</div>-->
 			<cosmoz-grouped-list id="groupedList" data="{{ data }}" selected-items="{{ selectedItems }}" class="flex">
-				<template slot="templates" data-type="item">
-					<div highlighted$="[[highlighted]]" class="item-template" style="border-bottom: 1px solid grey;">
-						<div on-tap="highlight">
-							<div>Outer binding: <span>[[outerValue]]</span></div>
-							<div>Id: <span>{{item.id}}</span></div>
-							<div>Name: <span>{{item.name}}</span></div>
-							<div>Value: <span>{{item.value}}</span></div>
-							<div>Highlighted: <span>[[highlighted]]</span></div>
+				<cosmoz-grouped-list-template id="itemTemplate">
+					<template>
+						<div highlighted$="[[highlighted]]" class="item-template" style="border-bottom: 1px solid grey;">
+							<div on-tap="highlight">
+								<div>Outer binding: <span>[[outerValue]]</span></div>
+								<div>Id: <span>{{item.id}}</span></div>
+								<div>Name: <span>{{item.name}}</span></div>
+								<div>Value: <span>{{item.value}}</span></div>
+								<div>Highlighted: <span>[[highlighted]]</span></div>
+							</div>
+							<div on-tap="select">Selected: <span>{{ selected }}</span> (click to select/deselect)</div>
+							<paper-dropdown-menu-light no-animations label="dropdown menu">
+								<paper-listbox slot="dropdown-content">
+									<paper-item>Item 1</paper-item>
+									<paper-item>Item 2</paper-item>
+									<paper-item>Item 3</paper-item>
+									<paper-item>Item 4</paper-item>
+								</paper-listbox>
+							</paper-dropdown-menu-light>
+							<div on-tap="toggleCollapse">[+]</div>
+							<div class$="{{_computeExtraContentClass(expanded)}}">
+								Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed quis posuere turpis, quis commodo neque. Aenean dapibus consequat dolor, et vestibulum enim volutpat a. Donec vel dui at diam tristique condimentum dapibus ac elit. Sed consequat nibh id nibh posuere egestas. Phasellus blandit convallis tellus, nec pharetra orci viverra ut. In at arcu consectetur, tempus velit sit amet, congue diam. Suspendisse potenti. In ac tristique nulla, quis elementum nisi.
+							</div>
 						</div>
 						<div on-tap="select">Selected: <span>{{ selected }}</span> (click to select/deselect)</div>
 						<div on-tap="toggleCollapse">[+]</div>
