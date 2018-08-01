@@ -8,6 +8,11 @@
 			:host ::slotted([hidden]) {
 				display: none !important;
 			}
+
+			/* This will give a row with an opened dropdown a z-index higher than all other rows */
+			:host(.has-dropdown) {
+				z-index: 100;
+			}
 		</style>
 		<slot></slot>
 	</template>
@@ -36,6 +41,19 @@
 
 			created() {
 				this.elements = {};
+			},
+
+			ready() {
+				// HACK(pasleq) Because iron-list uses `translate3d` transform on row template instances,
+				// a new stacking context is created for each row, preventing a dropdown to overflow the rows beneath.
+				// In order to workaround this issue, increase the z-index of the row if it has an opened dropdown
+				this.listen(this, 'paper-dropdown-open', '_onDropdownOpen');
+				this.listen(this, 'paper-dropdown-close', '_onDropdownClose');
+			},
+
+			detached() {
+				this.unlisten(this, 'paper-dropdown-open', '_onDropdownOpen');
+				this.unlisten(this, 'paper-dropdown-close', '_onDropdownClose');
 			},
 
 			show(element, templateId) {
@@ -74,6 +92,14 @@
 
 				this.groupedList.selectorItemChanged(this, newItem);
 			},
+
+			_onDropdownOpen(event) { // eslint-disable-line
+				this.classList.add('has-dropdown');
+			},
+
+			_onDropdownClose(event) { // eslint-disable-line
+				this.classList.remove('has-dropdown');
+			}
 		});
 	</script>
 </dom-module>
