@@ -142,9 +142,12 @@
 
 		_getInstanceByProperty(prop, value) {
 			return this._instances
-				.find(instance =>
-					(IS_V2 ? instance._getProperty(prop) : instance[prop]) === value
+				.find(instance => this._getInstanceProperty(instance, prop) === value
 				);
+		},
+
+		_getInstanceProperty(instance, prop) {
+			return IS_V2 ? instance._getProperty(prop) : instance[prop];
 		},
 
 		_forwardHostProp(prop, value) {

@@ -35,6 +35,7 @@
 				const {index, item, hidden} = this;
 				this._fireChange({index, item, hidden});
 			},
+
 			detached() {
 				this._fireChange({hidden: true});
 			},
