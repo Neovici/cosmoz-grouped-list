@@ -1,0 +1,247 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../cosmoz-templatize/cosmoz-templatize.html">
+<script>
+/**
+ `Cosmoz.GroupedListTemplatizeBehavior`
+ */
+(function () {
+	'use strict';
+	window.Cosmoz = window.Cosmoz || {};
+	const IS_V2 = Polymer.flush != null;
+
+	/**
+	* @polymerBehavior Cosmoz.GroupedListTemplatizeBehavior
+	*/
+	Cosmoz.GroupedListTemplatizeBehaviorImpl = {
+		properties: {
+			as: {
+				type: String,
+				value: 'item'
+			},
+
+			indexAs: {
+				type: String,
+				value: 'index'
+			},
+		},
+
+		/**
+		 * Polymer `created` livecycle function.
+		 *
+		 * @returns {void}
+		 */
+		created() {
+			this._reusableInstances = [];
+			this._instances = [];
+		},
+		/**
+		 * Polymer `attached` livecycle function.
+		 *
+		 * @returns {void}
+		 */
+		attached() {
+			this._templatesObserver = Polymer.dom(this.$.templates).observeNodes(this._onTemplatesChange.bind(this));
+		},
+
+		/**
+		 * Polymer `detached` livecycle function.
+		 *
+		 * @returns {void}
+		 */
+		detached() {
+			if (this._templatesObserver) {
+				Polymer.dom(this).unobserveNodes(this._templatesObserver);
+				this._templatesObserver = null;
+			}
+			this._removeInstances();
+		},
+
+		_getInstanceDefaultProps() {
+			return {
+				[this.as]: true,
+				[this.indexAs]: true,
+				folded: true,
+				expanded: true,
+				selected: true,
+				highlighted: true
+			};
+		},
+
+		_onTemplatesChange({addedNodes}) {
+			const ctors = this._ctors;
+
+			if (ctors && Object.keys(ctors) > 0) {
+				return;
+			}
+
+			const templates = Array.from(addedNodes)
+				.filter(n => n.matches && n.matches('template[data-type]'));
+
+			if (templates.length === 0) {
+				console.warn('cosmoz-grouped-list requires templates');
+				return;
+			}
+
+			this._ctors = templates.reduce((ctors, template) => {
+				const type = template.dataset.type;
+				ctors[type] = Cosmoz.Templatize.templatize(template, this, {
+					instanceProps: Object.assign(this._getInstanceDefaultProps(), {type: type}),
+					parentModel: true,
+					forwardParentProp: this._forwardHostProp,
+					// forwardParentPath: this._forwardParentPath,
+					forwardHostProp: this._forwardHostProp,
+					forwardInstanceProp: this._notifyInstanceProp,
+					notifyInstanceProp: this._notifyInstanceProp
+				});
+				return ctors;
+			}, {});
+		},
+
+		/**
+		 * Reuse an existing TemplateInstance or create a new one if there is not any available.
+		 *
+		 * @param   {String}            type           The type of instance to return
+		 * @param   {Object}            props          Properties to set on the instance
+		 * @param		{TemplateInstance}  prevInstance   The previously used instance
+		 * @returns {TemplateInstance}                 The instance to use
+		*/
+		_getInstance(type, props = {}, prevInstance) {
+			const ctors = this._ctors;
+			if (ctors == null || Object.keys(ctors).length === 0) {
+				console.warn('cosmoz-grouped-list templates are required.');
+				return;
+			}
+			if (ctors[type] == null) {
+				console.warn(`cosmoz-grouped-list template for ${type} type not found.`);
+			}
+
+			if (prevInstance && prevInstance.type === type) {
+				this._forwardProperties(prevInstance, props);
+				return prevInstance;
+			}
+
+			if (prevInstance) {
+				this._reuseInstance(prevInstance);
+			}
+
+			const {_reusableInstances: reusable, _instances: instances} = this;
+
+			let instance = reusable.find(({__type}) => __type === type);
+
+			if (instance) {
+				reusable.splice(reusable.indexOf(instance), 1);
+				this._forwardProperties(instance, props);
+			} else {
+				instance = new ctors[type](props);
+				instance.__type = type;
+				instance.element = instance.root.querySelector('*');
+			}
+			instances.push(instance);
+			return instance;
+		},
+
+		_getInstanceByProperty(prop, value) {
+			return this._instances
+				.find(instance => this._getInstanceProperty(instance, prop) === value
+				);
+		},
+
+		_getInstanceProperty(instance, prop) {
+			return IS_V2 ? instance._getProperty(prop) : instance[prop];
+		},
+
+		_forwardHostProp(prop, value) {
+			const forward = instance => IS_V2 ? instance.forwardHostProp(prop, value) : instance[prop] = value;
+			this._instances.forEach(forward);
+			this._reusableInstances.forEach(forward);
+		},
+
+		_forwardProperty(instance, name, value, flush = false) {
+			if (IS_V2) {
+				instance._setPendingProperty(name, value);
+			} else {
+				instance[name] = value;
+			}
+			if (flush && instance._flushProperties) {
+				instance._flushProperties(true);
+			}
+		},
+
+		_forwardProperties(instance, props = {}) {
+			Object.keys(props)
+				.forEach(key => this._forwardProperty(instance, key, props[key]));
+			if (instance._flushProperties) {
+				instance._flushProperties(true);
+			}
+		},
+
+		_forwardPropertyByItem(item, property, value, flush) {
+			const instance = this._getInstanceByProperty('item', item);
+			if (!instance) {
+				return;
+			}
+			this._forwardProperty(instance, property, value, flush);
+		},
+
+		_detachInstance(instance, reuse = false) {
+			if (!instance) {
+				return;
+			}
+			const children = IS_V2 ? instance.children : instance._children,
+				root = instance.root,
+				dom = Polymer.dom;
+
+			for (let i = 0; i < children.length; i++) {
+				const child = children[i],
+					parent = child.parentNode;
+				if (reuse || !IS_V2) {
+					dom(root).appendChild(child);
+				} else if (parent !== null) {
+					dom(parent).removeChild(child);
+				}
+			}
+
+			if (!reuse) {
+				instance.element = null;
+			}
+		},
+
+		_reuseInstance(instance) {
+			if (!instance) {
+				return;
+			}
+			const {_reusableInstances: reusable, _instances: instances} = this,
+				index = instances.indexOf(instance);
+			if (index < 0) {
+				return;
+			}
+			instances.splice(index, 1);
+			reusable.push(instance);
+			this._detachInstance(instance, true);
+		},
+
+		_removeInstance(instance) {
+			if (!instance) {
+				return;
+			}
+
+			const {_reusableInstances: reusable, _instances: instances} = this,
+				ridx = reusable.indexOf(instance),
+				uidx = instances.indexOf(instance);
+			if (ridx) {
+				reusable.splice(ridx, 1);
+			}
+			if (uidx) {
+				instances.splice(uidx, 1);
+			}
+			this._detachInstance(instance);
+		},
+
+		_removeInstances() {
+			this._reusableInstances.splice(0).forEach(this._detachInstance);
+			this._instances.splice(0).forEach(this._detachInstance);
+		}
+	};
+
+	Cosmoz.GroupedListTemplatizeBehaviorImpl = [Cosmoz.GroupedListTemplatizeBehaviorImpl];
+})();

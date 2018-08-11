@@ -7,145 +7,83 @@
       "path": "cosmoz-grouped-list-template-selector.html",
       "properties": [
         {
+          "name": "index",
+          "type": "number | null | undefined",
+          "description": "",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 18,
+              "column": 4
+            },
+            "end": {
+              "line": 20,
+              "column": 5
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "attributeType": "Number"
+            }
+          }
+        },
+        {
           "name": "item",
           "type": "Object | null | undefined",
           "description": "",
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 20,
+              "line": 21,
               "column": 4
             },
             "end": {
-              "line": 23,
+              "line": 24,
               "column": 5
             }
           },
           "metadata": {
             "polymer": {
-              "observer": "\"_itemChanged\"",
+              "observer": "\"_onItemChanged\"",
               "attributeType": "Object"
             }
           }
         },
         {
-          "name": "selectorId",
-          "type": "null",
+          "name": "hidden",
+          "type": "boolean | null | undefined",
           "description": "",
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 26,
-              "column": 3
-            },
-            "end": {
-              "line": 26,
-              "column": 19
-            }
-          },
-          "metadata": {
-            "polymer": {
-              "readOnly": false
-            }
-          }
-        },
-        {
-          "name": "elements",
-          "type": "null",
-          "description": "",
-          "privacy": "public",
-          "sourceRange": {
-            "start": {
-              "line": 28,
-              "column": 3
+              "line": 25,
+              "column": 4
             },
             "end": {
               "line": 28,
-              "column": 17
+              "column": 5
             }
           },
           "metadata": {
             "polymer": {
-              "readOnly": false
-            }
-          }
-        },
-        {
-          "name": "currentElement",
-          "type": "null",
-          "description": "",
-          "privacy": "public",
-          "sourceRange": {
-            "start": {
-              "line": 30,
-              "column": 3
-            },
-            "end": {
-              "line": 30,
-              "column": 23
-            }
-          },
-          "metadata": {
-            "polymer": {
-              "readOnly": false
-            }
-          }
-        },
-        {
-          "name": "currentTemplateId",
-          "type": "null",
-          "description": "",
-          "privacy": "public",
-          "sourceRange": {
-            "start": {
-              "line": 32,
-              "column": 3
-            },
-            "end": {
-              "line": 32,
-              "column": 26
-            }
-          },
-          "metadata": {
-            "polymer": {
-              "readOnly": false
-            }
-          }
-        },
-        {
-          "name": "groupedList",
-          "type": "null",
-          "description": "",
-          "privacy": "public",
-          "sourceRange": {
-            "start": {
-              "line": 34,
-              "column": 3
-            },
-            "end": {
-              "line": 34,
-              "column": 20
-            }
-          },
-          "metadata": {
-            "polymer": {
-              "readOnly": false
+              "observer": "\"_onHiddenChanged\"",
+              "attributeType": "Boolean"
             }
           }
         }
       ],
       "methods": [
         {
-          "name": "created",
+          "name": "detached",
           "description": "",
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 36,
+              "line": 31,
               "column": 3
             },
             "end": {
-              "line": 38,
+              "line": 33,
               "column": 4
             }
           },
@@ -156,26 +94,23 @@
           }
         },
         {
-          "name": "show",
+          "name": "_onItemChanged",
           "description": "",
-          "privacy": "public",
+          "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 40,
+              "line": 35,
               "column": 3
             },
             "end": {
-              "line": 49,
+              "line": 43,
               "column": 4
             }
           },
           "metadata": {},
           "params": [
             {
-              "name": "element"
-            },
-            {
-              "name": "templateId"
+              "name": "item"
             }
           ],
           "return": {
@@ -183,23 +118,48 @@
           }
         },
         {
-          "name": "_itemChanged",
+          "name": "_onHiddenChanged",
           "description": "",
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 51,
+              "line": 44,
               "column": 3
             },
             "end": {
-              "line": 72,
+              "line": 47,
               "column": 4
             }
           },
           "metadata": {},
           "params": [
             {
-              "name": "newItem"
+              "name": "hidden"
+            }
+          ],
+          "return": {
+            "type": "void"
+          }
+        },
+        {
+          "name": "_fireChange",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 49,
+              "column": 3
+            },
+            "end": {
+              "line": 53,
+              "column": 4
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "props",
+              "defaultValue": "{}"
             }
           ],
           "return": {
@@ -221,7 +181,7 @@
           "column": 10
         },
         "end": {
-          "line": 73,
+          "line": 55,
           "column": 3
         }
       },
@@ -229,20 +189,52 @@
       "superclass": "HTMLElement",
       "attributes": [
         {
+          "name": "index",
+          "description": "",
+          "sourceRange": {
+            "start": {
+              "line": 18,
+              "column": 4
+            },
+            "end": {
+              "line": 20,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "type": "number | null | undefined"
+        },
+        {
           "name": "item",
           "description": "",
           "sourceRange": {
             "start": {
-              "line": 20,
+              "line": 21,
               "column": 4
             },
             "end": {
-              "line": 23,
+              "line": 24,
               "column": 5
             }
           },
           "metadata": {},
           "type": "Object | null | undefined"
+        },
+        {
+          "name": "hidden",
+          "description": "",
+          "sourceRange": {
+            "start": {
+              "line": 25,
+              "column": 4
+            },
+            "end": {
+              "line": 28,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "type": "boolean | null | undefined"
         }
       ],
       "events": [],
@@ -295,8 +287,8 @@
           }
         },
         {
-          "name": "as",
-          "type": "string | null | undefined",
+          "name": "scrollTarget",
+          "type": "HTMLElement | null | undefined",
           "description": "",
           "privacy": "public",
           "sourceRange": {
@@ -305,51 +297,7 @@
               "column": 3
             },
             "end": {
-              "line": 19,
-              "column": 4
-            }
-          },
-          "metadata": {
-            "polymer": {
-              "attributeType": "String"
-            }
-          },
-          "defaultValue": "\"item\""
-        },
-        {
-          "name": "indexAs",
-          "type": "string | null | undefined",
-          "description": "",
-          "privacy": "public",
-          "sourceRange": {
-            "start": {
-              "line": 21,
-              "column": 3
-            },
-            "end": {
-              "line": 24,
-              "column": 4
-            }
-          },
-          "metadata": {
-            "polymer": {
-              "attributeType": "String"
-            }
-          },
-          "defaultValue": "\"index\""
-        },
-        {
-          "name": "scrollTarget",
-          "type": "HTMLElement | null | undefined",
-          "description": "",
-          "privacy": "public",
-          "sourceRange": {
-            "start": {
-              "line": 26,
-              "column": 3
-            },
-            "end": {
-              "line": 28,
+              "line": 18,
               "column": 4
             }
           },
@@ -366,11 +314,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 30,
+              "line": 20,
               "column": 3
             },
             "end": {
-              "line": 33,
+              "line": 23,
               "column": 4
             }
           },
@@ -388,11 +336,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 35,
+              "line": 25,
               "column": 3
             },
             "end": {
-              "line": 41,
+              "line": 31,
               "column": 4
             }
           },
@@ -410,11 +358,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 46,
+              "line": 36,
               "column": 3
             },
             "end": {
-              "line": 50,
+              "line": 40,
               "column": 4
             }
           },
@@ -432,11 +380,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 52,
+              "line": 42,
               "column": 3
             },
             "end": {
-              "line": 54,
+              "line": 44,
               "column": 4
             }
           },
@@ -453,11 +401,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 68,
+              "line": 61,
               "column": 2
             },
             "end": {
-              "line": 68,
+              "line": 61,
               "column": 18
             }
           },
@@ -474,159 +422,12 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 73,
+              "line": 66,
               "column": 2
             },
             "end": {
-              "line": 73,
+              "line": 66,
               "column": 17
-            }
-          },
-          "metadata": {
-            "polymer": {
-              "readOnly": false
-            }
-          }
-        },
-        {
-          "name": "_itemTemplate",
-          "type": "null",
-          "description": "The <cosmoz-grouped-list-template> used to render items.\n\t\t ",
-          "privacy": "protected",
-          "sourceRange": {
-            "start": {
-              "line": 78,
-              "column": 2
-            },
-            "end": {
-              "line": 78,
-              "column": 21
-            }
-          },
-          "metadata": {
-            "polymer": {
-              "readOnly": false
-            }
-          }
-        },
-        {
-          "name": "_groupTemplate",
-          "type": "null",
-          "description": "The <cosmoz-grouped-list-template> used to render groups.\n\t\t ",
-          "privacy": "protected",
-          "sourceRange": {
-            "start": {
-              "line": 83,
-              "column": 2
-            },
-            "end": {
-              "line": 83,
-              "column": 22
-            }
-          },
-          "metadata": {
-            "polymer": {
-              "readOnly": false
-            }
-          }
-        },
-        {
-          "name": "_templateSelectorsCount",
-          "type": "number",
-          "description": "The number of <cosmoz-grouped-list-template-selector> currently used by iron-list.\nThis number should grows until the viewport is filled by iron-list, then it should not change anymore.\n\t\t ",
-          "privacy": "protected",
-          "sourceRange": {
-            "start": {
-              "line": 89,
-              "column": 2
-            },
-            "end": {
-              "line": 89,
-              "column": 28
-            }
-          },
-          "metadata": {
-            "polymer": {
-              "readOnly": false
-            }
-          }
-        },
-        {
-          "name": "_templateSelectors",
-          "type": "null",
-          "description": "Array of <cosmoz-grouped-list-template-selector> instantiated by <iron-list>\n\t\t ",
-          "privacy": "protected",
-          "sourceRange": {
-            "start": {
-              "line": 94,
-              "column": 2
-            },
-            "end": {
-              "line": 94,
-              "column": 26
-            }
-          },
-          "metadata": {
-            "polymer": {
-              "readOnly": false
-            }
-          }
-        },
-        {
-          "name": "_renderedItems",
-          "type": "null",
-          "description": "Array of items currently rendered.\nNote that an item might be a 'real' item, or a group.\n\t\t ",
-          "privacy": "protected",
-          "sourceRange": {
-            "start": {
-              "line": 100,
-              "column": 2
-            },
-            "end": {
-              "line": 100,
-              "column": 22
-            }
-          },
-          "metadata": {
-            "polymer": {
-              "readOnly": false
-            }
-          }
-        },
-        {
-          "name": "_usedInstances",
-          "type": "Array",
-          "description": "Instances of Template that are NOT available for reuse at the moment.\n\t\t ",
-          "privacy": "protected",
-          "sourceRange": {
-            "start": {
-              "line": 105,
-              "column": 2
-            },
-            "end": {
-              "line": 105,
-              "column": 20
-            }
-          },
-          "metadata": {
-            "polymer": {
-              "readOnly": false
-            }
-          }
-        },
-        {
-          "name": "_reusableInstances",
-          "type": "Array",
-          "description": " Instances of Template that are available for reuse at the moment.\n\t\t ",
-          "privacy": "protected",
-          "sourceRange": {
-            "start": {
-              "line": 110,
-              "column": 2
-            },
-            "end": {
-              "line": 110,
-              "column": 24
             }
           },
           "metadata": {
@@ -642,11 +443,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 436,
+              "line": 261,
               "column": 2
             },
             "end": {
-              "line": 445,
+              "line": 267,
               "column": 3
             }
           },
@@ -664,11 +465,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 117,
+              "line": 73,
               "column": 2
             },
             "end": {
-              "line": 120,
+              "line": 75,
               "column": 3
             }
           },
@@ -684,11 +485,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 127,
+              "line": 82,
               "column": 2
             },
             "end": {
-              "line": 131,
+              "line": 84,
               "column": 3
             }
           },
@@ -704,11 +505,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 138,
+              "line": 91,
               "column": 2
             },
             "end": {
-              "line": 151,
+              "line": 93,
               "column": 3
             }
           },
@@ -719,67 +520,16 @@
           }
         },
         {
-          "name": "_onTemplatesChange",
-          "description": "",
-          "privacy": "protected",
-          "sourceRange": {
-            "start": {
-              "line": 152,
-              "column": 2
-            },
-            "end": {
-              "line": 183,
-              "column": 3
-            }
-          },
-          "metadata": {},
-          "params": [
-            {
-              "name": "change"
-            }
-          ],
-          "return": {
-            "type": "void"
-          }
-        },
-        {
-          "name": "_forwardHostProp",
-          "description": "",
-          "privacy": "protected",
-          "sourceRange": {
-            "start": {
-              "line": 185,
-              "column": 2
-            },
-            "end": {
-              "line": 189,
-              "column": 3
-            }
-          },
-          "metadata": {},
-          "params": [
-            {
-              "name": "prop"
-            },
-            {
-              "name": "value"
-            }
-          ],
-          "return": {
-            "type": "void"
-          }
-        },
-        {
           "name": "_dataChanged",
           "description": "",
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 191,
+              "line": 95,
               "column": 2
             },
             "end": {
-              "line": 199,
+              "line": 103,
               "column": 3
             }
           },
@@ -799,11 +549,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 201,
+              "line": 105,
               "column": 2
             },
             "end": {
-              "line": 203,
+              "line": 107,
               "column": 3
             }
           },
@@ -819,11 +569,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 205,
+              "line": 109,
               "column": 2
             },
             "end": {
-              "line": 210,
+              "line": 114,
               "column": 3
             }
           },
@@ -839,11 +589,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 212,
+              "line": 116,
               "column": 2
             },
             "end": {
-              "line": 248,
+              "line": 152,
               "column": 3
             }
           },
@@ -858,90 +608,16 @@
           ]
         },
         {
-          "name": "_forwardProperty",
-          "description": "",
-          "privacy": "protected",
-          "sourceRange": {
-            "start": {
-              "line": 250,
-              "column": 2
-            },
-            "end": {
-              "line": 256,
-              "column": 3
-            }
-          },
-          "metadata": {},
-          "params": [
-            {
-              "name": "instance"
-            },
-            {
-              "name": "name"
-            },
-            {
-              "name": "value"
-            }
-          ],
-          "return": {
-            "type": "void"
-          }
-        },
-        {
-          "name": "_resetAllTemplates",
-          "description": "",
-          "privacy": "protected",
-          "sourceRange": {
-            "start": {
-              "line": 258,
-              "column": 2
-            },
-            "end": {
-              "line": 270,
-              "column": 3
-            }
-          },
-          "metadata": {},
-          "params": [],
-          "return": {
-            "type": "void"
-          }
-        },
-        {
-          "name": "releaseInstance",
-          "description": "",
-          "privacy": "public",
-          "sourceRange": {
-            "start": {
-              "line": 272,
-              "column": 2
-            },
-            "end": {
-              "line": 279,
-              "column": 3
-            }
-          },
-          "metadata": {},
-          "params": [
-            {
-              "name": "templateInstance"
-            }
-          ],
-          "return": {
-            "type": "void"
-          }
-        },
-        {
           "name": "_scrollTargetChanged",
           "description": "",
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 281,
+              "line": 154,
               "column": 2
             },
             "end": {
-              "line": 291,
+              "line": 164,
               "column": 3
             }
           },
@@ -964,11 +640,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 293,
+              "line": 166,
               "column": 2
             },
             "end": {
-              "line": 328,
+              "line": 201,
               "column": 3
             }
           },
@@ -981,81 +657,30 @@
           ]
         },
         {
-          "name": "_onTemplateSelectorCreated",
+          "name": "_onTemplateSelectorChanged",
           "description": "",
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 330,
+              "line": 203,
               "column": 2
             },
             "end": {
-              "line": 336,
+              "line": 234,
               "column": 3
             }
           },
           "metadata": {},
           "params": [
             {
-              "name": "event"
+              "name": "e"
+            },
+            {
+              "name": "{\n  item,\n  index,\n  hidden,\n  selector\n}"
             }
           ],
           "return": {
             "type": "void"
-          }
-        },
-        {
-          "name": "selectorItemChanged",
-          "description": "",
-          "privacy": "public",
-          "sourceRange": {
-            "start": {
-              "line": 338,
-              "column": 2
-            },
-            "end": {
-              "line": 379,
-              "column": 3
-            }
-          },
-          "metadata": {},
-          "params": [
-            {
-              "name": "selector"
-            },
-            {
-              "name": "item"
-            }
-          ],
-          "return": {
-            "type": "void"
-          }
-        },
-        {
-          "name": "_getInstance",
-          "description": "Reuse an existing Instance or create a new one if there is not any available",
-          "privacy": "protected",
-          "sourceRange": {
-            "start": {
-              "line": 388,
-              "column": 2
-            },
-            "end": {
-              "line": 397,
-              "column": 3
-            }
-          },
-          "metadata": {},
-          "params": [
-            {
-              "name": "type",
-              "type": "String",
-              "description": "Can be 'item' or 'group'"
-            }
-          ],
-          "return": {
-            "type": "type",
-            "desc": "Instance of Cosmoz.Templatize"
           }
         },
         {
@@ -1064,11 +689,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 404,
+              "line": 242,
               "column": 2
             },
             "end": {
-              "line": 428,
+              "line": 253,
               "column": 3
             }
           },
@@ -1085,11 +710,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 455,
+              "line": 277,
               "column": 2
             },
             "end": {
-              "line": 469,
+              "line": 291,
               "column": 3
             }
           },
@@ -1112,11 +737,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 471,
+              "line": 293,
               "column": 2
             },
             "end": {
-              "line": 473,
+              "line": 295,
               "column": 3
             }
           },
@@ -1133,11 +758,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 480,
+              "line": 302,
               "column": 2
             },
             "end": {
-              "line": 485,
+              "line": 307,
               "column": 3
             }
           },
@@ -1160,11 +785,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 487,
+              "line": 309,
               "column": 2
             },
             "end": {
-              "line": 490,
+              "line": 312,
               "column": 3
             }
           },
@@ -1181,11 +806,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 492,
+              "line": 314,
               "column": 2
             },
             "end": {
-              "line": 504,
+              "line": 326,
               "column": 3
             }
           },
@@ -1205,11 +830,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 506,
+              "line": 328,
               "column": 2
             },
             "end": {
-              "line": 515,
+              "line": 337,
               "column": 3
             }
           },
@@ -1229,11 +854,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 517,
+              "line": 339,
               "column": 2
             },
             "end": {
-              "line": 525,
+              "line": 347,
               "column": 3
             }
           },
@@ -1253,11 +878,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 527,
+              "line": 349,
               "column": 2
             },
             "end": {
-              "line": 536,
+              "line": 358,
               "column": 3
             }
           },
@@ -1277,11 +902,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 538,
+              "line": 360,
               "column": 2
             },
             "end": {
-              "line": 553,
+              "line": 375,
               "column": 3
             }
           },
@@ -1304,11 +929,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 555,
+              "line": 377,
               "column": 2
             },
             "end": {
-              "line": 575,
+              "line": 397,
               "column": 3
             }
           },
@@ -1328,11 +953,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 577,
+              "line": 399,
               "column": 2
             },
             "end": {
-              "line": 579,
+              "line": 401,
               "column": 3
             }
           },
@@ -1349,11 +974,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 581,
+              "line": 403,
               "column": 2
             },
             "end": {
-              "line": 583,
+              "line": 405,
               "column": 3
             }
           },
@@ -1370,11 +995,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 585,
+              "line": 407,
               "column": 2
             },
             "end": {
-              "line": 598,
+              "line": 420,
               "column": 3
             }
           },
@@ -1397,11 +1022,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 600,
+              "line": 422,
               "column": 2
             },
             "end": {
-              "line": 603,
+              "line": 425,
               "column": 3
             }
           },
@@ -1418,11 +1043,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 605,
+              "line": 427,
               "column": 2
             },
             "end": {
-              "line": 612,
+              "line": 434,
               "column": 3
             }
           },
@@ -1442,11 +1067,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 614,
+              "line": 436,
               "column": 2
             },
             "end": {
-              "line": 631,
+              "line": 453,
               "column": 3
             }
           },
@@ -1462,11 +1087,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 633,
+              "line": 455,
               "column": 2
             },
             "end": {
-              "line": 649,
+              "line": 471,
               "column": 3
             }
           },
@@ -1482,11 +1107,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 651,
+              "line": 473,
               "column": 2
             },
             "end": {
-              "line": 656,
+              "line": 478,
               "column": 3
             }
           },
@@ -1506,11 +1131,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 658,
+              "line": 480,
               "column": 2
             },
             "end": {
-              "line": 660,
+              "line": 482,
               "column": 3
             }
           },
@@ -1530,11 +1155,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 662,
+              "line": 484,
               "column": 2
             },
             "end": {
-              "line": 676,
+              "line": 498,
               "column": 3
             }
           },
@@ -1554,11 +1179,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 678,
+              "line": 500,
               "column": 2
             },
             "end": {
-              "line": 681,
+              "line": 503,
               "column": 3
             }
           },
@@ -1575,11 +1200,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 683,
+              "line": 505,
               "column": 2
             },
             "end": {
-              "line": 688,
+              "line": 507,
               "column": 3
             }
           },
@@ -1587,6 +1212,52 @@
           "params": [
             {
               "name": "item"
+            }
+          ]
+        },
+        {
+          "name": "_getSlotByIndex",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 509,
+              "column": 2
+            },
+            "end": {
+              "line": 511,
+              "column": 3
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "index"
+            }
+          ]
+        },
+        {
+          "name": "_getItemType",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 513,
+              "column": 2
+            },
+            "end": {
+              "line": 515,
+              "column": 3
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "item"
+            },
+            {
+              "name": "isGroup",
+              "defaultValue": "this.isGroup(item)"
             }
           ]
         }
@@ -1609,7 +1280,7 @@
           "column": 9
         },
         "end": {
-          "line": 689,
+          "line": 516,
           "column": 2
         }
       },
@@ -1633,7 +1304,7 @@
           "type": "Array | null | undefined"
         },
         {
-          "name": "as",
+          "name": "scroll-target",
           "description": "",
           "sourceRange": {
             "start": {
@@ -1641,39 +1312,7 @@
               "column": 3
             },
             "end": {
-              "line": 19,
-              "column": 4
-            }
-          },
-          "metadata": {},
-          "type": "string | null | undefined"
-        },
-        {
-          "name": "index-as",
-          "description": "",
-          "sourceRange": {
-            "start": {
-              "line": 21,
-              "column": 3
-            },
-            "end": {
-              "line": 24,
-              "column": 4
-            }
-          },
-          "metadata": {},
-          "type": "string | null | undefined"
-        },
-        {
-          "name": "scroll-target",
-          "description": "",
-          "sourceRange": {
-            "start": {
-              "line": 26,
-              "column": 3
-            },
-            "end": {
-              "line": 28,
+              "line": 18,
               "column": 4
             }
           },
@@ -1685,11 +1324,11 @@
           "description": "",
           "sourceRange": {
             "start": {
-              "line": 30,
+              "line": 20,
               "column": 3
             },
             "end": {
-              "line": 33,
+              "line": 23,
               "column": 4
             }
           },
@@ -1701,11 +1340,11 @@
           "description": "",
           "sourceRange": {
             "start": {
-              "line": 35,
+              "line": 25,
               "column": 3
             },
             "end": {
-              "line": 41,
+              "line": 31,
               "column": 4
             }
           },
@@ -1717,11 +1356,11 @@
           "description": "Indicates wether this grouped-list should render groups without items.",
           "sourceRange": {
             "start": {
-              "line": 46,
+              "line": 36,
               "column": 3
             },
             "end": {
-              "line": 50,
+              "line": 40,
               "column": 4
             }
           },
@@ -1754,11 +1393,11 @@
           "range": {
             "file": "cosmoz-grouped-list.html",
             "start": {
-              "line": 54,
+              "line": 52,
               "column": 2
             },
             "end": {
-              "line": 54,
+              "line": 52,
               "column": 47
             }
           }
@@ -1766,5 +1405,463 @@
       ],
       "tagname": "cosmoz-grouped-list"
     }
-  ]
+  ],
+  "metadata": {
+    "polymer": {
+      "behaviors": [
+        {
+          "description": "",
+          "summary": "",
+          "path": "cosmoz-grouped-list-templatize-behavior.html",
+          "properties": [
+            {
+              "name": "as",
+              "type": "string | null | undefined",
+              "description": "",
+              "privacy": "public",
+              "sourceRange": {
+                "start": {
+                  "line": 16,
+                  "column": 3
+                },
+                "end": {
+                  "line": 19,
+                  "column": 4
+                }
+              },
+              "metadata": {
+                "polymer": {
+                  "attributeType": "String"
+                }
+              },
+              "defaultValue": "\"item\""
+            },
+            {
+              "name": "indexAs",
+              "type": "string | null | undefined",
+              "description": "",
+              "privacy": "public",
+              "sourceRange": {
+                "start": {
+                  "line": 21,
+                  "column": 3
+                },
+                "end": {
+                  "line": 24,
+                  "column": 4
+                }
+              },
+              "metadata": {
+                "polymer": {
+                  "attributeType": "String"
+                }
+              },
+              "defaultValue": "\"index\""
+            }
+          ],
+          "methods": [
+            {
+              "name": "created",
+              "description": "Polymer `created` livecycle function.",
+              "privacy": "protected",
+              "sourceRange": {
+                "start": {
+                  "line": 32,
+                  "column": 2
+                },
+                "end": {
+                  "line": 35,
+                  "column": 3
+                }
+              },
+              "metadata": {},
+              "params": [],
+              "return": {
+                "type": "void"
+              }
+            },
+            {
+              "name": "attached",
+              "description": "Polymer `attached` livecycle function.",
+              "privacy": "protected",
+              "sourceRange": {
+                "start": {
+                  "line": 41,
+                  "column": 2
+                },
+                "end": {
+                  "line": 43,
+                  "column": 3
+                }
+              },
+              "metadata": {},
+              "params": [],
+              "return": {
+                "type": "void"
+              }
+            },
+            {
+              "name": "detached",
+              "description": "Polymer `detached` livecycle function.",
+              "privacy": "protected",
+              "sourceRange": {
+                "start": {
+                  "line": 50,
+                  "column": 2
+                },
+                "end": {
+                  "line": 56,
+                  "column": 3
+                }
+              },
+              "metadata": {},
+              "params": [],
+              "return": {
+                "type": "void"
+              }
+            },
+            {
+              "name": "_getInstanceDefaultProps",
+              "description": "",
+              "privacy": "protected",
+              "sourceRange": {
+                "start": {
+                  "line": 58,
+                  "column": 2
+                },
+                "end": {
+                  "line": 67,
+                  "column": 3
+                }
+              },
+              "metadata": {},
+              "params": []
+            },
+            {
+              "name": "_onTemplatesChange",
+              "description": "",
+              "privacy": "protected",
+              "sourceRange": {
+                "start": {
+                  "line": 69,
+                  "column": 2
+                },
+                "end": {
+                  "line": 97,
+                  "column": 3
+                }
+              },
+              "metadata": {},
+              "params": [
+                {
+                  "name": "{\n  addedNodes\n}"
+                }
+              ],
+              "return": {
+                "type": "void"
+              }
+            },
+            {
+              "name": "_getInstance",
+              "description": "Reuse an existing TemplateInstance or create a new one if there is not any available.",
+              "privacy": "protected",
+              "sourceRange": {
+                "start": {
+                  "line": 107,
+                  "column": 2
+                },
+                "end": {
+                  "line": 140,
+                  "column": 3
+                }
+              },
+              "metadata": {},
+              "params": [
+                {
+                  "name": "type",
+                  "type": "String",
+                  "description": "The type of instance to return"
+                },
+                {
+                  "name": "props",
+                  "type": "Object",
+                  "defaultValue": "{}",
+                  "description": "Properties to set on the instance"
+                },
+                {
+                  "name": "prevInstance",
+                  "type": "TemplateInstance",
+                  "description": "The previously used instance"
+                }
+              ],
+              "return": {
+                "type": "TemplateInstance",
+                "desc": "The instance to use"
+              }
+            },
+            {
+              "name": "_getInstanceByProperty",
+              "description": "",
+              "privacy": "protected",
+              "sourceRange": {
+                "start": {
+                  "line": 142,
+                  "column": 2
+                },
+                "end": {
+                  "line": 147,
+                  "column": 3
+                }
+              },
+              "metadata": {},
+              "params": [
+                {
+                  "name": "prop"
+                },
+                {
+                  "name": "value"
+                }
+              ]
+            },
+            {
+              "name": "_forwardHostProp",
+              "description": "",
+              "privacy": "protected",
+              "sourceRange": {
+                "start": {
+                  "line": 149,
+                  "column": 2
+                },
+                "end": {
+                  "line": 153,
+                  "column": 3
+                }
+              },
+              "metadata": {},
+              "params": [
+                {
+                  "name": "prop"
+                },
+                {
+                  "name": "value"
+                }
+              ],
+              "return": {
+                "type": "void"
+              }
+            },
+            {
+              "name": "_forwardProperty",
+              "description": "",
+              "privacy": "protected",
+              "sourceRange": {
+                "start": {
+                  "line": 155,
+                  "column": 2
+                },
+                "end": {
+                  "line": 161,
+                  "column": 3
+                }
+              },
+              "metadata": {},
+              "params": [
+                {
+                  "name": "instance"
+                },
+                {
+                  "name": "name"
+                },
+                {
+                  "name": "value"
+                }
+              ],
+              "return": {
+                "type": "void"
+              }
+            },
+            {
+              "name": "_forwardProperties",
+              "description": "",
+              "privacy": "protected",
+              "sourceRange": {
+                "start": {
+                  "line": 163,
+                  "column": 2
+                },
+                "end": {
+                  "line": 169,
+                  "column": 3
+                }
+              },
+              "metadata": {},
+              "params": [
+                {
+                  "name": "instance"
+                },
+                {
+                  "name": "props",
+                  "defaultValue": "{}"
+                }
+              ],
+              "return": {
+                "type": "void"
+              }
+            },
+            {
+              "name": "_detachInstance",
+              "description": "",
+              "privacy": "protected",
+              "sourceRange": {
+                "start": {
+                  "line": 171,
+                  "column": 2
+                },
+                "end": {
+                  "line": 196,
+                  "column": 3
+                }
+              },
+              "metadata": {},
+              "params": [
+                {
+                  "name": "instance"
+                },
+                {
+                  "name": "reuse",
+                  "defaultValue": "false"
+                }
+              ],
+              "return": {
+                "type": "void"
+              }
+            },
+            {
+              "name": "_reuseInstance",
+              "description": "",
+              "privacy": "protected",
+              "sourceRange": {
+                "start": {
+                  "line": 198,
+                  "column": 2
+                },
+                "end": {
+                  "line": 210,
+                  "column": 3
+                }
+              },
+              "metadata": {},
+              "params": [
+                {
+                  "name": "instance"
+                }
+              ],
+              "return": {
+                "type": "void"
+              }
+            },
+            {
+              "name": "_removeInstance",
+              "description": "",
+              "privacy": "protected",
+              "sourceRange": {
+                "start": {
+                  "line": 212,
+                  "column": 2
+                },
+                "end": {
+                  "line": 227,
+                  "column": 3
+                }
+              },
+              "metadata": {},
+              "params": [
+                {
+                  "name": "instance"
+                }
+              ],
+              "return": {
+                "type": "void"
+              }
+            },
+            {
+              "name": "_removeInstances",
+              "description": "",
+              "privacy": "protected",
+              "sourceRange": {
+                "start": {
+                  "line": 229,
+                  "column": 2
+                },
+                "end": {
+                  "line": 232,
+                  "column": 3
+                }
+              },
+              "metadata": {},
+              "params": [],
+              "return": {
+                "type": "void"
+              }
+            }
+          ],
+          "staticMethods": [],
+          "demos": [],
+          "metadata": {},
+          "sourceRange": {
+            "start": {
+              "line": 14,
+              "column": 1
+            },
+            "end": {
+              "line": 233,
+              "column": 3
+            }
+          },
+          "privacy": "public",
+          "name": "Cosmoz.GroupedListTemplatizeBehavior",
+          "attributes": [
+            {
+              "name": "as",
+              "description": "",
+              "sourceRange": {
+                "start": {
+                  "line": 16,
+                  "column": 3
+                },
+                "end": {
+                  "line": 19,
+                  "column": 4
+                }
+              },
+              "metadata": {},
+              "type": "string | null | undefined"
+            },
+            {
+              "name": "index-as",
+              "description": "",
+              "sourceRange": {
+                "start": {
+                  "line": 21,
+                  "column": 3
+                },
+                "end": {
+                  "line": 24,
+                  "column": 4
+                }
+              },
+              "metadata": {},
+              "type": "string | null | undefined"
+            }
+          ],
+          "events": [],
+          "styling": {
+            "cssVariables": [],
+            "selectors": []
+          },
+          "slots": []
+        }
+      ]
+    }
+  }
 }

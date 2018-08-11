@@ -12,65 +12,54 @@
 		<slot></slot>
 	</template>
 	<script>
+	(function () {
 		'use strict';
+
 		Polymer({
-
 			is: 'cosmoz-grouped-list-template-selector',
-
 			properties: {
+				index: {
+					type: Number
+				},
 				item: {
 					type: Object,
-					observer: '_itemChanged'
+					observer: '_onItemChanged'
+				},
+				hidden: {
+					type: Boolean,
+					observer: '_onHiddenChanged'
 				},
 			},
 
-			selectorId: null,
-
-			elements: null,
-
-			currentElement: null,
-
-			currentTemplateId: null,
-
-			groupedList: null,
-
-			created() {
-				this.elements = {};
+			attached() {
+				const {index, item, hidden} = this;
+				this._fireChange({index, item, hidden});
 			},
 
-			show(element, templateId) {
-				if (this.currentElement && element !== this.currentElement) {
-					this.currentElement.setAttribute('hidden', '');
-				}
-
-				element.removeAttribute('hidden');
-
-				this.currentElement = element;
-				this.currentTemplateId = templateId;
+			detached() {
+				this._fireChange({hidden: true});
 			},
 
-			_itemChanged(newItem) {
-
-				if (this.selectorId === null) {
-					// Notifies parent cosmoz-grouped-list that a new template-selector
-					// has been added so that it gets a selectorId
-					this.fire('template-selector-created', {
-						selector: this
-					}, {
-						bubbles: false
-					});
-
-					const slotName = this.slotName = 'selectorSlot' + this.selectorId;
-					let slot = Polymer.dom(this).querySelector('slot');
-					if (slot == null) {
-						slot = Polymer.dom(this).querySelector('content');
-						slot.setAttribute('select', '[slot="' + slotName + '"]');
-					}
-					slot.setAttribute('name', slotName);
+			_onItemChanged(item) {
+				const {index, hidden} = this;
+				if (item == null || hidden) {
+					return;
 				}
+				this._fireChange({index, item});
 
-				this.groupedList.selectorItemChanged(this, newItem);
+			},
+			_onHiddenChanged(hidden) {
+				const {index, item} = this;
+				this._fireChange({index, hidden, item});
+			},
+
+			_fireChange(props = {}) {
+				this.fire('cosmoz-selector-changed', Object.assign({
+					selector: this,
+				}, props));
 			}
+
 		});
+	})();
 	</script>
 </dom-module>
