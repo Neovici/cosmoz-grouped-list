@@ -434,12 +434,7 @@
 		},
 
 		_toggleSelected(value) {
-			this._templateSelectors.forEach(selector => {
-				const templateInstance = selector.currentElement && selector.currentElement.__tmplInstance;
-				if (templateInstance) {
-					templateInstance.selected = value;
-				}
-			});
+			this._instances.forEach(instance => this._forwardProperty(instance, 'selected', value));
 		},
 
 		selectAll() {
