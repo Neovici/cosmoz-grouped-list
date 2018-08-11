@@ -175,6 +175,14 @@
 			}
 		},
 
+		_forwardPropertyByItem(item, property, value, flush) {
+			const instance = this._getInstanceByProperty('item', item);
+			if (!instance) {
+				return;
+			}
+			this._forwardProperty(instance, property, value, flush);
+		},
+
 		_detachInstance(instance, reuse = false) {
 			if (!instance) {
 				return;
