@@ -266,6 +266,8 @@
 
 			test('folds a group', done => {
 				const group = groups[1];
+				assert.isFalse(getInstanceByItemProperty(element, group, 'folded'));
+				assert.isFalse(element.isFolded(group));
 
 				element.foldGroup(group);
 				flush(() => {
@@ -277,6 +279,8 @@
 
 			test('unfolds a folded group', done => {
 				const group = groups[1];
+				assert.isFalse(getInstanceByItemProperty(element, group, 'folded'));
+				assert.isFalse(element.isFolded(group));
 
 				element.foldGroup(group);
 				flush(() => {
@@ -294,6 +298,8 @@
 
 			test('toggles collapse on an item', done => {
 				const item = groups[1].items[1];
+				assert.isFalse(getInstanceByItemProperty(element, item, 'expanded'));
+				assert.isFalse(element.isExpanded(item));
 
 				element.toggleCollapse(item);
 				flush(() => {
