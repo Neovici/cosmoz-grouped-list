@@ -270,6 +270,7 @@
 				element.foldGroup(group);
 				flush(() => {
 					assert.isTrue(element.isFolded(group));
+					assert.isTrue(getInstanceByItemProperty(element, group, 'folded'));
 					done();
 				});
 			});
@@ -280,9 +281,11 @@
 				element.foldGroup(group);
 				flush(() => {
 					assert.isTrue(element.isFolded(group));
+					assert.isTrue(getInstanceByItemProperty(element, group, 'folded'));
 					element.unfoldGroup(group);
 
 					flush(() => {
+						assert.isFalse(getInstanceByItemProperty(element, group, 'folded'));
 						assert.isFalse(element.isFolded(group));
 						done();
 					});
@@ -294,6 +297,7 @@
 
 				element.toggleCollapse(item);
 				flush(() => {
+					assert.isTrue(getInstanceByItemProperty(element, item, 'expanded'));
 					assert.isTrue(element.isExpanded(item));
 					done();
 				});
