@@ -67,15 +67,6 @@
 		_itemsMap: null,
 
 		/**
-		 * Polymer `created` livecycle function.
-		 *
-		 * @return {void}
-		 */
-		created() {
-			this._templateSelectors = [];
-		},
-
-		/**
 		 * Polymer `attached` livecycle function.
 		 *
 		 * @return {void}
@@ -339,33 +330,29 @@
 				groupState.folded = false;
 				const groupFlatIndex = this._flatData.indexOf(group);
 				this.splice.apply(this, ['_flatData', groupFlatIndex + 1, 0].concat(group.items));
+				this._forwardPropertyByItem(group, 'folded', false, true);
 			}
-
 		},
 
 		foldGroup(group) {
 			const groupState = this._groupsMap && this._groupsMap.get(group);
-
 			if (groupState && !groupState.folded) {
 				groupState.folded = true;
 				const groupFlatIndex = this._flatData.indexOf(group);
 				this.splice('_flatData', groupFlatIndex + 1, group.items.length);
+				this._forwardPropertyByItem(group, 'folded', true, true);
 			}
 		},
 
 		selectItem(item) {
-			const model = this._getModelFromItem(item);
 			if (!this.isItemSelected(item)) {
 				this.push('selectedItems', item);
 			}
-			if (model) {
-				this._forwardProperty(model, 'selected', true, true);
-			}
+			this._forwardPropertyByItem(item, 'selected', true, true);
 		},
 
 		highlightItem(item, reverse) {
-			const model = this._getModelFromItem(item),
-				highlightedIndex = this.highlightedItems.indexOf(item);
+			const	highlightedIndex = this.highlightedItems.indexOf(item);
 
 			if (highlightedIndex === -1 && !reverse) {
 				this.push('highlightedItems', item);
@@ -374,31 +361,22 @@
 			if (highlightedIndex > -1 && reverse) {
 				this.splice('highlightedItems', highlightedIndex, 1);
 			}
-
-			if (model) {
-				this._forwardProperty(model, 'highlighted', !reverse, true);
-			}
+			this._forwardPropertyByItem(item, 'highlighted', !reverse, true);
 		},
 
 		deselectItem(item) {
-			const selectedIndex = this.selectedItems.indexOf(item);
-			if (selectedIndex >= 0) {
-				this.splice('selectedItems', selectedIndex, 1);
+			const index = this.selectedItems.indexOf(item);
+			if (index >= 0) {
+				this.splice('selectedItems', index, 1);
 			}
-			const model = this._getModelFromItem(item);
-			if (model) {
-				this._forwardProperty(model, 'selected', false, true);
-			}
+			this._forwardPropertyByItem(item, 'selected', false, true);
 			// If the containing group was selected, then deselect it
 			// as all items are not selected anymore
 			const group = this.getItemGroup(item);
 			if (group && this.isGroupSelected(group)) {
-				const groupState = this._groupsMap.get(group),
-					groupModel = this._getModelFromItem(group);
-				if (groupModel) {
-					groupModel['selected'] = false;
-				}
+				const groupState = this._groupsMap.get(group);
 				groupState.selected = false;
+				this._forwardPropertyByItem(group, 'selected', false, true);
 			}
 		},
 
@@ -411,18 +389,14 @@
 		},
 
 		toggleSelectGroup(group, selected) {
-			const model = this._getModelFromItem(group),
-				groupState = this._groupsMap && this._groupsMap.get(group);
-
+			const groupState = this._groupsMap && this._groupsMap.get(group);
+			const willSelect = selected ? false : true;
+			const itemAction = willSelect ? 'selectItem' : 'deselectItem';
 			if (groupState) {
-				groupState.selected = selected ? false : true;
+				groupState.selected = willSelect;
 			}
-
-			if (model) {
-				this._forwardProperty(model, 'selected', selected ? false : true, true);
-			}
-			const temp = selected ? 'deselectItem' : 'selectItem';
-			group.items.forEach(this[temp], this);
+			this._forwardPropertyByItem(group, 'selected', willSelect, true);
+			group.items.forEach(this[itemAction], this);
 		},
 
 		isGroupSelected(group) {
@@ -483,28 +457,16 @@
 		},
 
 		toggleCollapse(item) {
-			const model = this._getModelFromItem(item);
-			if (!model) {
-				return;
-			}
-			model.expanded = !model.expanded;
-
-			let itemState = this._itemsMap.get(item);
-			if (!itemState) {
-				itemState = { selected: false, expanded: false };
-				this._itemsMap.set(item, itemState);
-			}
-			itemState.expanded = model.expanded;
+			const	state = this._itemsMap.get(item) || { selected: false, expanded: false },
+				willExpand = state.expanded = !state.expanded;
+			this._itemsMap.set(item, state);
+			this._forwardPropertyByItem(item, 'expanded', willExpand, true);
 			this.$.list.updateSizeForItem(item);
 		},
 
 		isExpanded(item) {
 			const itemState = this._itemsMap ? this._itemsMap.get(item) : undefined;
 			return itemState !== undefined && itemState.expanded;
-		},
-
-		_getModelFromItem(item) {
-			return this._getInstanceByProperty('item', item);
 		},
 
 		_getSlotByIndex(index) {
