@@ -321,9 +321,8 @@
 			return groupState && groupState.folded;
 		},
 
-		toggleFold(templateInstance) {
-			const item = templateInstance.item,
-				group = this.isGroup(item) ? item : this.getItemGroup(item),
+		toggleFold(item) {
+			const group = this.isGroup(item) ? item : this.getItemGroup(item),
 				isFolded = this.isFolded(group);
 
 			if (isFolded) {
@@ -331,8 +330,6 @@
 			} else {
 				this.foldGroup(group);
 			}
-
-			templateInstance.folded = !isFolded;
 		},
 
 		unfoldGroup(group) {

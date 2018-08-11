@@ -161,7 +161,8 @@
 			},
 
 			toggleFold: function (event) {
-				this.$.groupedList.toggleFold(event.model);
+				const { model: {item }} = event;
+				this.$.groupedList.toggleFold(item);
 			},
 
 			toggleSelect: function (event) {
