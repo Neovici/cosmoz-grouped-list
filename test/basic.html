@@ -46,6 +46,11 @@
 			var element,
 				groups;
 
+			const getInstanceByItemProperty = (element, item, property) => {
+				const instance = element._getInstanceByProperty('item', item);
+				return element._getInstanceProperty(instance, property);
+			};
+
 			setup(done => {
 				element = fixture('basic');
 				groups = [{
