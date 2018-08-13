@@ -7,8 +7,8 @@
 			"dir": "./coverage",
 			"reporters": ["text-summary", "lcov"],
 			"include": [
+				"cosmoz-grouped-list-templatize-behavior.html",
 				"cosmoz-grouped-list-template-selector.html",
-				"cosmoz-grouped-list-template.html",
 				"cosmoz-grouped-list.html",
 				"cosmoz-grouped-list.js"
 			],
