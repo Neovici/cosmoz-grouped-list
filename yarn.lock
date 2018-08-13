@@ -2784,7 +2784,7 @@ eslint-visitor-keys@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/eslint-visitor-keys/-/eslint-visitor-keys-1.0.0.tgz#3f3180fb2e291017716acb4c9d6d5b5c34a6a81d"
 
-eslint@^5.1.0:
+eslint@^5.3.0:
   version "5.3.0"
   resolved "https://registry.yarnpkg.com/eslint/-/eslint-5.3.0.tgz#53695aca5213968aacdf970ccb231e42a2b285f8"
   dependencies:
@@ -7379,7 +7379,7 @@ web-component-tester-istanbul@Neovici/web-component-tester-istanbul:
     express "^4.15.3"
     html-script-hook "^1.0.0"
     istanbul "^0.4.0"
-    istanbul-threshold-checker "^0.2.1"
+    istanbul-threshold-checker "^0.1.0"
     lodash "^4.0.0"
     minimatch "^3.0.0"
     strip-html-comments "^1.0.0"

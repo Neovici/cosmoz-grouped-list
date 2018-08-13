@@ -39,32 +39,24 @@
 			attached() {
 				const {index, item, hidden} = this;
 				this._fireChange({index, item, hidden});
+				this.listen(this, 'paper-dropdown-open', '_onDropdownOpen');
+				this.listen(this, 'paper-dropdown-close', '_onDropdownClose');
 			},
 
 			detached() {
 				this._fireChange({hidden: true});
+				this.unlisten(this, 'paper-dropdown-open', '_onDropdownOpen');
+				this.unlisten(this, 'paper-dropdown-close', '_onDropdownClose');
 			},
 
 			_onItemChanged(item) {
 				const {index, hidden} = this;
 				if (item == null || hidden) {
 					return;
-			ready() {
-				// HACK(pasleq) Because iron-list uses `translate3d` transform on row template instances,
-				// a new stacking context is created for each row, preventing a dropdown to overflow the rows beneath.
-				// In order to workaround this issue, increase the z-index of the row if it has an opened dropdown
-				this.listen(this, 'paper-dropdown-open', '_onDropdownOpen');
-				this.listen(this, 'paper-dropdown-close', '_onDropdownClose');
-			},
-
-			detached() {
-				this.unlisten(this, 'paper-dropdown-open', '_onDropdownOpen');
-				this.unlisten(this, 'paper-dropdown-close', '_onDropdownClose');
-			},
 				}
 				this._fireChange({index, item});
-
 			},
+
 			_onHiddenChanged(hidden) {
 				const {index, item} = this;
 				this._fireChange({index, hidden, item});
@@ -74,7 +66,16 @@
 				this.fire('cosmoz-selector-changed', Object.assign({
 					selector: this,
 				}, props));
+			},
+
+			_onDropdownOpen(event) { // eslint-disable-line no-unused-vars
+				this.classList.add('has-dropdown');
+			},
+
+			_onDropdownClose(event) { // eslint-disable-line no-unused-vars
+				this.classList.remove('has-dropdown');
 			}
+
 
 		});
 	})();
