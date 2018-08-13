@@ -9,10 +9,9 @@
 	window.Cosmoz = window.Cosmoz || {};
 	const IS_V2 = Polymer.flush != null;
 
-	/**
-	* @polymerBehavior Cosmoz.GroupedListTemplatizeBehavior
-	*/
-	Cosmoz.GroupedListTemplatizeBehaviorImpl = {
+
+	/** @polymerBehavior */
+	Cosmoz.GroupedListTemplatizeBehavior = {
 		properties: {
 			as: {
 				type: String,
@@ -242,6 +241,5 @@
 			this._instances.splice(0).forEach(this._detachInstance);
 		}
 	};
-
-	Cosmoz.GroupedListTemplatizeBehaviorImpl = [Cosmoz.GroupedListTemplatizeBehaviorImpl];
 })();
+</script>

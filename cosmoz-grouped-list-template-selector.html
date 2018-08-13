@@ -8,6 +8,11 @@
 			:host ::slotted([hidden]) {
 				display: none !important;
 			}
+
+			/* This will give a row with an opened dropdown a z-index higher than all other rows */
+			:host(.has-dropdown) {
+				z-index: 100;
+			}
 		</style>
 		<slot></slot>
 	</template>
@@ -34,10 +39,14 @@
 			attached() {
 				const {index, item, hidden} = this;
 				this._fireChange({index, item, hidden});
+				this.listen(this, 'paper-dropdown-open', '_onDropdownOpen');
+				this.listen(this, 'paper-dropdown-close', '_onDropdownClose');
 			},
 
 			detached() {
 				this._fireChange({hidden: true});
+				this.unlisten(this, 'paper-dropdown-open', '_onDropdownOpen');
+				this.unlisten(this, 'paper-dropdown-close', '_onDropdownClose');
 			},
 
 			_onItemChanged(item) {
@@ -46,8 +55,8 @@
 					return;
 				}
 				this._fireChange({index, item});
-
 			},
+
 			_onHiddenChanged(hidden) {
 				const {index, item} = this;
 				this._fireChange({index, hidden, item});
@@ -57,7 +66,16 @@
 				this.fire('cosmoz-selector-changed', Object.assign({
 					selector: this,
 				}, props));
+			},
+
+			_onDropdownOpen(event) { // eslint-disable-line no-unused-vars
+				this.classList.add('has-dropdown');
+			},
+
+			_onDropdownClose(event) { // eslint-disable-line no-unused-vars
+				this.classList.remove('has-dropdown');
 			}
+
 
 		});
 	})();

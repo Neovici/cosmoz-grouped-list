@@ -46,7 +46,7 @@
 
 		},
 		behaviors: [
-			Cosmoz.GroupedListTemplatizeBehaviorImpl
+			Cosmoz.GroupedListTemplatizeBehavior
 		],
 
 		observers: [
