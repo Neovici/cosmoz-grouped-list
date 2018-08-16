@@ -405,7 +405,7 @@
 		},
 
 		_toggleSelected(value) {
-			this._instances.forEach(instance => this._forwardProperty(instance, 'selected', value));
+			this._instances.forEach(instance => this._forwardProperty(instance, 'selected', value, true));
 		},
 
 		selectAll() {
