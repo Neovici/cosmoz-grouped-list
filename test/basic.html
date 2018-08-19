@@ -326,10 +326,10 @@
 				done();
 			});
 
-			test('_getInstance calls _reuseInstance if instance with same type already exists', done => {
+			test('_getInstance calls _reuseInstance if prevInstance has different type', done => {
 				const itemInstance = element._getInstance('item'),
 					spy = sinon.spy(element, '_reuseInstance');
-				element._getInstance('item', {}, itemInstance);
+				element._getInstance('group', {}, itemInstance);
 				sinon.assert.calledOnce(spy);
 				done();
 			});

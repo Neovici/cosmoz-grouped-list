@@ -84,7 +84,7 @@
 			this._ctors = templates.reduce((ctors, template) => {
 				const type = template.dataset.type;
 				ctors[type] = Cosmoz.Templatize.templatize(template, this, {
-					instanceProps: Object.assign(this._getInstanceDefaultProps(), {type: type}),
+					instanceProps: this._getInstanceDefaultProps(),
 					parentModel: true,
 					forwardParentProp: this._forwardHostProp,
 					// forwardParentPath: this._forwardParentPath,
