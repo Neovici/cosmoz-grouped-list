@@ -331,6 +331,7 @@
 					spy = sinon.spy(element, '_reuseInstance');
 				element._getInstance('group', {}, itemInstance);
 				sinon.assert.calledOnce(spy);
+				spy.restore();
 				done();
 			});
 
@@ -342,8 +343,8 @@
 				const spy = sinon.spy(element, '_getInstanceByProperty');
 				Polymer.Base.async(() => {
 					const first = element.getFirstVisibleItemElement();
-					console.log(first);
 					sinon.assert.called(spy);
+					spy.restore();
 					done();
 				}, 200);
 			});
@@ -384,6 +385,7 @@
 					change = {path: 'other', value: newData, base: newData};
 				element._dataChanged(change);
 				sinon.assert.calledOnce(spy);
+				spy.restore();
 				done();
 			});
 
