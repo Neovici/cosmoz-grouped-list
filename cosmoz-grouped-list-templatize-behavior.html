@@ -101,7 +101,8 @@
 		 *
 		 * @param   {String}            type           The type of instance to return
 		 * @param   {Object}            props          Properties to set on the instance
-		 * @param		{TemplateInstance}  prevInstance   The previously used instance
+		 * @param   {TemplateInstance}  prevInstance   The previously used instance
+		 * @param   {Boolean}           flush          True if instance properties should be flushed.
 		 * @returns {TemplateInstance}                 The instance to use
 		*/
 		_getInstance(type, props = {}, prevInstance, flush = true) {
