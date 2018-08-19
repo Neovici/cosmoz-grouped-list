@@ -344,6 +344,7 @@
 				Polymer.Base.async(() => {
 					const first = element.getFirstVisibleItemElement();
 					sinon.assert.called(spy);
+					assert.isNotNull(first);
 					spy.restore();
 					done();
 				}, 200);

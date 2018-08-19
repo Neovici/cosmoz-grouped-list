@@ -19,6 +19,7 @@
 	<script>
 	(function () {
 		'use strict';
+		const IS_V2 = Polymer.flush != null;
 
 		Polymer({
 			is: 'cosmoz-grouped-list-template-selector',
@@ -38,7 +39,9 @@
 
 			attached() {
 				const {index, item, hidden} = this;
-				this._fireChange({index, item, hidden});
+				if (!(IS_V2 && index == null && item == null)) {
+					this._fireChange({index, item, hidden});
+				}
 				this.listen(this, 'paper-dropdown-open', '_onDropdownOpen');
 				this.listen(this, 'paper-dropdown-close', '_onDropdownClose');
 			},
