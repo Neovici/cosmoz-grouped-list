@@ -211,7 +211,7 @@
 					expanded: !isGroup ? this.isExpanded(item) : undefined,
 					highlighted: this.isItemHighlighted(item),
 				},
-				instance = this._getInstance(type, props, prevInstance);
+				instance = this._getInstance(type, props, prevInstance, item != null);
 
 			let slot = Polymer.dom(selector).querySelector('slot');
 			if (slot == null) {

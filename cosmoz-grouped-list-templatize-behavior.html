@@ -104,7 +104,7 @@
 		 * @param		{TemplateInstance}  prevInstance   The previously used instance
 		 * @returns {TemplateInstance}                 The instance to use
 		*/
-		_getInstance(type, props = {}, prevInstance) {
+		_getInstance(type, props = {}, prevInstance, flush = true) {
 			const ctors = this._ctors;
 			if (ctors == null || Object.keys(ctors).length === 0) {
 				console.warn('cosmoz-grouped-list templates are required.');
@@ -129,7 +129,7 @@
 
 			if (instance) {
 				reusable.splice(reusable.indexOf(instance), 1);
-				this._forwardProperties(instance, props);
+				this._forwardProperties(instance, props, flush);
 			} else {
 				instance = new ctors[type](props);
 				instance.__type = type;
@@ -166,10 +166,10 @@
 			}
 		},
 
-		_forwardProperties(instance, props = {}) {
+		_forwardProperties(instance, props = {}, flush = true) {
 			Object.keys(props)
 				.forEach(key => this._forwardProperty(instance, key, props[key]));
-			if (instance._flushProperties) {
+			if (flush && instance._flushProperties) {
 				instance._flushProperties(true);
 			}
 		},
