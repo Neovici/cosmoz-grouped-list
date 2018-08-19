@@ -114,8 +114,8 @@
 				console.warn(`cosmoz-grouped-list template for ${type} type not found.`);
 			}
 
-			if (prevInstance && prevInstance.type === type) {
-				this._forwardProperties(prevInstance, props);
+			if (prevInstance && prevInstance.__type === type) {
+				this._forwardProperties(prevInstance, props, flush);
 				return prevInstance;
 			}
 
