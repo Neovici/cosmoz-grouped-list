@@ -38,18 +38,21 @@
 			},
 
 			attached() {
-				const {index, item, hidden} = this;
-				if (!(IS_V2 && index == null && item == null)) {
-					this._fireChange({index, item, hidden});
-				}
 				this.listen(this, 'paper-dropdown-open', '_onDropdownOpen');
 				this.listen(this, 'paper-dropdown-close', '_onDropdownClose');
+
+				const {index, item, hidden} = this;
+
+				if (IS_V2 && index == null && item == null) {
+					return;
+				}
+				this._fireChange({index, item, hidden});
 			},
 
 			detached() {
-				this._fireChange({hidden: true});
 				this.unlisten(this, 'paper-dropdown-open', '_onDropdownOpen');
 				this.unlisten(this, 'paper-dropdown-close', '_onDropdownClose');
+				this._fireChange({hidden: true});
 			},
 
 			_onItemChanged(item) {
