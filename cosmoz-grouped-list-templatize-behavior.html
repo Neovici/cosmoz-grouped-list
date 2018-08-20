@@ -84,7 +84,7 @@
 			this._ctors = templates.reduce((ctors, template) => {
 				const type = template.dataset.type;
 				ctors[type] = Cosmoz.Templatize.templatize(template, this, {
-					instanceProps: Object.assign(this._getInstanceDefaultProps(), {type: type}),
+					instanceProps: this._getInstanceDefaultProps(),
 					parentModel: true,
 					forwardParentProp: this._forwardHostProp,
 					// forwardParentPath: this._forwardParentPath,
@@ -101,10 +101,11 @@
 		 *
 		 * @param   {String}            type           The type of instance to return
 		 * @param   {Object}            props          Properties to set on the instance
-		 * @param		{TemplateInstance}  prevInstance   The previously used instance
+		 * @param   {TemplateInstance}  prevInstance   The previously used instance
+		 * @param   {Boolean}           flush          True if instance properties should be flushed.
 		 * @returns {TemplateInstance}                 The instance to use
 		*/
-		_getInstance(type, props = {}, prevInstance) {
+		_getInstance(type, props = {}, prevInstance, flush = true) {
 			const ctors = this._ctors;
 			if (ctors == null || Object.keys(ctors).length === 0) {
 				console.warn('cosmoz-grouped-list templates are required.');
@@ -114,8 +115,8 @@
 				console.warn(`cosmoz-grouped-list template for ${type} type not found.`);
 			}
 
-			if (prevInstance && prevInstance.type === type) {
-				this._forwardProperties(prevInstance, props);
+			if (prevInstance && prevInstance.__type === type) {
+				this._forwardProperties(prevInstance, props, flush);
 				return prevInstance;
 			}
 
@@ -129,7 +130,7 @@
 
 			if (instance) {
 				reusable.splice(reusable.indexOf(instance), 1);
-				this._forwardProperties(instance, props);
+				this._forwardProperties(instance, props, flush);
 			} else {
 				instance = new ctors[type](props);
 				instance.__type = type;
@@ -166,10 +167,10 @@
 			}
 		},
 
-		_forwardProperties(instance, props = {}) {
+		_forwardProperties(instance, props = {}, flush = true) {
 			Object.keys(props)
 				.forEach(key => this._forwardProperty(instance, key, props[key]));
-			if (instance._flushProperties) {
+			if (flush && instance._flushProperties) {
 				instance._flushProperties(true);
 			}
 		},
