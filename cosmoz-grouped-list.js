@@ -1,11 +1,7 @@
 (function () {
-
 	'use strict';
 
-	const IS_V2 = Polymer.flush != null;
-
 	Polymer({
-
 		is: 'cosmoz-grouped-list',
 
 		properties: {
@@ -130,11 +126,7 @@
 				return;
 			}
 
-			if (IS_V2) {
-				instance._setPendingPropertyOrPath(propertyPath, value, false, true);
-			} else {
-				instance.notifyPath(propertyPath, value, true);
-			}
+			instance._setPendingPropertyOrPath(propertyPath, value, false, true);
 
 			if (instance._flushProperties) {
 				instance._flushProperties(true);

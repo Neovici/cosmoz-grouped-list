@@ -1,5 +1,4 @@
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../cosmoz-templatize/cosmoz-templatize.html">
 <script>
 /**
  `Cosmoz.GroupedListTemplatizeBehavior`
@@ -7,8 +6,6 @@
 (function () {
 	'use strict';
 	window.Cosmoz = window.Cosmoz || {};
-	const IS_V2 = Polymer.flush != null;
-
 
 	/** @polymerBehavior */
 	Cosmoz.GroupedListTemplatizeBehavior = {
@@ -83,13 +80,10 @@
 
 			this._ctors = templates.reduce((ctors, template) => {
 				const type = template.dataset.type;
-				ctors[type] = Cosmoz.Templatize.templatize(template, this, {
+				ctors[type] = Polymer.Templatize.templatize(template, this, {
 					instanceProps: this._getInstanceDefaultProps(),
 					parentModel: true,
-					forwardParentProp: this._forwardHostProp,
-					// forwardParentPath: this._forwardParentPath,
 					forwardHostProp: this._forwardHostProp,
-					forwardInstanceProp: this._notifyInstanceProp,
 					notifyInstanceProp: this._notifyInstanceProp
 				});
 				return ctors;
@@ -142,26 +136,22 @@
 
 		_getInstanceByProperty(prop, value) {
 			return this._instances
-				.find(instance => this._getInstanceProperty(instance, prop) === value
-				);
+				.find(instance => this._getInstanceProperty(instance, prop) === value);
+
 		},
 
 		_getInstanceProperty(instance, prop) {
-			return IS_V2 ? instance._getProperty(prop) : instance[prop];
+			return instance._getProperty(prop);
 		},
 
 		_forwardHostProp(prop, value) {
-			const forward = instance => IS_V2 ? instance.forwardHostProp(prop, value) : instance[prop] = value;
+			const forward = instance => instance.forwardHostProp(prop, value);
 			this._instances.forEach(forward);
 			this._reusableInstances.forEach(forward);
 		},
 
 		_forwardProperty(instance, name, value, flush = false) {
-			if (IS_V2) {
-				instance._setPendingProperty(name, value);
-			} else {
-				instance[name] = value;
-			}
+			instance._setPendingProperty(name, value);
 			if (flush && instance._flushProperties) {
 				instance._flushProperties(true);
 			}
@@ -187,14 +177,13 @@
 			if (!instance) {
 				return;
 			}
-			const children = IS_V2 ? instance.children : instance._children,
-				root = instance.root,
+			const {children, root} = instance,
 				dom = Polymer.dom;
 
 			for (let i = 0; i < children.length; i++) {
 				const child = children[i],
 					parent = child.parentNode;
-				if (reuse || !IS_V2) {
+				if (reuse) {
 					dom(root).appendChild(child);
 				} else if (parent !== null) {
 					dom(parent).removeChild(child);

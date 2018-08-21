@@ -19,7 +19,6 @@
 	<script>
 	(function () {
 		'use strict';
-		const IS_V2 = Polymer.flush != null;
 
 		Polymer({
 			is: 'cosmoz-grouped-list-template-selector',
@@ -43,7 +42,7 @@
 
 				const {index, item, hidden} = this;
 
-				if (IS_V2 && index == null && item == null) {
+				if (index == null && item == null) {
 					return;
 				}
 				this._fireChange({index, item, hidden});
