@@ -1,4 +1,5 @@
-<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="../shadycss/apply-shim.html">
+<link rel="import" href="../polymer/polymer-element.html"/>
 <!--
 @demo demo/full.html Full Demo
 -->
@@ -20,25 +21,37 @@
 	(function () {
 		'use strict';
 
-		Polymer({
-			is: 'cosmoz-grouped-list-template-selector',
-			properties: {
-				index: {
-					type: Number
-				},
-				item: {
-					type: Object,
-					observer: '_onItemChanged'
-				},
-				hidden: {
-					type: Boolean,
-					observer: '_onHiddenChanged'
-				},
-			},
+		class TemplateSelector extends Polymer.Element {
+			static get is() {
+				return 'cosmoz-grouped-list-template-selector';
+			}
+			static get properties() {
+				return {
+					index: {
+						type: Number
+					},
+					item: {
+						type: Object,
+						observer: '_onItemChanged'
+					},
+					hidden: {
+						type: Boolean,
+						observer: '_onHiddenChanged'
+					},
+				};
+			}
 
-			attached() {
-				this.listen(this, 'paper-dropdown-open', '_onDropdownOpen');
-				this.listen(this, 'paper-dropdown-close', '_onDropdownClose');
+			constructor() {
+				super();
+				this._onDropdownOpen = this._onDropdownOpen.bind(this);
+				this._onDropdownClose = this._onDropdownClose.bind(this);
+			}
+
+			connectedCallback() {
+				super.connectedCallback();
+
+				this.addEventListener('paper-dropdown-open', this._onDropdownOpen);
+				this.addEventListener('paper-dropdown-close', this._onDropdownClose);
 
 				const {index, item, hidden} = this;
 
@@ -46,13 +59,14 @@
 					return;
 				}
 				this._fireChange({index, item, hidden});
-			},
+			}
 
-			detached() {
-				this.unlisten(this, 'paper-dropdown-open', '_onDropdownOpen');
-				this.unlisten(this, 'paper-dropdown-close', '_onDropdownClose');
+			disconnectedCallback() {
+				super.disconnectedCallback();
+				this.removeEventListener('paper-dropdown-open', this._onDropdownOpen);
+				this.removeEventListener('paper-dropdown-close', this._onDropdownClose);
 				this._fireChange({hidden: true});
-			},
+			}
 
 			_onItemChanged(item) {
 				const {index, hidden} = this;
@@ -60,29 +74,34 @@
 					return;
 				}
 				this._fireChange({index, item});
-			},
+			}
 
 			_onHiddenChanged(hidden) {
 				const {index, item} = this;
 				this._fireChange({index, hidden, item});
-			},
+			}
 
 			_fireChange(props = {}) {
-				this.fire('cosmoz-selector-changed', Object.assign({
-					selector: this,
-				}, props));
-			},
+				this.dispatchEvent(new CustomEvent('cosmoz-selector-changed', {
+					bubbles: true,
+					composed: true,
+					detail: {
+						selector: this,
+						...props
+					}
+				}));
+			}
 
 			_onDropdownOpen(event) { // eslint-disable-line no-unused-vars
 				this.classList.add('has-dropdown');
-			},
+			}
 
 			_onDropdownClose(event) { // eslint-disable-line no-unused-vars
 				this.classList.remove('has-dropdown');
 			}
 
-
-		});
+		}
+		customElements.define(TemplateSelector.is, TemplateSelector);
 	})();
 	</script>
 </dom-module>
