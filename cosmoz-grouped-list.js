@@ -203,15 +203,10 @@
 					expanded: !isGroup ? this.isExpanded(item) : undefined,
 					highlighted: this.isItemHighlighted(item),
 				},
-				instance = this._getInstance(type, props, prevInstance, item != null);
+				instance = this._getInstance(type, props, prevInstance, item != null),
+				slot = Polymer.dom(selector).querySelector('slot');
 
-			let slot = Polymer.dom(selector).querySelector('slot');
-			if (slot == null) {
-				slot = Polymer.dom(selector).querySelector('content');
-				slot.setAttribute('select', '[slot="' + slotName + '"]');
-			} else {
-				slot.setAttribute('name', slotName);
-			}
+			slot.setAttribute('name', slotName);
 			instance.element.setAttribute('slot', slotName);
 			Polymer.dom(this).appendChild(instance.root);
 			selector.__instance = instance;
