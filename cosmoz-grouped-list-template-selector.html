@@ -20,7 +20,12 @@
 	<script>
 	(function () {
 		'use strict';
-
+		/**
+		 * # TemplateSelector
+		 *
+		 * @customElement
+		 * @demo demo/index.html
+		 */
 		class TemplateSelector extends Polymer.Element {
 			static get is() {
 				return 'cosmoz-grouped-list-template-selector';
@@ -85,10 +90,9 @@
 				this.dispatchEvent(new CustomEvent('cosmoz-selector-changed', {
 					bubbles: true,
 					composed: true,
-					detail: {
+					detail: Object.assign({
 						selector: this,
-						...props
-					}
+					}, props)
 				}));
 			}
 
