@@ -137,6 +137,7 @@
 				});
 			});
 
+
 			test('deselects an item', done => {
 				const item = groups[1].items[0];
 				element.selectItem(item);
@@ -306,6 +307,37 @@
 					assert.isTrue(getInstanceByItemProperty(element, item, 'expanded'));
 					assert.isTrue(element.isExpanded(item));
 					done();
+				});
+			});
+
+			test('highlights an item', done => {
+				const item = groups[0].items[0];
+				element.highlightItem(item);
+				flush(() => {
+					assert.isTrue(getInstanceByItemProperty(element, item, 'highlighted'));
+					assert.isTrue(element.isItemHighlighted(item));
+					assert.equal(element.highlightedItems.length, 1);
+					assert.equal(element.highlightedItems[0], item);
+					done();
+				});
+			});
+
+			test('unhighlights a highlighted item', done => {
+				const item = groups[0].items[0];
+				element.highlightItem(item);
+				flush(() => {
+					assert.isTrue(getInstanceByItemProperty(element, item, 'highlighted'));
+					assert.isTrue(element.isItemHighlighted(item));
+					assert.equal(element.highlightedItems.length, 1);
+					assert.equal(element.highlightedItems[0], item);
+
+					element.highlightItem(item, true);
+					flush(() => {
+						assert.isFalse(getInstanceByItemProperty(element, item, 'highlighted'));
+						assert.isFalse(element.isItemHighlighted(item));
+						assert.equal(element.highlightedItems.length, 0);
+						done();
+					});
 				});
 			});
 
