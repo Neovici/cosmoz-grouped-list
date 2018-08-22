@@ -37,19 +37,32 @@
 			</cosmoz-grouped-list>
 		</template>
 	</test-fixture>
-
 	<script>
 	(function () {
 		'use strict';
 
-		suite('<cosmoz-grouped-list>', () => {
-			var element,
-				groups;
+		const getInstanceByItemProperty = (element, item, property) => {
+			const instance = element._getInstanceByProperty('item', item);
+			return element._getInstanceProperty(instance, property);
+		};
 
-			const getInstanceByItemProperty = (element, item, property) => {
-				const instance = element._getInstanceByProperty('item', item);
-				return element._getInstanceProperty(instance, property);
-			};
+		suite('empty', () => {
+			let element;
+			setup(done => {
+				element = fixture('basic');
+				element.data = [];
+				flush(done);
+			});
+
+			test('creates no maps for empty data', done => {
+				assert.isNull(element._groupsMap);
+				done();
+			});
+		});
+
+		suite('basic', () => {
+			let element,
+				groups;
 
 			setup(done => {
 				element = fixture('basic');
@@ -85,7 +98,7 @@
 				flush(() => {
 					setTimeout(() => {
 						done();
-					}, 120);
+					}, 30);
 				});
 			});
 
@@ -136,7 +149,6 @@
 					done();
 				});
 			});
-
 
 			test('deselects an item', done => {
 				const item = groups[1].items[0];
