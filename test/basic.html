@@ -400,6 +400,16 @@
 				done();
 			});
 
+			test('_dataChanged calls _forwardItemPath for item changes', done => {
+				const spy = sinon.spy(element, '_forwardItemPath');
+				element.set('data.0.value', -1);
+				sinon.assert.calledOnce(spy);
+				sinon.assert.calledWith(spy, 'data.0.value', -1);
+				element.set('data.0.items.value', -2);
+				sinon.assert.calledWith(spy, 'data.0.items.value', -2);
+				done();
+			});
+
 			test('_dataChanged calls _debounceRender for splices changes', done => {
 				const spy = sinon.spy(element, '_debounceRender'),
 					newData = [{
@@ -445,23 +455,28 @@
 							value: 0
 						}]
 					}];
+
 				element.isAttached = null;
 				element.data = newData;
-				Polymer.Base.async(() => {
+
+				flush(() => {
 					assert.equal(flatData, element._flatData);
 					done();
-				}, 200);
+				});
 			});
 
 			test('removeItem removes one item from data', done => {
 				const first = element.data[0].items[0],
 					length = element.data[0].items.length;
+
 				element.removeItem(first);
-				Polymer.Base.async(() => {
+
+				flush(() => {
 					assert.equal(element.data[0].items.length, length - 1);
 					done();
-				}, 200);
+				});
 			});
+
 		});
 	}());
 	</script>

@@ -108,8 +108,7 @@
 				return;
 			}
 
-			const
-				groupIndex = match[1],
+			const groupIndex = match[1],
 				itemIndex =  match[2],
 				propertyPath = 'item' + match[3],
 				item =  groupIndex ? this.data[groupIndex].items[itemIndex] : itemIndex ? this.data[itemIndex] : null;
@@ -119,7 +118,7 @@
 				return;
 			}
 
-			const instance = this._getModelFromItem(item);
+			const instance = this._getInstanceByProperty('item', item);
 
 			if (!instance) {
 				console.warn('Template instance for item not found when forwarding path', path);
