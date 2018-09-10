@@ -1,6 +1,6 @@
 language: node_js
 node_js: "lts/*"
-dist: trusty
+dist: xenial
 sudo: required
 env:
   global:
@@ -15,11 +15,10 @@ addons:
 cache:
   yarn: true
   directories:
-  - node_modules
-  - bower_components
-  - bower_components-1.x
-  - ".eslintcache"
-  - "$HOME/.cache/bower"
+    - node_modules
+    - bower_components
+    - ".eslintcache"
+    - "$HOME/.cache/bower"
 before_script:
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter

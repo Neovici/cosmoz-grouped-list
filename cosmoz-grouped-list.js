@@ -1,11 +1,7 @@
 (function () {
-
 	'use strict';
 
-	const IS_V2 = Polymer.flush != null;
-
 	Polymer({
-
 		is: 'cosmoz-grouped-list',
 
 		properties: {
@@ -112,8 +108,7 @@
 				return;
 			}
 
-			const
-				groupIndex = match[1],
+			const groupIndex = match[1],
 				itemIndex =  match[2],
 				propertyPath = 'item' + match[3],
 				item =  groupIndex ? this.data[groupIndex].items[itemIndex] : itemIndex ? this.data[itemIndex] : null;
@@ -123,18 +118,14 @@
 				return;
 			}
 
-			const instance = this._getModelFromItem(item);
+			const instance = this._getInstanceByProperty('item', item);
 
 			if (!instance) {
 				console.warn('Template instance for item not found when forwarding path', path);
 				return;
 			}
 
-			if (IS_V2) {
-				instance._setPendingPropertyOrPath(propertyPath, value, false, true);
-			} else {
-				instance.notifyPath(propertyPath, value, true);
-			}
+			instance._setPendingPropertyOrPath(propertyPath, value, false, true);
 
 			if (instance._flushProperties) {
 				instance._flushProperties(true);
@@ -211,15 +202,10 @@
 					expanded: !isGroup ? this.isExpanded(item) : undefined,
 					highlighted: this.isItemHighlighted(item),
 				},
-				instance = this._getInstance(type, props, prevInstance, item != null);
+				instance = this._getInstance(type, props, prevInstance, item != null),
+				slot = Polymer.dom(selector).querySelector('slot');
 
-			let slot = Polymer.dom(selector).querySelector('slot');
-			if (slot == null) {
-				slot = Polymer.dom(selector).querySelector('content');
-				slot.setAttribute('select', '[slot="' + slotName + '"]');
-			} else {
-				slot.setAttribute('name', slotName);
-			}
+			slot.setAttribute('name', slotName);
 			instance.element.setAttribute('slot', slotName);
 			Polymer.dom(this).appendChild(instance.root);
 			selector.__instance = instance;

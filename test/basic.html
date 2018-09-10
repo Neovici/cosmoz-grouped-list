@@ -37,19 +37,32 @@
 			</cosmoz-grouped-list>
 		</template>
 	</test-fixture>
-
 	<script>
 	(function () {
 		'use strict';
 
-		suite('<cosmoz-grouped-list>', () => {
-			var element,
-				groups;
+		const getInstanceByItemProperty = (element, item, property) => {
+			const instance = element._getInstanceByProperty('item', item);
+			return element._getInstanceProperty(instance, property);
+		};
 
-			const getInstanceByItemProperty = (element, item, property) => {
-				const instance = element._getInstanceByProperty('item', item);
-				return element._getInstanceProperty(instance, property);
-			};
+		suite('empty', () => {
+			let element;
+			setup(done => {
+				element = fixture('basic');
+				element.data = [];
+				flush(done);
+			});
+
+			test('creates no maps for empty data', done => {
+				assert.isNull(element._groupsMap);
+				done();
+			});
+		});
+
+		suite('basic', () => {
+			let element,
+				groups;
 
 			setup(done => {
 				element = fixture('basic');
@@ -85,7 +98,7 @@
 				flush(() => {
 					setTimeout(() => {
 						done();
-					}, 120);
+					}, 30);
 				});
 			});
 
@@ -309,6 +322,37 @@
 				});
 			});
 
+			test('highlights an item', done => {
+				const item = groups[0].items[0];
+				element.highlightItem(item);
+				flush(() => {
+					assert.isTrue(getInstanceByItemProperty(element, item, 'highlighted'));
+					assert.isTrue(element.isItemHighlighted(item));
+					assert.equal(element.highlightedItems.length, 1);
+					assert.equal(element.highlightedItems[0], item);
+					done();
+				});
+			});
+
+			test('unhighlights a highlighted item', done => {
+				const item = groups[0].items[0];
+				element.highlightItem(item);
+				flush(() => {
+					assert.isTrue(getInstanceByItemProperty(element, item, 'highlighted'));
+					assert.isTrue(element.isItemHighlighted(item));
+					assert.equal(element.highlightedItems.length, 1);
+					assert.equal(element.highlightedItems[0], item);
+
+					element.highlightItem(item, true);
+					flush(() => {
+						assert.isFalse(getInstanceByItemProperty(element, item, 'highlighted'));
+						assert.isFalse(element.isItemHighlighted(item));
+						assert.equal(element.highlightedItems.length, 0);
+						done();
+					});
+				});
+			});
+
 			test('_onTemplatesChange does not return constructors if they already exist', () => {
 				element._ctors = {item: {}, group: {}};
 				assert.isUndefined(element._onTemplatesChange({addedNodes: []}));
@@ -353,6 +397,16 @@
 			test('getFirstVisibleItemElement handles null _flatData', done => {
 				element._flatData = null;
 				assert.isFalse(element.getFirstVisibleItemElement());
+				done();
+			});
+
+			test('_dataChanged calls _forwardItemPath for item changes', done => {
+				const spy = sinon.spy(element, '_forwardItemPath');
+				element.set('data.0.value', -1);
+				sinon.assert.calledOnce(spy);
+				sinon.assert.calledWith(spy, 'data.0.value', -1);
+				element.set('data.0.items.value', -2);
+				sinon.assert.calledWith(spy, 'data.0.items.value', -2);
 				done();
 			});
 
@@ -401,23 +455,28 @@
 							value: 0
 						}]
 					}];
+
 				element.isAttached = null;
 				element.data = newData;
-				Polymer.Base.async(() => {
+
+				flush(() => {
 					assert.equal(flatData, element._flatData);
 					done();
-				}, 200);
+				});
 			});
 
 			test('removeItem removes one item from data', done => {
 				const first = element.data[0].items[0],
 					length = element.data[0].items.length;
+
 				element.removeItem(first);
-				Polymer.Base.async(() => {
+
+				flush(() => {
 					assert.equal(element.data[0].items.length, length - 1);
 					done();
-				}, 200);
+				});
 			});
+
 		});
 	}());
 	</script>
