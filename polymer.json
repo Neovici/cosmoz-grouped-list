@@ -1,8 +1,5 @@
 {
 	"lint": {
-		"rules": ["polymer-2-hybrid"],
-		"ignoreWarnings": [
-				"multiple-global-declarations"
-		]
+		"rules": ["polymer-2"]
 	}
 }
