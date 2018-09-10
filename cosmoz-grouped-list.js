@@ -207,7 +207,11 @@
 
 			slot.setAttribute('name', slotName);
 			instance.element.setAttribute('slot', slotName);
-			Polymer.dom(this).appendChild(instance.root);
+			Polymer.dom(this).appendChild(
+				Polymer.Settings.useShadow
+					? instance.root
+					: instance.element
+			);
 			selector.__instance = instance;
 		},
 
