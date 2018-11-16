@@ -15,10 +15,12 @@
 	},
 	"scripts": {
 		"start": "polymer serve -o",
-		"postinstall": "polymer install",
+		"preinstall": "rm -f package-lock.json",
+		"postinstall": "polymer install --variants && yarn sync-npm",
 		"lint": "eslint --cache --ext .js,.html . && polymer lint cosmoz-*.html",
 		"test": "polymer test",
-		"analyze": "polymer analyze --input cosmoz-*.html  > analysis.json"
+		"analyze": "polymer analyze --input cosmoz-*.html  > analysis.json",
+		"sync-npm": "npm shrinkwrap && mv npm-shrinkwrap.json package-lock.json"
 	},
 	"repository": {
 		"type": "git",
