@@ -1,66 +1,72 @@
 (function () {
 	'use strict';
 
-	Polymer({
-		is: 'cosmoz-grouped-list',
-
-		properties: {
-
-			data: {
-				type: Array
-			},
-
-			scrollTarget: {
-				type: HTMLElement
-			},
-
-			selectedItems: {
-				type: Array,
-				notify: true
-			},
-
-			highlightedItems: {
-				type: Array,
-				value() {
-					return [];
-				},
-				notify: true
-			},
+	class CosmozGroupedList extends Polymer.mixinBehaviors([Cosmoz.GroupedListTemplatizeBehavior], Polymer.Element) {
+		constructor() {
+			super();
+			/**
+			 * A map of (group,state).
+			 * If source data is grouped, then this map stores group level items, with an associated state object indicating wether
+			 * the group is folded and selected.
+			 */
+			this._groupsMap = null;
 
 			/**
-			 * Indicates wether this grouped-list should render groups without items.
+			 * A map of (item,state), used to store an object indicating wether an item is selected and expanded.
 			 */
-			displayEmptyGroups: {
-				type: Boolean,
-				value: false
+			this._itemsMap = null;
+		}
 
-			},
+		static get is() {
+			return 'cosmoz-grouped-list';
+		}
 
-			_flatData: {
-				type: Array,
-			}
+		static get properties() {
+			return {
 
-		},
-		behaviors: [
-			Cosmoz.GroupedListTemplatizeBehavior
-		],
+				data: {
+					type: Array
+				},
 
-		observers: [
-			'_dataChanged(data.*)',
-			'_scrollTargetChanged(scrollTarget, isAttached)'
-		],
+				scrollTarget: {
+					type: HTMLElement
+				},
 
-		/**
-		 * A map of (group,state).
-		 * If source data is grouped, then this map stores group level items, with an associated state object indicating wether
-		 * the group is folded and selected.
-		 */
-		_groupsMap: null,
+				selectedItems: {
+					type: Array,
+					notify: true
+				},
 
-		/**
-		 * A map of (item,state), used to store an object indicating wether an item is selected and expanded.
-		 */
-		_itemsMap: null,
+				highlightedItems: {
+					type: Array,
+					value() {
+						return [];
+					},
+					notify: true
+				},
+
+				/**
+				 * Indicates wether this grouped-list should render groups without items.
+				 */
+				displayEmptyGroups: {
+					type: Boolean,
+					value: false
+
+				},
+
+				_flatData: {
+					type: Array,
+				}
+
+			};
+		}
+
+		static get observers() {
+			return [
+				'_dataChanged(data.*)',
+				'_scrollTargetChanged(scrollTarget, isAttached, classList)'
+			];
+		}
 
 		/**
 		 * Polymer `attached` livecycle function.
@@ -69,7 +75,7 @@
 		 */
 		attached() {
 			this._debounceRender();
-		},
+		}
 
 		/**
 		 * Polymer `detached` livecycle function.
@@ -78,7 +84,7 @@
 		 */
 		detached() {
 			this.cancelDebouncer('render');
-		},
+		}
 
 		_dataChanged(change) {
 			if (change.path === 'data' || change.path.slice(-8) === '.splices') {
@@ -88,18 +94,18 @@
 					this._debounceRender();
 				}
 			}
-		},
+		}
 
 		_debounceRender() {
 			this.debounce('render', this._render);
-		},
+		}
 
 		_render() {
 			if (!this.isAttached) {
 				return;
 			}
 			this._flatData = this._prepareData(this.data);
-		},
+		}
 
 		_forwardItemPath(path, value) {
 			const match = path.match(/data(?:\.#?(\d+)\.items)?\.#?(\d+)(\..+)$/i);
@@ -132,19 +138,19 @@
 			}
 
 			return true;
-		},
+		}
 
-		_scrollTargetChanged(scrollTarget, isAttached)  {
+		_scrollTargetChanged(scrollTarget, isAttached, classList)  {
 			if (! (scrollTarget === undefined || isAttached === undefined)) {
 				if (scrollTarget && isAttached) {
-					this.classList.add('has-scroll-target');
+					classList.add('has-scroll-target');
 					this.$.list.scrollTarget = scrollTarget;
 				} else {
 					this.$.list.scrollTarget = undefined;
-					this.classList.remove('has-scroll-target');
+					classList.remove('has-scroll-target');
 				}
 			}
-		},
+		}
 
 		_prepareData(data = null) {
 
@@ -181,7 +187,7 @@
 				}
 				return flatData;
 			}.bind(this), []);
-		},
+		}
 
 		_onTemplateSelectorChanged(e, {item, index, hidden, selector}) {
 			const idx = index != null ? index : this._flatData ? this._flatData.indexOf(item) : '',
@@ -213,7 +219,7 @@
 					: instance.element
 			);
 			selector.__instance = instance;
-		},
+		}
 
 
 		/**
@@ -241,7 +247,7 @@
 			if (instance) {
 				return instance.element;
 			}
-		},
+		}
 
 		/**
 		 * Returns true if this list has rendered data.
@@ -255,7 +261,7 @@
 				return false;
 			}
 			return instances.some(instance => instance !== null);
-		},
+		}
 
 		/**
 		 * Utility method to remove an item from the list.
@@ -279,11 +285,11 @@
 			if (i >= 0) {
 				this.splice('data', i, 1);
 			}
-		},
+		}
 
 		isGroup(item) {
 			return this._groupsMap && this._groupsMap.get(item) !== undefined;
-		},
+		}
 
 		/**
 		 * Returns the group of the specified item
@@ -295,12 +301,12 @@
 				return;
 			}
 			return this.data.find(group => Array.isArray(group.items) && group.items.indexOf(item) > -1);
-		},
+		}
 
 		isFolded(group) {
 			const groupState = this._groupsMap && this._groupsMap.get(group);
 			return groupState && groupState.folded;
-		},
+		}
 
 		toggleFold(item) {
 			const group = this.isGroup(item) ? item : this.getItemGroup(item),
@@ -311,7 +317,7 @@
 			} else {
 				this.foldGroup(group);
 			}
-		},
+		}
 
 		unfoldGroup(group) {
 			const groupState = this._groupsMap && this._groupsMap.get(group);
@@ -322,7 +328,7 @@
 				this.splice.apply(this, ['_flatData', groupFlatIndex + 1, 0].concat(group.items));
 				this._forwardPropertyByItem(group, 'folded', false, true);
 			}
-		},
+		}
 
 		foldGroup(group) {
 			const groupState = this._groupsMap && this._groupsMap.get(group);
@@ -332,14 +338,14 @@
 				this.splice('_flatData', groupFlatIndex + 1, group.items.length);
 				this._forwardPropertyByItem(group, 'folded', true, true);
 			}
-		},
+		}
 
 		selectItem(item) {
 			if (!this.isItemSelected(item)) {
 				this.push('selectedItems', item);
 			}
 			this._forwardPropertyByItem(item, 'selected', true, true);
-		},
+		}
 
 		highlightItem(item, reverse) {
 			const	highlightedIndex = this.highlightedItems.indexOf(item);
@@ -352,7 +358,7 @@
 				this.splice('highlightedItems', highlightedIndex, 1);
 			}
 			this._forwardPropertyByItem(item, 'highlighted', !reverse, true);
-		},
+		}
 
 		deselectItem(item) {
 			const index = this.selectedItems.indexOf(item);
@@ -368,15 +374,15 @@
 				groupState.selected = false;
 				this._forwardPropertyByItem(group, 'selected', false, true);
 			}
-		},
+		}
 
 		isItemSelected(item) {
 			return this.selectedItems.indexOf(item) >= 0;
-		},
+		}
 
 		isItemHighlighted(item) {
 			return this.highlightedItems.indexOf(item) >= 0;
-		},
+		}
 
 		toggleSelectGroup(group, selected) {
 			const groupState = this._groupsMap && this._groupsMap.get(group);
@@ -387,16 +393,16 @@
 			}
 			this._forwardPropertyByItem(group, 'selected', willSelect, true);
 			group.items.forEach(this[itemAction], this);
-		},
+		}
 
 		isGroupSelected(group) {
 			const groupState = this._groupsMap && this._groupsMap.get(group);
 			return groupState !== undefined && groupState.selected;
-		},
+		}
 
 		_toggleSelected(value) {
 			this._instances.forEach(instance => this._forwardProperty(instance, 'selected', value, true));
-		},
+		}
 
 		selectAll() {
 			const groups = this._groupsMap;
@@ -415,7 +421,7 @@
 
 			// Set the selected property to all visible items
 			this._toggleSelected(true);
-		},
+		}
 
 		deselectAll() {
 
@@ -433,18 +439,18 @@
 
 			// Set the selected property to all visible items
 			this._toggleSelected(false);
-		},
+		}
 
 		updateSize(item) {
 			// Do not attempt to update size of item is not visible (for example when groups are folded)
 			if (this._flatData.indexOf(item) >= 0) {
 				this.$.list.updateSizeForItem(item);
 			}
-		},
+		}
 
 		updateSizes(group) {
 			group.items.forEach(this.updateSize, this);
-		},
+		}
 
 		toggleCollapse(item) {
 			const	state = this._itemsMap.get(item) || { selected: false, expanded: false },
@@ -452,19 +458,20 @@
 			this._itemsMap.set(item, state);
 			this._forwardPropertyByItem(item, 'expanded', willExpand, true);
 			this.$.list.updateSizeForItem(item);
-		},
+		}
 
 		isExpanded(item) {
 			const itemState = this._itemsMap ? this._itemsMap.get(item) : undefined;
 			return itemState !== undefined && itemState.expanded;
-		},
+		}
 
 		_getSlotByIndex(index) {
 			return `cosmoz-glts-${index}`;
-		},
+		}
 
 		_getItemType(item, isGroup = this.isGroup(item)) {
 			return isGroup ? 'group' : 'item';
 		}
-	});
+	}
+	customElements.define(CosmozGroupedList.is, CosmozGroupedList);
 }());
