@@ -16,11 +16,17 @@
 			 */
 			this._itemsMap = null;
 		}
-
+		/**
+		 * Get component name.
+		 * @returns {string} Name.
+		 */
 		static get is() {
 			return 'cosmoz-grouped-list';
 		}
-
+		/**
+		 * Get component properties.
+		 * @returns {string} Properties.
+		 */
 		static get properties() {
 			return {
 
@@ -60,6 +66,10 @@
 
 			};
 		}
+		/**
+		 * Get component observers.
+		 * @returns {string} Observers.
+		 */
 
 		static get observers() {
 			return [
@@ -85,7 +95,11 @@
 		detached() {
 			this.cancelDebouncer('render');
 		}
-
+		/**
+		 * Forward item path if necessary and debounce render.
+		 * @param {object} change Change notifier.
+		 * @returns {void}
+		 */
 		_dataChanged(change) {
 			if (change.path === 'data' || change.path.slice(-8) === '.splices') {
 				this._debounceRender();
@@ -95,18 +109,29 @@
 				}
 			}
 		}
-
+		/**
+		 * Debounce render.
+		 * @returns {void}
+		 */
 		_debounceRender() {
 			this.debounce('render', this._render);
 		}
-
+		/**
+		 * Prepare and set flat data.
+		 * @returns {void}
+		 */
 		_render() {
 			if (!this.isAttached) {
 				return;
 			}
 			this._flatData = this._prepareData(this.data);
 		}
-
+		/**
+		 * Forward item path.
+		 * @param {string} path Path.
+		 * @param {any} value Value.
+		 * @returns {void}
+		 */
 		_forwardItemPath(path, value) {
 			const match = path.match(/data(?:\.#?(\d+)\.items)?\.#?(\d+)(\..+)$/i);
 
@@ -139,7 +164,14 @@
 
 			return true;
 		}
-
+		/**
+		 * Add or remove has scroll target classes and set or remove list scroll
+		 * target.
+		 * @param {object} scrollTarget Scroll target.
+		 * @param {boolean} isAttached Whether is attached.
+		 * @param {array} classList Class list.
+		 * @returns {void}
+		 */
 		_scrollTargetChanged(scrollTarget, isAttached, classList)  {
 			if (! (scrollTarget === undefined || isAttached === undefined)) {
 				if (scrollTarget && isAttached) {
@@ -151,7 +183,11 @@
 				}
 			}
 		}
-
+		/**
+		 * Prepare data.
+		 * @param {array} data Data.
+		 * @returns {void|array} Prepared data.
+		 */
 		_prepareData(data = null) {
 
 			this.selectedItems = [];
@@ -188,7 +224,6 @@
 				return flatData;
 			}.bind(this), []);
 		}
-
 		_onTemplateSelectorChanged(e, {item, index, hidden, selector}) {
 			const idx = index != null ? index : this._flatData ? this._flatData.indexOf(item) : '',
 				prevInstance = selector.__instance;
@@ -220,8 +255,6 @@
 			);
 			selector.__instance = instance;
 		}
-
-
 		/**
 		 * Utility method that returns the element that displays the first visible item in the list.
 		 * This method is mainly aimed at `cosmoz-omnitable`.
@@ -248,7 +281,6 @@
 				return instance.element;
 			}
 		}
-
 		/**
 		 * Returns true if this list has rendered data.
 		 * This property returns true if at least one group or item has been rendered by iron-list.
@@ -286,11 +318,14 @@
 				this.splice('data', i, 1);
 			}
 		}
-
+		/**
+		 * Determine if item is a group.
+		 * @param {object} item Item.
+		 * @returns {boolean} Whether item is group.
+		 */
 		isGroup(item) {
 			return this._groupsMap && this._groupsMap.get(item) !== undefined;
 		}
-
 		/**
 		 * Returns the group of the specified item
 		 * @param {Object} item The item to search for
@@ -302,12 +337,20 @@
 			}
 			return this.data.find(group => Array.isArray(group.items) && group.items.indexOf(item) > -1);
 		}
-
+		/**
+		 * Check if group is folded.
+		 * @param {object} group Group.
+		 * @returns {boolean} Whether group is folded.
+		 */
 		isFolded(group) {
 			const groupState = this._groupsMap && this._groupsMap.get(group);
 			return groupState && groupState.folded;
 		}
-
+		/**
+		 * Fold or unfold an item depending on previous state.
+		 * @param {object} item Item to fold or unfold.
+		 * @returns {void}
+		 */
 		toggleFold(item) {
 			const group = this.isGroup(item) ? item : this.getItemGroup(item),
 				isFolded = this.isFolded(group);
@@ -318,7 +361,11 @@
 				this.foldGroup(group);
 			}
 		}
-
+		/**
+		 * Unfold a group.
+		 * @param {object} group Group to unfold.
+		 * @returns {void}
+		 */
 		unfoldGroup(group) {
 			const groupState = this._groupsMap && this._groupsMap.get(group);
 
@@ -329,7 +376,11 @@
 				this._forwardPropertyByItem(group, 'folded', false, true);
 			}
 		}
-
+		/**
+		 * Fold a group.
+		 * @param {object} group Group to fold.
+		 * @returns {void}
+		 */
 		foldGroup(group) {
 			const groupState = this._groupsMap && this._groupsMap.get(group);
 			if (groupState && !groupState.folded) {
@@ -339,14 +390,23 @@
 				this._forwardPropertyByItem(group, 'folded', true, true);
 			}
 		}
-
+		/**
+		 * Add an item to the list of selected items and set it as selected.
+		 * @param {object}  item Item to select.
+		 * @returns {void}
+		 */
 		selectItem(item) {
 			if (!this.isItemSelected(item)) {
 				this.push('selectedItems', item);
 			}
 			this._forwardPropertyByItem(item, 'selected', true, true);
 		}
-
+		/**
+		 * Highlight or un-highlight an item.
+		 * @param {object} item Item.
+		 * @param {boolean} reverse Set to true to un-highlight.
+		 * @returns {void}
+		 */
 		highlightItem(item, reverse) {
 			const	highlightedIndex = this.highlightedItems.indexOf(item);
 
@@ -359,7 +419,11 @@
 			}
 			this._forwardPropertyByItem(item, 'highlighted', !reverse, true);
 		}
-
+		/**
+		 * Remove an item to the list of selected items and set it as deselected.
+		 * @param {object} item Item to deselect.
+		 * @returns {void}
+		 */
 		deselectItem(item) {
 			const index = this.selectedItems.indexOf(item);
 			if (index >= 0) {
@@ -375,15 +439,28 @@
 				this._forwardPropertyByItem(group, 'selected', false, true);
 			}
 		}
-
+		/**
+		 * Check if item is selected.
+		 * @param {object} item Item.
+		 * @returns {boolean} Whether item is selected.
+		 */
 		isItemSelected(item) {
 			return this.selectedItems.indexOf(item) >= 0;
 		}
-
+		/**
+		 * Check if item is highlighted.
+		 * @param {object} item Item.
+		 * @returns {boolean} Whether item is highlighted.
+		 */
 		isItemHighlighted(item) {
 			return this.highlightedItems.indexOf(item) >= 0;
 		}
-
+		/**
+		 * Toggle group selection.
+		 * @param {object} group Group.
+		 * @param {boolean} selected Whether selected.
+		 * @returns {void}
+		 */
 		toggleSelectGroup(group, selected) {
 			const groupState = this._groupsMap && this._groupsMap.get(group);
 			const willSelect = selected ? false : true;
@@ -394,16 +471,27 @@
 			this._forwardPropertyByItem(group, 'selected', willSelect, true);
 			group.items.forEach(this[itemAction], this);
 		}
-
+		/**
+		 * Check if group is selected.
+		 * @param {object} group Group.
+		 * @returns {boolean} Whether group is selected.
+		 */
 		isGroupSelected(group) {
 			const groupState = this._groupsMap && this._groupsMap.get(group);
 			return groupState !== undefined && groupState.selected;
 		}
-
+		/**
+		 * Toggle instance selection by value.
+		 * @param {any} value Value.
+		 * @returns {void}
+		 */
 		_toggleSelected(value) {
 			this._instances.forEach(instance => this._forwardProperty(instance, 'selected', value, true));
 		}
-
+		/**
+		 * Select all items.
+		 * @returns {void}
+		 */
 		selectAll() {
 			const groups = this._groupsMap;
 			let	selected = this.data;
@@ -422,7 +510,10 @@
 			// Set the selected property to all visible items
 			this._toggleSelected(true);
 		}
-
+		/**
+		 * Deselect all selected items.
+		 * @returns {void}
+		 */
 		deselectAll() {
 
 			this.splice('selectedItems', 0, this.selectedItems.length);
@@ -440,18 +531,30 @@
 			// Set the selected property to all visible items
 			this._toggleSelected(false);
 		}
-
+		/**
+		 * Update size for an item.
+		 * @param {object} item Item to update size on.
+		 * @returns {void}
+		 */
 		updateSize(item) {
 			// Do not attempt to update size of item is not visible (for example when groups are folded)
 			if (this._flatData.indexOf(item) >= 0) {
 				this.$.list.updateSizeForItem(item);
 			}
 		}
-
+		/**
+		 * Update item sizes in a group.
+		 * @param {object} group Group to update item sizes in.
+		 * @returns {void}
+		 */
 		updateSizes(group) {
 			group.items.forEach(this.updateSize, this);
 		}
-
+		/**
+		 * Toggle collapse status on an item.
+		 * @param {object} item Item.
+		 * @returns {void}
+		 */
 		toggleCollapse(item) {
 			const	state = this._itemsMap.get(item) || { selected: false, expanded: false },
 				willExpand = state.expanded = !state.expanded;
@@ -459,16 +562,29 @@
 			this._forwardPropertyByItem(item, 'expanded', willExpand, true);
 			this.$.list.updateSizeForItem(item);
 		}
-
+		/**
+		 * Determine if an item is expanded.
+		 * @param {object} item Item.
+		 * @returns {boolean} Whether the item is expanded.
+		 */
 		isExpanded(item) {
 			const itemState = this._itemsMap ? this._itemsMap.get(item) : undefined;
 			return itemState !== undefined && itemState.expanded;
 		}
-
+		/**
+		 * Get slot by index.
+		 * @param {number} index Index.
+		 * @returns {string} Slot.
+		 */
 		_getSlotByIndex(index) {
 			return `cosmoz-glts-${index}`;
 		}
-
+		/**
+		 * Get item type.
+		 * @param {object} item Item.
+		 * @param {boolean} isGroup Whether item is a group.
+		 * @returns {string} Item type.
+		 */
 		_getItemType(item, isGroup = this.isGroup(item)) {
 			return isGroup ? 'group' : 'item';
 		}

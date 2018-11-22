@@ -51,7 +51,10 @@
 			}
 			this._removeInstances();
 		},
-
+		/**
+		 * Get instance default properties.
+		 * @returns {object} Default properties.
+		 */
 		_getInstanceDefaultProps() {
 			return {
 				[this.as]: true,
@@ -62,7 +65,11 @@
 				highlighted: true
 			};
 		},
-
+		/**
+		 * Set template defaults.
+		 * @param {array} addedNodes Added nodes.
+		 * @returns {void}
+		 */
 		_onTemplatesChange({addedNodes}) {
 			const ctors = this._ctors;
 
@@ -133,30 +140,58 @@
 			instances.push(instance);
 			return instance;
 		},
-
+		/**
+		 * Get an instance by a matching property value.
+		 * @param {string} prop Property
+		 * @param {any} value Value.
+		 * @return {object} Matching instance.
+		 */
 		_getInstanceByProperty(prop, value) {
 			return this._instances
 				.find(instance => this._getInstanceProperty(instance, prop) === value);
 
 		},
-
+		/**
+		 * Get an instance property.
+		 * @param {object} instance Instance.
+		 * @param {string} prop Property in instance.
+		 * @return {any} Instance property.
+		 */
 		_getInstanceProperty(instance, prop) {
 			return instance._getProperty(prop);
 		},
-
+		/**
+		 * Forward host property.
+		 * @param {string} prop Property.
+		 * @param {any} value Value.
+		 * @returns {void}
+		 */
 		_forwardHostProp(prop, value) {
 			const forward = instance => instance.forwardHostProp(prop, value);
 			this._instances.forEach(forward);
 			this._reusableInstances.forEach(forward);
 		},
-
+		/**
+		 * Forward a property.
+		 * @param {object} instance Instance.
+		 * @param {string} name Property name.
+		 * @param {any} value Property value.
+		 * @param {boolean} flush Whether to flush properties.
+		 * @returns {void}
+		 */
 		_forwardProperty(instance, name, value, flush = false) {
 			instance._setPendingProperty(name, value);
 			if (flush && instance._flushProperties) {
 				instance._flushProperties(true);
 			}
 		},
-
+		/**
+		 * Forward properties.
+		 * @param {object} instance Instance.
+		 * @param {object} props Properties to forward.
+		 * @param {boolean} flush Whether to flush properties.
+		 * @returns {void}
+		 */
 		_forwardProperties(instance, props = {}, flush = true) {
 			Object.keys(props)
 				.forEach(key => this._forwardProperty(instance, key, props[key]));
@@ -164,7 +199,14 @@
 				instance._flushProperties(true);
 			}
 		},
-
+		/**
+		 * Forward a property by item.
+		 * @param {object} item Item.
+		 * @param {string} property Property.
+		 * @param {any} value Value.
+		 * @param {boolean} flush Whether to flush properties.
+		 * @returns {void}
+		 */
 		_forwardPropertyByItem(item, property, value, flush) {
 			const instance = this._getInstanceByProperty('item', item);
 			if (!instance) {
@@ -172,7 +214,12 @@
 			}
 			this._forwardProperty(instance, property, value, flush);
 		},
-
+		/**
+		 * Detach an instance from the DOM.
+		 * @param {object} instance Instance to detach.
+		 * @param {boolean} reuse Whether to reuse it.
+		 * @returns {void}
+		 */
 		_detachInstance(instance, reuse = false) {
 			if (!instance) {
 				return;
@@ -194,7 +241,11 @@
 				instance.element = null;
 			}
 		},
-
+		/**
+		 * Reuse an instance - remove it from the list, detach it and make it available.
+		 * @param {object} instance Instance to reuse.
+		 * @returns {void}
+		 */
 		_reuseInstance(instance) {
 			if (!instance) {
 				return;
@@ -208,7 +259,11 @@
 			reusable.push(instance);
 			this._detachInstance(instance, true);
 		},
-
+		/**
+		 * Remove an instance by removing it from the list and detaching it.
+		 * @param {object} instance Instance to remove.
+		 * @returns {void}
+		 */
 		_removeInstance(instance) {
 			if (!instance) {
 				return;
@@ -225,7 +280,10 @@
 			}
 			this._detachInstance(instance);
 		},
-
+		/**
+		 * Remove instances
+		 * @returns {void}
+		 */
 		_removeInstances() {
 			this._reusableInstances.splice(0).forEach(this._detachInstance);
 			this._instances.splice(0).forEach(this._detachInstance);
