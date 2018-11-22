@@ -45,13 +45,20 @@
 					},
 				};
 			}
-
+			/**
+			 * Set drop down open and close handlers.
+			 * @returns {void}
+			 */
 			constructor() {
 				super();
 				this._onDropdownOpen = this._onDropdownOpen.bind(this);
 				this._onDropdownClose = this._onDropdownClose.bind(this);
 			}
-
+			/**
+			 * Add event listeners for the drop down open and close and dispatch
+			 * an event that the selector has changed if needed.
+			 * @returns {void}
+			 */
 			connectedCallback() {
 				super.connectedCallback();
 
@@ -65,14 +72,23 @@
 				}
 				this._fireChange({index, item, hidden});
 			}
-
+			/**
+			 * Remove event listeners for the drop down open and close and
+			 * dispatch an event that the selector has changed.
+			 * @returns {void}
+			 */
 			disconnectedCallback() {
 				super.disconnectedCallback();
 				this.removeEventListener('paper-dropdown-open', this._onDropdownOpen);
 				this.removeEventListener('paper-dropdown-close', this._onDropdownClose);
 				this._fireChange({hidden: true});
 			}
-
+			/**
+			 * Check if the changed item contains something and if so dispatch
+			 * an event that the selector has changed.
+			 * @param {object} item Item.
+			 * @returns {void}
+			 */
 			_onItemChanged(item) {
 				const {index, hidden} = this;
 				if (item == null || hidden) {
@@ -80,12 +96,21 @@
 				}
 				this._fireChange({index, item});
 			}
-
+			/**
+			 * Dispatch an event that the selector has changed with the hidden
+			 * status.
+			 * @param {boolean} hidden Hidden status.
+			 * @returns {void}
+			 */
 			_onHiddenChanged(hidden) {
 				const {index, item} = this;
 				this._fireChange({index, hidden, item});
 			}
-
+			/**
+			 * Dispatch an event that the selector has changed.
+			 * @param {object} props Properties.
+			 * @returns {void}
+			 */
 			_fireChange(props = {}) {
 				this.dispatchEvent(new CustomEvent('cosmoz-selector-changed', {
 					bubbles: true,
@@ -95,15 +120,22 @@
 					}, props)
 				}));
 			}
-
+			/**
+			 * Add has drop down style class to the class list.
+			 * @param {object} event Polymer event object.
+			 * @returns {void}
+			 */
 			_onDropdownOpen(event) { // eslint-disable-line no-unused-vars
 				this.classList.add('has-dropdown');
 			}
-
+			/**
+			 * Remove has drop down style class from the class list.
+			 * @param {object} event Polymer event object.
+			 * @returns {void}
+			 */
 			_onDropdownClose(event) { // eslint-disable-line no-unused-vars
 				this.classList.remove('has-dropdown');
 			}
-
 		}
 		customElements.define(TemplateSelector.is, TemplateSelector);
 	})();
