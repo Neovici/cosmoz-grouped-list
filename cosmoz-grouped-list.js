@@ -74,7 +74,7 @@
 		static get observers() {
 			return [
 				'_dataChanged(data.*)',
-				'_scrollTargetChanged(scrollTarget, isAttached, classList)'
+				'_scrollTargetChanged(scrollTarget, isAttached)'
 			];
 		}
 
@@ -172,14 +172,14 @@
 		 * @param {array} classList Class list.
 		 * @returns {void}
 		 */
-		_scrollTargetChanged(scrollTarget, isAttached, classList)  {
+		_scrollTargetChanged(scrollTarget, isAttached)  {
 			if (! (scrollTarget === undefined || isAttached === undefined)) {
 				if (scrollTarget && isAttached) {
-					classList.add('has-scroll-target');
+					this.classList.add('has-scroll-target');
 					this.$.list.scrollTarget = scrollTarget;
 				} else {
 					this.$.list.scrollTarget = undefined;
-					classList.remove('has-scroll-target');
+					this.classList.remove('has-scroll-target');
 				}
 			}
 		}
