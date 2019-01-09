@@ -79,20 +79,22 @@
 		}
 
 		/**
-		 * Polymer `attached` livecycle function.
+		 * Polymer `connectedCallback` livecycle function.
 		 *
 		 * @return {void}
 		 */
-		attached() {
+		connectedCallback() {
+			super.connectedCallback();
 			this._debounceRender();
 		}
 
 		/**
-		 * Polymer `detached` livecycle function.
+		 * Polymer `disconnectedCallback` livecycle function.
 		 *
 		 * @return {void}
 		 */
-		detached() {
+		disconnectedCallback() {
+			super.disconnectedCallback();
 			this.cancelDebouncer('render');
 		}
 		/**
