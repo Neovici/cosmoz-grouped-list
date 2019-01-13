@@ -81,7 +81,7 @@
 		static get observers() {
 			return [
 				'_dataChanged(data.*)',
-				'_scrollTargetChanged(scrollTarget, isAttached)'
+				'_scrollTargetChanged(scrollTarget)'
 			];
 		}
 
@@ -183,19 +183,18 @@
 		 * Add or remove has scroll target classes and set or remove list scroll
 		 * target.
 		 * @param {object} scrollTarget Scroll target.
-		 * @param {boolean} isAttached Whether is attached.
-		 * @param {array} classList Class list.
 		 * @returns {void}
 		 */
-		_scrollTargetChanged(scrollTarget, isAttached)  {
-			if (! (scrollTarget === undefined || isAttached === undefined)) {
-				if (scrollTarget && isAttached) {
-					this.classList.add('has-scroll-target');
-					this.$.list.scrollTarget = scrollTarget;
-				} else {
-					this.$.list.scrollTarget = undefined;
-					this.classList.remove('has-scroll-target');
-				}
+		_scrollTargetChanged(scrollTarget)  {
+			if (scrollTarget === undefined) {
+				return;
+			}
+			if (scrollTarget) {
+				this.classList.add('has-scroll-target');
+				this.$.list.scrollTarget = scrollTarget;
+			} else {
+				this.$.list.scrollTarget = undefined;
+				this.classList.remove('has-scroll-target');
 			}
 		}
 		/**
