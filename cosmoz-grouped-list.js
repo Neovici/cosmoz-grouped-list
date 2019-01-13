@@ -1,7 +1,8 @@
 (function () {
 	'use strict';
+	const {GroupedListTemplatizeBehavior} = Cosmoz;
 
-	class CosmozGroupedList extends Polymer.mixinBehaviors([Cosmoz.GroupedListTemplatizeBehavior], Polymer.Element) {
+	class CosmozGroupedList extends GroupedListTemplatizeBehavior(Polymer.Element) {
 		constructor() {
 			super();
 			/**
