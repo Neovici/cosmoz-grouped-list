@@ -1,13 +1,13 @@
 (function () {
 	'use strict';
-	const { GroupedListTemplatizeBehavior } = Cosmoz,
+	const { GroupedListTemplatizeMixin } = Cosmoz,
 		{
 			Async,
 			Debouncer,
 			enqueueDebouncer
 		} = Polymer;
 
-	class CosmozGroupedList extends GroupedListTemplatizeBehavior(Polymer.Element) {
+	class CosmozGroupedList extends GroupedListTemplatizeMixin(Polymer.Element) {
 		constructor() {
 			super();
 			/**
