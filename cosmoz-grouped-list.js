@@ -22,7 +22,7 @@
 			 */
 			this._itemsMap = null;
 
-			this._bounderRender = this._render.bind(this);
+			this._boundRender = this._render.bind(this);
 		}
 		/**
 		 * Get component name.
@@ -127,7 +127,7 @@
 				this._renderDebouncer = Debouncer.debounce(
 					this._renderDebouncer,
 					Async.timeOut.after(30),
-					this._bounderRender
+					this._boundRender
 				)
 			);
 		}
