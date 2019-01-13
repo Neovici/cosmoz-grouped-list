@@ -1,6 +1,11 @@
 (function () {
 	'use strict';
-	const {GroupedListTemplatizeBehavior} = Cosmoz;
+	const { GroupedListTemplatizeBehavior } = Cosmoz,
+		{
+			Async,
+			Debouncer,
+			enqueueDebouncer
+		} = Polymer;
 
 	class CosmozGroupedList extends GroupedListTemplatizeBehavior(Polymer.Element) {
 		constructor() {
@@ -16,6 +21,8 @@
 			 * A map of (item,state), used to store an object indicating wether an item is selected and expanded.
 			 */
 			this._itemsMap = null;
+
+			this._bounderRender = this._render.bind(this);
 		}
 		/**
 		 * Get component name.
@@ -71,7 +78,6 @@
 		 * Get component observers.
 		 * @returns {string} Observers.
 		 */
-
 		static get observers() {
 			return [
 				'_dataChanged(data.*)',
@@ -96,7 +102,7 @@
 		 */
 		disconnectedCallback() {
 			super.disconnectedCallback();
-			this.cancelDebouncer('render');
+			this._renderDebouncer.cancel();
 		}
 		/**
 		 * Forward item path if necessary and debounce render.
@@ -117,14 +123,20 @@
 		 * @returns {void}
 		 */
 		_debounceRender() {
-			this.debounce('render', this._render);
+			enqueueDebouncer(
+				this._renderDebouncer = Debouncer.debounce(
+					this._renderDebouncer,
+					Async.timeOut.after(30),
+					this._bounderRender
+				)
+			);
 		}
 		/**
 		 * Prepare and set flat data.
 		 * @returns {void}
 		 */
 		_render() {
-			if (!this.isAttached) {
+			if (!this.isConnected) {
 				return;
 			}
 			this._flatData = this._prepareData(this.data);
@@ -227,6 +239,7 @@
 				return flatData;
 			}.bind(this), []);
 		}
+
 		_onTemplateSelectorChanged(e, {item, index, hidden, selector}) {
 			const idx = index != null ? index : this._flatData ? this._flatData.indexOf(item) : '',
 				prevInstance = selector.__instance;
@@ -247,11 +260,11 @@
 					highlighted: this.isItemHighlighted(item),
 				},
 				instance = this._getInstance(type, props, prevInstance, item != null),
-				slot = Polymer.dom(selector).querySelector('slot');
+				slot = selector.querySelector('slot');
 
 			slot.setAttribute('name', slotName);
 			instance.element.setAttribute('slot', slotName);
-			Polymer.dom(this).appendChild(
+			this.appendChild(
 				Polymer.Settings.useShadow
 					? instance.root
 					: instance.element
