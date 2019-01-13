@@ -1,56 +1,70 @@
-<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../shadycss/apply-shim.html">
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../polymer/lib/utils/flattened-nodes-observer.html">
 <script>
 /**
  `Cosmoz.GroupedListTemplatizeBehavior`
  */
-(function () {
+(() => {
 	'use strict';
+
 	window.Cosmoz = window.Cosmoz || {};
 
+	const {
+		FlattenedNodesObserver,
+		Templatize,
+		dedupingMixin
+	} = Polymer;
+
 	/** @polymerBehavior */
-	Cosmoz.GroupedListTemplatizeBehavior = {
-		properties: {
-			as: {
-				type: String,
-				value: 'item'
-			},
+	Cosmoz.GroupedListTemplatizeMixin = dedupingMixin(base => class extends base {
+		static get properties() {
+			return {
+				as: {
+					type: String,
+					value: 'item'
+				},
 
-			indexAs: {
-				type: String,
-				value: 'index'
-			},
-		},
+				indexAs: {
+					type: String,
+					value: 'index'
+				},
+			};
+		}
 
-		/**
-		 * Polymer `created` livecycle function.
-		 *
-		 * @returns {void}
-		 */
-		created() {
+
+		constructor() {
+			super();
+
 			this._reusableInstances = [];
 			this._instances = [];
-		},
-		/**
-		 * Polymer `attached` livecycle function.
-		 *
-		 * @returns {void}
-		 */
-		attached() {
-			this._templatesObserver = Polymer.dom(this.$.templates).observeNodes(this._onTemplatesChange.bind(this));
-		},
+			this._boundOnTemplatesChange = this._onTemplatesChange.bind(this);
+		}
 
 		/**
-		 * Polymer `detached` livecycle function.
+		 * Polymer `connectedCallback` livecycle function.
 		 *
 		 * @returns {void}
 		 */
-		detached() {
-			if (this._templatesObserver) {
-				Polymer.dom(this).unobserveNodes(this._templatesObserver);
-				this._templatesObserver = null;
-			}
+		connectedCallback() {
+			super.connectedCallback();
+			this._templatesObserver = new FlattenedNodesObserver(
+				this.$.templates,
+				this._boundOnTemplatesChange
+			);
+		}
+
+		/**
+		 * Polymer `disconnectedCallback` livecycle function.
+		 *
+		 * @returns {void}
+		 */
+		disconnectedCallback() {
+			super.disconnectedCallback();
+			this._templatesObserver.disconnect();
 			this._removeInstances();
-		},
+		}
+
 		/**
 		 * Get instance default properties.
 		 * @returns {object} Default properties.
@@ -64,7 +78,8 @@
 				selected: true,
 				highlighted: true
 			};
-		},
+		}
+
 		/**
 		 * Set template defaults.
 		 * @param {array} addedNodes Added nodes.
@@ -87,7 +102,7 @@
 
 			this._ctors = templates.reduce((ctors, template) => {
 				const type = template.dataset.type;
-				ctors[type] = Polymer.Templatize.templatize(template, this, {
+				ctors[type] = Templatize.templatize(template, this, {
 					instanceProps: this._getInstanceDefaultProps(),
 					parentModel: true,
 					forwardHostProp: this._forwardHostProp,
@@ -95,7 +110,7 @@
 				});
 				return ctors;
 			}, {});
-		},
+		}
 
 		/**
 		 * Reuse an existing TemplateInstance or create a new one if there is not any available.
@@ -139,7 +154,8 @@
 			}
 			instances.push(instance);
 			return instance;
-		},
+		}
+
 		/**
 		 * Get an instance by a matching property value.
 		 * @param {string} prop Property
@@ -149,8 +165,8 @@
 		_getInstanceByProperty(prop, value) {
 			return this._instances
 				.find(instance => this._getInstanceProperty(instance, prop) === value);
+		}
 
-		},
 		/**
 		 * Get an instance property.
 		 * @param {object} instance Instance.
@@ -159,7 +175,8 @@
 		 */
 		_getInstanceProperty(instance, prop) {
 			return instance._getProperty(prop);
-		},
+		}
+
 		/**
 		 * Forward host property.
 		 * @param {string} prop Property.
@@ -170,7 +187,8 @@
 			const forward = instance => instance.forwardHostProp(prop, value);
 			this._instances.forEach(forward);
 			this._reusableInstances.forEach(forward);
-		},
+		}
+
 		/**
 		 * Forward a property.
 		 * @param {object} instance Instance.
@@ -184,7 +202,8 @@
 			if (flush && instance._flushProperties) {
 				instance._flushProperties(true);
 			}
-		},
+		}
+
 		/**
 		 * Forward properties.
 		 * @param {object} instance Instance.
@@ -198,7 +217,8 @@
 			if (flush && instance._flushProperties) {
 				instance._flushProperties(true);
 			}
-		},
+		}
+
 		/**
 		 * Forward a property by item.
 		 * @param {object} item Item.
@@ -213,7 +233,8 @@
 				return;
 			}
 			this._forwardProperty(instance, property, value, flush);
-		},
+		}
+
 		/**
 		 * Detach an instance from the DOM.
 		 * @param {object} instance Instance to detach.
@@ -240,7 +261,8 @@
 			if (!reuse) {
 				instance.element = null;
 			}
-		},
+		}
+
 		/**
 		 * Reuse an instance - remove it from the list, detach it and make it available.
 		 * @param {object} instance Instance to reuse.
@@ -258,7 +280,8 @@
 			instances.splice(index, 1);
 			reusable.push(instance);
 			this._detachInstance(instance, true);
-		},
+		}
+
 		/**
 		 * Remove an instance by removing it from the list and detaching it.
 		 * @param {object} instance Instance to remove.
@@ -279,7 +302,8 @@
 				instances.splice(uidx, 1);
 			}
 			this._detachInstance(instance);
-		},
+		}
+
 		/**
 		 * Remove instances
 		 * @returns {void}
@@ -288,6 +312,7 @@
 			this._reusableInstances.splice(0).forEach(this._detachInstance);
 			this._instances.splice(0).forEach(this._detachInstance);
 		}
-	};
+	});
+
 })();
 </script>
