@@ -60,6 +60,7 @@
 		 * @returns {void}
 		 */
 		disconnectedCallback() {
+			super.disconnectedCallback();
 			this._templatesObserver.disconnect();
 			this._removeInstances();
 		}
