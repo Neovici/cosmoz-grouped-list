@@ -220,7 +220,7 @@
 			}
 			this._groupsMap = new WeakMap();
 
-			return data.reduce(function (flatData, group) {
+			return data.reduce((flatData, group) => {
 				if (!group.items) {
 					console.warn('Incorrect data, group does not have items');
 					return flatData;
@@ -237,7 +237,7 @@
 					return flatData.concat(group);
 				}
 				return flatData;
-			}.bind(this), []);
+			}, []);
 		}
 
 		_onTemplateSelectorChanged(e, {item, index, hidden, selector}) {
