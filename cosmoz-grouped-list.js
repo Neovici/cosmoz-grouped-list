@@ -22,6 +22,8 @@
 			 */
 			this._itemsMap = null;
 
+			this.selectedItems = [];
+
 			this._boundRender = this._render.bind(this);
 		}
 		/**
@@ -203,9 +205,6 @@
 		 * @returns {void|array} Prepared data.
 		 */
 		_prepareData(data = null) {
-
-			this.selectedItems = [];
-
 			if (data === null || data.length === 0 || data[0] === undefined) {
 				this._expandedItems = this._foldedGroups = this._groupsMap = null;
 				return null;
@@ -215,11 +214,12 @@
 			if (!data[0].items) {
 				// no grouping, so render items as a standard list
 				this._groupsMap = null;
+				this.selectedItems = this.selectedItems.filter(i => data.indexOf(i) >= 0);
 				return data.slice();
 			}
 			this._groupsMap = new WeakMap();
 
-			return data.reduce((flatData, group) => {
+			const flatData = data.reduce((flatData, group) => {
 				if (!group.items) {
 					console.warn('Incorrect data, group does not have items');
 					return flatData;
@@ -237,6 +237,10 @@
 				}
 				return flatData;
 			}, []);
+
+			this.selectedItems = this.selectedItems.filter(i => flatData.indexOf(i) >= 0);
+
+			return flatData;
 		}
 
 		_onTemplateSelectorChanged(e, {item, index, hidden, selector}) {
