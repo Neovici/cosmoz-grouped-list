@@ -214,15 +214,15 @@
 			if (!data[0].items) {
 				// no grouping, so render items as a standard list
 				this._groupsMap = null;
-				this.selectedItems = this.selectedItems.filter(i => data.indexOf(i) >= 0);
+				this.selectedItems = this.selectedItems.filter(i => data.includes(i));
 				return data.slice();
 			}
 			this._groupsMap = new WeakMap();
 
-			const flatData = data.reduce((flatData, group) => {
+			const flatData = data.reduce((acc, group) => {
 				if (!group.items) {
 					console.warn('Incorrect data, group does not have items');
-					return flatData;
+					return acc;
 				}
 
 				this._groupsMap.set(group, {
@@ -231,14 +231,14 @@
 				});
 
 				if (group.items.length) {
-					return flatData.concat(group, group.items);
+					return acc.concat(group, group.items);
 				} else if (this.displayEmptyGroups) {
-					return flatData.concat(group);
+					return acc.concat(group);
 				}
-				return flatData;
+				return acc;
 			}, []);
 
-			this.selectedItems = this.selectedItems.filter(i => flatData.indexOf(i) >= 0);
+			this.selectedItems = this.selectedItems.filter(i => flatData.includes(i));
 
 			return flatData;
 		}
