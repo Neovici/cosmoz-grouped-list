@@ -24,6 +24,8 @@
 							ID:<span class="item-id">{{ item.id }}</span>
 							NAME:<span class="item-name">{{ item.name }}</span>
 							VALUE:<span class="item-value">{{ item.value }}</span>
+							SELECTED: <span class="item-selected">{{ selected }}</span>
+							EXPANDED: <span class="item-expanded">{{ expanded }}</span>
 						</div>
 					</div>
 				</template>
@@ -32,6 +34,7 @@
 						NAME:<span class="item-name">{{ item.name }}</span>
 						VALUE: <span class="item-value">{{ item.value }}</span>
 						SELECTED: <span class="item-selected">{{ selected }}</span>
+						FOLDED: <span class="item-expanded">{{ folded }}</span>
 					</div>
 				</template>
 			</cosmoz-grouped-list>
@@ -57,6 +60,117 @@
 			test('creates no maps for empty data', done => {
 				assert.isNull(element._groupsMap);
 				done();
+			});
+		});
+
+		suite('flat data', () => {
+			let element,
+				items;
+
+			setup(done => {
+				element = fixture('basic');
+				items = [{
+					id: 'i0',
+					name: 'item 0',
+					value: 0
+				}, {
+					id: 'i1',
+					name: 'item 1',
+					value: 1
+				}, {
+					id: 'i2',
+					name: 'item 2',
+					value: 1
+				}];
+
+				element._templatesObserver.flush();
+				element.data = items;
+				flush(done);
+			});
+
+			test('attaches a iron-list element', () => {
+				const list = element.$.list;
+				assert.equal(list.is, 'iron-list');
+				assert.equal(list.items.length, 3);
+				assert.equal(list.items[0], items[0]);
+			});
+
+			test('top level items are items', () => {
+				assert.isFalse(element.isGroup(items[0]));
+				assert.isFalse(element.isGroup(items[1]));
+				assert.isFalse(element.isGroup(items[3]));
+			});
+
+			test('selects items', () => {
+				const item = items[0];
+				element.selectItem(item);
+
+				assert.isTrue(getInstanceByItemProperty(element, item, 'selected'));
+				assert.isTrue(element.isItemSelected(item));
+				assert.equal(element.selectedItems.length, 1);
+				assert.equal(element.selectedItems[0], item);
+			});
+
+			test('removing a selected item does not clear rest of selection [#41]', done => {
+				const allItems = items.slice();
+				element.selectItem(allItems[0]);
+				element.selectItem(allItems[1]);
+				element.selectItem(allItems[2]);
+				element.removeItem(allItems[0]);
+				flush(() => {
+					assert.isUndefined(element._getInstanceByProperty('item', allItems[0]));
+					assert.isTrue(getInstanceByItemProperty(element, allItems[1], 'selected'));
+					assert.isTrue(getInstanceByItemProperty(element, allItems[2], 'selected'));
+
+					assert.isFalse(element.isItemSelected(allItems[0]));
+					assert.isTrue(element.isItemSelected(allItems[1]));
+					assert.isTrue(element.isItemSelected(allItems[2]));
+
+					assert.equal(element.selectedItems.length, 2);
+					assert.equal(element.selectedItems[0], allItems[1]);
+					assert.equal(element.selectedItems[1], allItems[2]);
+					done();
+				});
+			});
+		});
+
+		suite('empty-groups', () => {
+			let element;
+			setup(done => {
+				element = fixture('basic');
+				element._templatesObserver.flush();
+				element.data = [{
+					name: 'Group 0',
+					id: 'g0',
+					items: []
+				}, {
+					name: 'Group 1',
+					id: 'g1',
+					items: [{
+						id: 'g1-0',
+						name: 'Group 1 item 0',
+						value: 0
+					}, {
+						id: 'g1-1',
+						name: 'Group 1 item 1',
+						value: 1
+					}]
+				}];
+				flush(done);
+			});
+
+			test('does not render empty groups by default', () => {
+				assert.lengthOf(element.shadowRoot.querySelectorAll('cosmoz-grouped-list-template-selector'), 3);
+			});
+
+			test('renders empty groups when `displayEmptyGroups` is true', done => {
+				element.displayEmptyGroups = true;
+				// force render, because displayEmptyGroups is not observed
+				element._render();
+				flush(() => {
+					assert.lengthOf(element.shadowRoot.querySelectorAll('cosmoz-grouped-list-template-selector'), 4);
+					done();
+				});
 			});
 		});
 
@@ -90,9 +204,6 @@
 						name: 'Group 1 item 1',
 						value: 1
 					}]
-				}, {
-					name: 'Element 1',
-					id: 'e1'
 				}];
 				element._templatesObserver.flush();
 				element.data = groups;
@@ -220,6 +331,25 @@
 				assert.isFalse(getInstanceByItemProperty(element, item, 'selected'));
 				// other items in group remain selected
 				assert.isTrue(getInstanceByItemProperty(element, group.items[0], 'selected'));
+			});
+
+			test('removing a selected item does not clear rest of selection [#41]', done => {
+				const group = groups[0],
+					firstItem = group.items[0],
+					secondItem = group.items[1];
+				element.toggleSelectGroup(group, false);
+				assert.equal(element.selectedItems.length, 2);
+				assert.equal(element.selectedItems[0], firstItem);
+				assert.equal(element.selectedItems[1], secondItem);
+				element.removeItem(firstItem);
+				flush(() => {
+					assert.isFalse(element.isItemSelected(firstItem));
+					assert.isTrue(element.isItemSelected(secondItem));
+
+					assert.equal(element.selectedItems.length, 1);
+					assert.equal(element.selectedItems[0], secondItem);
+					done();
+				});
 			});
 
 			test('selects all items', () => {

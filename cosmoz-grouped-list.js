@@ -343,7 +343,7 @@
 		 * @returns {boolean} Whether item is group.
 		 */
 		isGroup(item) {
-			return this._groupsMap && this._groupsMap.get(item) !== undefined;
+			return item ? item.items instanceof Array : false;
 		}
 		/**
 		 * Returns the group of the specified item
