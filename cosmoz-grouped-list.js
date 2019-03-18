@@ -22,6 +22,8 @@
 			 */
 			this._itemsMap = null;
 
+			this.selectedItems = [];
+
 			this._boundRender = this._render.bind(this);
 		}
 		/**
@@ -203,26 +205,28 @@
 		 * @returns {void|array} Prepared data.
 		 */
 		_prepareData(data = null) {
-
-			this.selectedItems = [];
-
 			if (data === null || data.length === 0 || data[0] === undefined) {
 				this._expandedItems = this._foldedGroups = this._groupsMap = null;
 				return null;
 			}
+
+			// data should be either all items or all grouped items, never mixed
+			this._assertDataIsHomogeneous(data);
+
 			this._itemsMap = new WeakMap();
 
 			if (!data[0].items) {
 				// no grouping, so render items as a standard list
 				this._groupsMap = null;
+				this.selectedItems = this.selectedItems.filter(i => data.includes(i));
 				return data.slice();
 			}
 			this._groupsMap = new WeakMap();
 
-			return data.reduce((flatData, group) => {
+			const flatData = data.reduce((acc, group) => {
 				if (!group.items) {
 					console.warn('Incorrect data, group does not have items');
-					return flatData;
+					return acc;
 				}
 
 				this._groupsMap.set(group, {
@@ -231,12 +235,34 @@
 				});
 
 				if (group.items.length) {
-					return flatData.concat(group, group.items);
+					return acc.concat(group, group.items);
 				} else if (this.displayEmptyGroups) {
-					return flatData.concat(group);
+					return acc.concat(group);
 				}
-				return flatData;
+				return acc;
 			}, []);
+
+			this.selectedItems = this.selectedItems.filter(i => flatData.includes(i));
+
+			return flatData;
+		}
+
+		/**
+		 * Asserts that data is either all items or all groups, never mixed.
+		 * @param  {Array} data the data
+		 * @return {void}
+		 */
+		_assertDataIsHomogeneous(data) {
+			if (!Array.isArray(data) || data.length === 0) {
+				return;
+			}
+
+			const firstItemIsAGroup = Array.isArray(data[0].items),
+				isHomogeneous = data.every(group => Array.isArray(group.items) === firstItemIsAGroup);
+
+			if (!isHomogeneous) {
+				throw new Error('Data must be homogeneous.');
+			}
 		}
 
 		_onTemplateSelectorChanged(e, {item, index, hidden, selector}) {
@@ -339,7 +365,7 @@
 		 * @returns {boolean} Whether item is group.
 		 */
 		isGroup(item) {
-			return this._groupsMap && this._groupsMap.get(item) !== undefined;
+			return item ? item.items instanceof Array : false;
 		}
 		/**
 		 * Returns the group of the specified item
