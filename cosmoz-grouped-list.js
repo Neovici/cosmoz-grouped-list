@@ -209,6 +209,10 @@
 				this._expandedItems = this._foldedGroups = this._groupsMap = null;
 				return null;
 			}
+
+			// data should be either all items or all grouped items, never mixed
+			this._assertDataIsHomogeneous(data);
+
 			this._itemsMap = new WeakMap();
 
 			if (!data[0].items) {
@@ -241,6 +245,24 @@
 			this.selectedItems = this.selectedItems.filter(i => flatData.includes(i));
 
 			return flatData;
+		}
+
+		/**
+		 * Asserts that data is either all items or all groups, never mixed.
+		 * @param  {Array} data the data
+		 * @return {void}
+		 */
+		_assertDataIsHomogeneous(data) {
+			if (!Array.isArray(data) || data.length === 0) {
+				return;
+			}
+
+			const firstItemIsAGroup = Array.isArray(data[0].items),
+				isHomogeneous = data.every(group => Array.isArray(group.items) === firstItemIsAGroup);
+
+			if (!isHomogeneous) {
+				throw new Error('Data must be homogeneous.');
+			}
 		}
 
 		_onTemplateSelectorChanged(e, {item, index, hidden, selector}) {
