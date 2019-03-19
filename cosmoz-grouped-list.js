@@ -10,17 +10,8 @@
 	class CosmozGroupedList extends GroupedListTemplatizeMixin(Polymer.Element) {
 		constructor() {
 			super();
-			/**
-			 * A map of (group,state).
-			 * If source data is grouped, then this map stores group level items, with an associated state object indicating wether
-			 * the group is folded and selected.
-			 */
-			this._groupsMap = null;
 
-			/**
-			 * A map of (item,state), used to store an object indicating wether an item is selected and expanded.
-			 */
-			this._itemsMap = null;
+			this._itemsState = new WeakMap();
 
 			this.selectedItems = [];
 
@@ -205,46 +196,50 @@
 		 * @returns {void|array} Prepared data.
 		 */
 		_prepareData(data = null) {
-			if (data === null || data.length === 0 || data[0] === undefined) {
-				this._expandedItems = this._foldedGroups = this._groupsMap = null;
-				return null;
+			if (!Array.isArray(data)) {
+				return;
 			}
 
 			// data should be either all items or all grouped items, never mixed
 			this._assertDataIsHomogeneous(data);
 
-			this._itemsMap = new WeakMap();
-
-			if (!data[0].items) {
-				// no grouping, so render items as a standard list
-				this._groupsMap = null;
-				this.selectedItems = this.selectedItems.filter(i => data.includes(i));
-				return data.slice();
-			}
-			this._groupsMap = new WeakMap();
-
-			const flatData = data.reduce((acc, group) => {
-				if (!group.items) {
-					console.warn('Incorrect data, group does not have items');
-					return acc;
+			const flatData = data.reduce((acc, item) => {
+				// simple items
+				if (!item.items) {
+					return acc.concat(item);
 				}
 
-				this._groupsMap.set(group, {
-					selected: false,
-					folded: false
-				});
-
-				if (group.items.length) {
-					return acc.concat(group, group.items);
-				} else if (this.displayEmptyGroups) {
-					return acc.concat(group);
+				// groups with items
+				if (item.items.length) {
+					return acc.concat(item, item.items);
 				}
+
+				// groups without items
+				if (this.displayEmptyGroups) {
+					return acc.concat(item);
+				}
+
 				return acc;
 			}, []);
 
+			// keep selected items accross data updates
 			this.selectedItems = this.selectedItems.filter(i => flatData.includes(i));
 
 			return flatData;
+		}
+
+		_getItemState(item) {
+			if (!this._itemsState.has(item)) {
+				const state = {
+					selected: false,
+					folded: false,
+					expanded: false
+				};
+				this._itemsState.set(item, state);
+				return state;
+			}
+
+			return this._itemsState.get(item);
 		}
 
 		/**
@@ -268,14 +263,20 @@
 		_onTemplateSelectorChanged(e, {item, index, hidden, selector}) {
 			const idx = index != null ? index : this._flatData ? this._flatData.indexOf(item) : '',
 				prevInstance = selector.__instance;
+
+			if (!item) {
+				return;
+			}
+
 			if (hidden && prevInstance != null) {
 				this._reuseInstance(prevInstance);
 				selector.__instance = null;
 				return;
 			}
+
 			const slotName = this._getSlotByIndex(idx) + Date.now(),
 				isGroup = this.isGroup(item),
-				type = this._getItemType(item, isGroup),
+				type = this._getItemType(item),
 				props = {
 					[this.as]: item,
 					[this.indexAs]: idx,
@@ -296,6 +297,7 @@
 			);
 			selector.__instance = instance;
 		}
+
 		/**
 		 * Utility method that returns the element that displays the first visible item in the list.
 		 * This method is mainly aimed at `cosmoz-omnitable`.
@@ -322,6 +324,7 @@
 				return instance.element;
 			}
 		}
+
 		/**
 		 * Returns true if this list has rendered data.
 		 * This property returns true if at least one group or item has been rendered by iron-list.
@@ -341,11 +344,12 @@
 		 * This method simply removes the specified item from the `data` using
 		 * Polymer array mutation methods.
 		 * Cannot be used to remove a group.
+		 * @deprecated
 		 * @param {Object} item The item to remove
 		 * @returns {Boolean|undefined} true/false or null
 		 */
 		removeItem(item) {
-			if (this._groupsMap) {
+			if (this.data[0].items) {
 				return this.data.some((group, groupIndex) => {
 					const index = group.items.indexOf(item);
 					if (index >= 0) {
@@ -359,6 +363,7 @@
 				this.splice('data', i, 1);
 			}
 		}
+
 		/**
 		 * Determine if item is a group.
 		 * @param {object} item Item.
@@ -367,25 +372,23 @@
 		isGroup(item) {
 			return item ? item.items instanceof Array : false;
 		}
+
 		/**
 		 * Returns the group of the specified item
 		 * @param {Object} item The item to search for
 		 * @returns {Object|null} The group the item is in or null
 		 */
 		getItemGroup(item) {
-			if (!this._groupsMap) {
-				return;
-			}
 			return this.data.find(group => Array.isArray(group.items) && group.items.indexOf(item) > -1);
 		}
+
 		/**
 		 * Check if group is folded.
 		 * @param {object} group Group.
 		 * @returns {boolean} Whether group is folded.
 		 */
 		isFolded(group) {
-			const groupState = this._groupsMap && this._groupsMap.get(group);
-			return groupState && groupState.folded;
+			return this._getItemState(group).folded;
 		}
 		/**
 		 * Fold or unfold an item depending on previous state.
@@ -408,14 +411,17 @@
 		 * @returns {void}
 		 */
 		unfoldGroup(group) {
-			const groupState = this._groupsMap && this._groupsMap.get(group);
+			const groupState = this._getItemState(group);
 
-			if (groupState && groupState.folded) {
-				groupState.folded = false;
-				const groupFlatIndex = this._flatData.indexOf(group);
-				this.splice.apply(this, ['_flatData', groupFlatIndex + 1, 0].concat(group.items));
-				this._forwardPropertyByItem(group, 'folded', false, true);
+			if (!groupState.folded) {
+				return;
 			}
+
+			groupState.folded = false;
+			const groupFlatIndex = this._flatData.indexOf(group);
+			this.splice.apply(this, ['_flatData', groupFlatIndex + 1, 0].concat(group.items));
+			this._forwardPropertyByItem(group, 'folded', false, true);
+
 		}
 		/**
 		 * Fold a group.
@@ -423,13 +429,16 @@
 		 * @returns {void}
 		 */
 		foldGroup(group) {
-			const groupState = this._groupsMap && this._groupsMap.get(group);
-			if (groupState && !groupState.folded) {
-				groupState.folded = true;
-				const groupFlatIndex = this._flatData.indexOf(group);
-				this.splice('_flatData', groupFlatIndex + 1, group.items.length);
-				this._forwardPropertyByItem(group, 'folded', true, true);
+			const groupState = this._getItemState(group);
+
+			if (groupState.folded) {
+				return;
 			}
+
+			groupState.folded = true;
+			const groupFlatIndex = this._flatData.indexOf(group);
+			this.splice('_flatData', groupFlatIndex + 1, group.items.length);
+			this._forwardPropertyByItem(group, 'folded', true, true);
 		}
 		/**
 		 * Add an item to the list of selected items and set it as selected.
@@ -475,11 +484,12 @@
 			// as all items are not selected anymore
 			const group = this.getItemGroup(item);
 			if (group && this.isGroupSelected(group)) {
-				const groupState = this._groupsMap.get(group);
+				const groupState = this._getItemState(group);
 				groupState.selected = false;
 				this._forwardPropertyByItem(group, 'selected', false, true);
 			}
 		}
+
 		/**
 		 * Check if item is selected.
 		 * @param {object} item Item.
@@ -488,6 +498,7 @@
 		isItemSelected(item) {
 			return this.selectedItems.indexOf(item) >= 0;
 		}
+
 		/**
 		 * Check if item is highlighted.
 		 * @param {object} item Item.
@@ -503,24 +514,23 @@
 		 * @returns {void}
 		 */
 		toggleSelectGroup(group, selected) {
-			const groupState = this._groupsMap && this._groupsMap.get(group);
+			const groupState = this._getItemState(group);
 			const willSelect = selected ? false : true;
 			const itemAction = willSelect ? 'selectItem' : 'deselectItem';
-			if (groupState) {
-				groupState.selected = willSelect;
-			}
+			groupState.selected = willSelect;
 			this._forwardPropertyByItem(group, 'selected', willSelect, true);
 			group.items.forEach(this[itemAction], this);
 		}
+
 		/**
 		 * Check if group is selected.
 		 * @param {object} group Group.
 		 * @returns {boolean} Whether group is selected.
 		 */
 		isGroupSelected(group) {
-			const groupState = this._groupsMap && this._groupsMap.get(group);
-			return groupState !== undefined && groupState.selected;
+			return this._getItemState(group).selected;
 		}
+
 		/**
 		 * Toggle instance selection by value.
 		 * @param {any} value Value.
@@ -534,18 +544,11 @@
 		 * @returns {void}
 		 */
 		selectAll() {
-			const groups = this._groupsMap;
-			let	selected = this.data;
-
-			if (groups) {
-				selected = selected.reduce((all, group) =>  {
-					const state = groups.get(group);
-					if (state) {
-						state.selected = true;
-					}
-					return all.concat(group.items || []);
-				}, []);
-			}
+			const selected = this.data.reduce((all, group) =>  {
+				const state = this._getItemState(group);
+				state.selected = true;
+				return all.concat(group.items || []);
+			}, []);
 			this.splice.apply(this, ['selectedItems', 0, this.selectedItems.length].concat(selected));
 
 			// Set the selected property to all visible items
@@ -556,18 +559,16 @@
 		 * @returns {void}
 		 */
 		deselectAll() {
-
 			this.splice('selectedItems', 0, this.selectedItems.length);
 
-			if (this._groupsMap) {
+			this.data.forEach(group => {
+				if (!group.items) {
+					return;
+				}
 
-				this.data.forEach(group => {
-					const groupState = this._groupsMap.get(group);
-					if (groupState) {
-						groupState.selected = false;
-					}
-				});
-			}
+				const groupState = this._getItemState(group);
+				groupState.selected = false;
+			});
 
 			// Set the selected property to all visible items
 			this._toggleSelected(false);
@@ -597,9 +598,8 @@
 		 * @returns {void}
 		 */
 		toggleCollapse(item) {
-			const	state = this._itemsMap.get(item) || { selected: false, expanded: false },
+			const	state = this._getItemState(item),
 				willExpand = state.expanded = !state.expanded;
-			this._itemsMap.set(item, state);
 			this._forwardPropertyByItem(item, 'expanded', willExpand, true);
 			this.$.list.updateSizeForItem(item);
 		}
@@ -609,8 +609,7 @@
 		 * @returns {boolean} Whether the item is expanded.
 		 */
 		isExpanded(item) {
-			const itemState = this._itemsMap ? this._itemsMap.get(item) : undefined;
-			return itemState !== undefined && itemState.expanded;
+			return this._getItemState(item).expanded;
 		}
 		/**
 		 * Get slot by index.
@@ -626,8 +625,8 @@
 		 * @param {boolean} isGroup Whether item is a group.
 		 * @returns {string} Item type.
 		 */
-		_getItemType(item, isGroup = this.isGroup(item)) {
-			return isGroup ? 'group' : 'item';
+		_getItemType(item) {
+			return this.isGroup(item) ? 'group' : 'item';
 		}
 	}
 	customElements.define(CosmozGroupedList.is, CosmozGroupedList);
