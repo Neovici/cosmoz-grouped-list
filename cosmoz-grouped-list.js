@@ -196,6 +196,10 @@
 		 * @returns {void|array} Prepared data.
 		 */
 		_prepareData(data = null) {
+			if (!Array.isArray(data)) {
+				return;
+			}
+
 			// data should be either all items or all grouped items, never mixed
 			this._assertDataIsHomogeneous(data);
 
