@@ -544,10 +544,11 @@
 		 * @returns {void}
 		 */
 		selectAll() {
-			const selected = this.data.reduce((all, group) =>  {
-				const state = this._getItemState(group);
+			const selected = this.data.reduce((all, item) =>  {
+				const state = this._getItemState(item);
 				state.selected = true;
-				return all.concat(group.items || []);
+				// select both groups and flat items
+				return all.concat(item.items || item);
 			}, []);
 			this.splice.apply(this, ['selectedItems', 0, this.selectedItems.length].concat(selected));
 

@@ -133,6 +133,20 @@
 					done();
 				});
 			});
+
+			test('select all items [#977]', () => {
+				const allItems = items.slice();
+				element.selectAll();
+
+				assert.isTrue(element.isItemSelected(allItems[0]));
+				assert.isTrue(element.isItemSelected(allItems[1]));
+				assert.isTrue(element.isItemSelected(allItems[2]));
+
+				assert.equal(element.selectedItems.length, 3);
+				assert.equal(element.selectedItems[0], allItems[0]);
+				assert.equal(element.selectedItems[1], allItems[1]);
+				assert.equal(element.selectedItems[2], allItems[2]);
+			});
 		});
 
 		suite('empty-groups', () => {
