@@ -114,86 +114,80 @@
 		</div>
 	</template>
 	<script type="text/javascript">
-	(function () {
-		'use strict';
+		/*global Polymer*/
+		class XDialogContainer extends Polymer.Element {
+			static get is() {
+				return 'demo-full';
+			}
+			static get properties() {
+				return {
+					data: {
+						type: Array,
+						notify: true
+					},
+					selectedItems: {
+						type: Array
+					},
+					outerValue: {
+						type: Number,
+						value: 0
+					},
+					groupIndex: {
+						type: Number,
+						value: 2
+					},
+					itemIndex: {
+						type: Number,
+						value: 0
+					},
+					itemValue: {
+						type: Number,
+						value: 100
+					}
+				};
+			}
 
-		Polymer({
-			is: 'demo-full',
-			properties: {
-				data: {
-					type: Array,
-					notify: true
-				},
-				selectedItems: {
-					type: Array
-				},
-				outerValue: {
-					type: Number,
-					value: 0
-				},
-				groupIndex: {
-					type: Number,
-					value: 2
-				},
-				itemIndex: {
-					type: Number,
-					value: 0
-				},
-				itemValue: {
-					type: Number,
-					value: 100
-				}
-
-			},
-			behaviors: [
-				Cosmoz.ListDemoBehavior
-			],
-
-			attached: function () {
+			connectedCallback() {
 				this.async(function () {
-					var data = this.generateListDemoData(10, 13, 1, 7);
-					this.data = data;
+					this.data = Cosmoz.Demo.generateListDemoData(10, 13, 1, 7);
 				}.bind(this), 16);
-			},
+			}
 
-			removeSelected: function () {
-				var i,
-					item;
-
+			removeSelected() {
 				if (this.selectedItems.length === 0) {
 					return;
 				}
 				// !!!WARN: do not use removeItem using forEach on this.selectedItems,
 				// as removing an item will remove it from the selection
-				for (i = this.selectedItems.length - 1 ; i >= 0 ; i -= 1) {
-					item = this.selectedItems[i];
+				for (let i = this.selectedItems.length - 1 ; i >= 0 ; i -= 1) {
+					const item = this.selectedItems[i];
 					this.$.groupedList.removeItem(item);
 				}
-			},
+			}
 
-			toggleFold: function (event) {
+			toggleFold(event) {
 				const { model: {item }} = event;
 				this.$.groupedList.toggleFold(item);
-			},
+			}
 
-			toggleSelect: function (event) {
-				var
+			toggleSelect(event) {
+				const
 					model = event.model,
 					group = model.item,
 					selected = model.selected;
 
 				this.$.groupedList.toggleSelectGroup(group, selected);
-			},
+			}
 
-			getFoldIcon: function (folded) {
+			getFoldIcon(folded) {
 				if (folded) {
 					return 'expand-more';
 				}
 				return 'expand-less';
-			},
+			}
 
-			select: function (event) {
-				var
+			select(event) {
+				const
 					model = event.model,
 					item = model.item,
 					selected = model.selected;
@@ -202,71 +196,66 @@
 				} else {
 					this.$.groupedList.selectItem(item);
 				}
-			},
+			}
 
-			highlight: function (event) {
-				var
+			highlight(event) {
+				const
 					model = event.model,
 					item = model.item,
 					highlighted = model.highlighted;
 				this.$.groupedList.highlightItem(item, highlighted);
-			},
+			}
 
-			selectAll: function () {
+			selectAll() {
 				this.$.groupedList.selectAll();
-			},
+			}
 
-			deselectAll: function () {
+			deselectAll() {
 				this.$.groupedList.deselectAll();
-			},
+			}
 
-			_emptySelectedItems: function () {
+			_emptySelectedItems() {
 				this.selectedItems = [];
-			},
+			}
 
-			toggleCollapse: function (event) {
+			toggleCollapse(event) {
 				this.$.groupedList.toggleCollapse(event.model.item);
-			},
+			}
 
-			_computeExtraContentClass: function (expanded) {
+			_computeExtraContentClass(expanded) {
 				return expanded ? 'extra-content expanded' : 'extra-content';
-			},
+			}
 
-			_changeItemValue: function () {
+			_changeItemValue() {
 				if (this.data[0].items) {
 					this.set('data.' + this.groupIndex + '.items.' + this.itemIndex + '.value', this.itemValue);
 				} else {
 					this.set('data.' + this.itemIndex + '.value', this.itemValue);
 				}
-			},
-			_changeOuterValue: function () {
+			}
+			_changeOuterValue() {
 				this.outerValue += 1;
-			},
-
-			_emptyData: function () {
-				this.data = [];
-			},
-
-			_newData: function () {
-				this.data = this.generateListDemoData(10, 15, 1, 7);
-			},
-
-			_newSmallData: function () {
-				this.data = this.generateListDemoData(1, 1, 2, 3);
-			},
-
-			_newFlatData: function () {
-				var data = this.generateListDemoData(3, 3, 50, 80);
-				this.data = data[3].items;
-			},
-			_firstVisibleItem: function () {
-				console.log(this.$.groupedList.getFirstVisibleItemElement());
 			}
 
+			_emptyData() {
+				this.data = [];
+			}
 
-		});
+			_newData() {
+				this.data = Cosmoz.Demo.generateListDemoData(10, 15, 1, 7);
+			}
 
-	}());
+			_newSmallData() {
+				this.data = Cosmoz.Demo.generateListDemoData(1, 1, 2, 3);
+			}
 
+			_newFlatData() {
+				const data = Cosmoz.Demo.generateListDemoData(3, 3, 50, 80);
+				this.data = data[3].items;
+			}
+			_firstVisibleItem() {
+				console.log(this.$.groupedList.getFirstVisibleItemElement());
+			}
+		}
 	</script>
 </dom-module>

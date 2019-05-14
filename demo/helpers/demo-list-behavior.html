@@ -1,53 +1,44 @@
 <script>
 	window.Cosmoz = window.Cosmoz || {};
 
+	Cosmoz.Demo = Cosmoz.Demo || {};
+
 	function getRandomInt(min, max) {
 		return Math.floor(Math.random() * (max - min + 1)) + min;
 	}
 
-	// function getRandomDate() {
-	// 	return new Date(2015, getRandomInt(1, 12), getRandomInt(1, 28));
-	// }
+	Cosmoz.Demo.generateListDemoData = function (groupsMin, groupsMax, itemsMin, itemsMax) {
+		const
+			data = [],
+			groupsCount = getRandomInt(groupsMin, groupsMax);
+		let n = 0,
+			itemsCount,
+			group;
 
-	/**
-	 * @polymerBehavior Cosmoz.ListDemoBehavior
-	 */
-	Cosmoz.ListDemoBehavior = {
-		generateListDemoData: function (groupsMin, groupsMax, itemsMin, itemsMax) {
-			var
-				data = [],
-				groupsCount = getRandomInt(groupsMin, groupsMax),
-				i,
-				j,
-				n = 0,
-				itemsCount,
-				group;
+		// Adds an empty group at the beginning
+		data.push({
+			name: 'Group 00',
+			items: []
+		});
 
-			// Adds an empty group at the beginning
-			data.push({
-				name: 'Group 00',
+		for (let i = 0; i < groupsCount; i += 1) {
+			group =  {
+				name: 'Group ' + i,
 				items: []
-			});
-			for (i = 0; i < groupsCount; i += 1) {
-				group =  {
-					name: 'Group ' + i,
-					items: []
-				};
+			};
 
-				itemsCount = getRandomInt(itemsMin, itemsMax);
-				for (j = 0; j < itemsCount; j += 1) {
-					group.items.push({
-						id: n,
-						name: group.name + ' item ' + j,
-						value: 0
-					});
-					n += 1;
-				}
-				data.push(group);
+			itemsCount = getRandomInt(itemsMin, itemsMax);
+			for (let j = 0; j < itemsCount; j += 1) {
+				group.items.push({
+					id: n,
+					name: group.name + ' item ' + j,
+					value: 0
+				});
+				n += 1;
 			}
-			console.log('generated ' + n + ' data items');
-			return data;
+			data.push(group);
 		}
-
-	};
+		console.log('generated ' + n + ' data items');
+		return data;
+	}
 </script>
