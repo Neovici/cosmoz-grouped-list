@@ -62,48 +62,50 @@
 		</div>
 	</template>
 	<script type="text/javascript">
-	(function () {
-		'use strict';
-
-		Polymer({
-			is: 'demo-basic',
-			properties: {
-				data: {
-					type: Array,
-					notify: true,
-					value: function () {
-						return  [{
-							name: 'Group 0',
-							id: 'g0',
-							items: [{
-								id: 'g0-0',
-								name: 'Group 0 item 0',
-								value: 0
-							}, {
-								id: 'g0-1',
-								name: 'Group 0 item 1',
-								value: 1
-							}]
-						}, {
-							name: 'Group 1',
-							id: 'g1',
-							items: [{
-								id: 'g1-0',
-								name: 'Group 1 item 0',
-								value: 0
-							}, {
-								id: 'g1-1',
-								name: 'Group 1 item 1',
-								value: 1
-							}]
-						}];
-					}
-				},
-				selectedItems: {
-					type: Array
-				},
+		/*global Polymer*/
+		class DemoBasic extends Polymer.Element {
+			static get is() {
+				return 'demo-basic';
 			}
-		});
-	}());
+			static get properties() {
+				return {
+					data: {
+						type: Array,
+						notify: true,
+						value: function () {
+							return  [{
+								name: 'Group 0',
+								id: 'g0',
+								items: [{
+									id: 'g0-0',
+									name: 'Group 0 item 0',
+									value: 0
+								}, {
+									id: 'g0-1',
+									name: 'Group 0 item 1',
+									value: 1
+								}]
+							}, {
+								name: 'Group 1',
+								id: 'g1',
+								items: [{
+									id: 'g1-0',
+									name: 'Group 1 item 0',
+									value: 0
+								}, {
+									id: 'g1-1',
+									name: 'Group 1 item 1',
+									value: 1
+								}]
+							}];
+						}
+					},
+					selectedItems: {
+						type: Array
+					},
+				}
+			}
+		}
+		customElements.define(DemoBasic.is, DemoBasic);
 	</script>
 </dom-module>

@@ -115,7 +115,7 @@
 	</template>
 	<script type="text/javascript">
 		/*global Polymer*/
-		class XDialogContainer extends Polymer.Element {
+		class DemoFull extends Polymer.Element {
 			static get is() {
 				return 'demo-full';
 			}
@@ -148,7 +148,8 @@
 			}
 
 			connectedCallback() {
-				this.async(function () {
+				super.connectedCallback();
+				window.setTimeout(function () {
 					this.data = Cosmoz.Demo.generateListDemoData(10, 13, 1, 7);
 				}.bind(this), 16);
 			}
@@ -257,5 +258,6 @@
 				console.log(this.$.groupedList.getFirstVisibleItemElement());
 			}
 		}
+		customElements.define(DemoFull.is, DemoFull);
 	</script>
 </dom-module>
