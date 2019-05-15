@@ -7,7 +7,7 @@
 		return Math.floor(Math.random() * (max - min + 1)) + min;
 	}
 
-	Cosmoz.Demo.generateListDemoData = function (groupsMin, groupsMax, itemsMin, itemsMax) {
+	Cosmoz.Demo.generateListDemoData = (groupsMin, groupsMax, itemsMin, itemsMax) => {
 		const
 			data = [],
 			groupsCount = getRandomInt(groupsMin, groupsMax);
