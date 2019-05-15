@@ -62,17 +62,17 @@
 		</div>
 	</template>
 	<script type="text/javascript">
-	(function () {
-		'use strict';
-
-		Polymer({
-			is: 'demo-basic',
-			properties: {
-				data: {
-					type: Array,
-					notify: true,
-					value: function () {
-						return  [{
+		/*global Polymer*/
+		class DemoBasic extends Polymer.Element {
+			static get is() {
+				return 'demo-basic';
+			}
+			static get properties() {
+				return {
+					data: {
+						type: Array,
+						notify: true,
+						value: () => [{
 							name: 'Group 0',
 							id: 'g0',
 							items: [{
@@ -96,14 +96,14 @@
 								name: 'Group 1 item 1',
 								value: 1
 							}]
-						}];
-					}
-				},
-				selectedItems: {
-					type: Array
-				},
+						}]
+					},
+					selectedItems: {
+						type: Array
+					},
+				};
 			}
-		});
-	}());
+		}
+		customElements.define(DemoBasic.is, DemoBasic);
 	</script>
 </dom-module>
