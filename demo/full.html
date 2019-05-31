@@ -15,17 +15,33 @@
 	<link rel="import" href="../../iron-flex-layout/iron-flex-layout.html"/>
 	<link rel="import" href="../../iron-flex-layout/iron-flex-layout-classes.html"/>
 
-	<link rel="import" href="./helpers/demo-full.html" />
+	<script type="module" src="./helpers/demo-full.js"></script>
 
-	<custom-style>
+	<!-- FIXME(polymer-modulizer):
+				These imperative modules that innerHTML your HTML are
+				a hacky way to be sure that any mixins in included style
+				modules are ready before any elements that reference them are
+				instantiated, otherwise the CSS @apply mixin polyfill won't be
+				able to expand the underlying CSS custom properties.
+				See: https://github.com/Polymer/polymer-modulizer/issues/154
+				-->
+		<script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<custom-style>
 		<style is="custom-style" include="demo-pages-shared-styles iron-flex iron-flex-alignment iron-positioning"></style>
-	</custom-style>
+	</custom-style>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
 </head>
 <body class="fullbleed">
-	<demo-full class="fit"></demo-full>
-	<script type="text/javascript">
-		(function () {
-			//
-		})();
-	</script>
+	<script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<demo-full class="fit"></demo-full>`;
+document.body.appendChild($_documentContainer.content);
+</script>
+	<script type="module">
+import './helpers/demo-full.js';
+</script>
 </body></html>

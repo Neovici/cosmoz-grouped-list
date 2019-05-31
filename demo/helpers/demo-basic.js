@@ -1,12 +1,8 @@
-<link rel="import" href="../../../polymer/polymer.html" />
-
-<link rel="import" href="../../../iron-flex-layout/iron-flex-layout.html" />
-<link rel="import" href="../../../iron-flex-layout/iron-flex-layout-classes.html" />
-
-<link rel="import" href="../../cosmoz-grouped-list.html" />
-
-<dom-module id="demo-basic">
-	<template>
+import '../../cosmoz-grouped-list.js';
+/*global Polymer*/
+class DemoBasic extends Polymer.Element {
+	static get template() {
+		return Polymer.html`
 		<style include="iron-flex iron-flex-alignment iron-positioning">
 			.group-header {
 				padding: 5px;
@@ -60,50 +56,47 @@
 				</template>
 			</cosmoz-grouped-list>
 		</div>
-	</template>
-	<script type="text/javascript">
-		/*global Polymer*/
-		class DemoBasic extends Polymer.Element {
-			static get is() {
-				return 'demo-basic';
-			}
-			static get properties() {
-				return {
-					data: {
-						type: Array,
-						notify: true,
-						value: () => [{
-							name: 'Group 0',
-							id: 'g0',
-							items: [{
-								id: 'g0-0',
-								name: 'Group 0 item 0',
-								value: 0
-							}, {
-								id: 'g0-1',
-								name: 'Group 0 item 1',
-								value: 1
-							}]
-						}, {
-							name: 'Group 1',
-							id: 'g1',
-							items: [{
-								id: 'g1-0',
-								name: 'Group 1 item 0',
-								value: 0
-							}, {
-								id: 'g1-1',
-								name: 'Group 1 item 1',
-								value: 1
-							}]
-						}]
-					},
-					selectedItems: {
-						type: Array
-					},
-				};
-			}
-		}
-		customElements.define(DemoBasic.is, DemoBasic);
-	</script>
-</dom-module>
+`;
+	}
+
+	static get is() {
+		return 'demo-basic';
+	}
+	static get properties() {
+		return {
+			data: {
+				type: Array,
+				notify: true,
+				value: () => [{
+					name: 'Group 0',
+					id: 'g0',
+					items: [{
+						id: 'g0-0',
+						name: 'Group 0 item 0',
+						value: 0
+					}, {
+						id: 'g0-1',
+						name: 'Group 0 item 1',
+						value: 1
+					}]
+				}, {
+					name: 'Group 1',
+					id: 'g1',
+					items: [{
+						id: 'g1-0',
+						name: 'Group 1 item 0',
+						value: 0
+					}, {
+						id: 'g1-1',
+						name: 'Group 1 item 1',
+						value: 1
+					}]
+				}]
+			},
+			selectedItems: {
+				type: Array
+			},
+		};
+	}
+}
+customElements.define(DemoBasic.is, DemoBasic);
