@@ -1,13 +1,9 @@
-window.Cosmoz = window.Cosmoz || {};
-
-const {
-	FlattenedNodesObserver,
-	Templatize,
-	dedupingMixin
-} = Polymer;
+import { dedupingMixin } from '@polymer/polymer/lib/utils/mixin.js';
+import { FlattenedNodesObserver } from '@polymer/polymer/lib/utils/flattened-nodes-observer.js';
+import { Templatize } from '@polymer/polymer/lib/utils/templatize.js';
 
 /** @polymerBehavior */
-Cosmoz.GroupedListTemplatizeMixin = dedupingMixin(base => class extends base {
+export const GroupedListTemplatizeMixin = dedupingMixin(base => class extends base {
 	static get properties() {
 		return {
 			as: {
@@ -235,16 +231,15 @@ Cosmoz.GroupedListTemplatizeMixin = dedupingMixin(base => class extends base {
 		if (!instance) {
 			return;
 		}
-		const {children, root} = instance,
-			dom = Polymer.dom;
+		const {children, root} = instance;
 
 		for (let i = 0; i < children.length; i++) {
 			const child = children[i],
 				parent = child.parentNode;
 			if (reuse) {
-				dom(root).appendChild(child);
+				root.appendChild(child);
 			} else if (parent !== null) {
-				dom(parent).removeChild(child);
+				parent.removeChild(child);
 			}
 		}
 

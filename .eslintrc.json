@@ -8,13 +8,6 @@
 		"sourceType": "module"
 	},
 	"extends": "eslint:recommended",
-	"globals": {
-		"Cosmoz": false,
-		"CustomElements": false,
-		"HTMLImports": false,
-		"Polymer": false,
-		"WeakMap": false
-	},
 	"plugins": [
 		"html"
 	],

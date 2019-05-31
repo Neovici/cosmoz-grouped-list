@@ -13,9 +13,12 @@
  * @polymer
  * @demo demo/index.html
  */
-class TemplateSelector extends Polymer.Element {
+
+import { PolymerElement, html } from '@polymer/polymer';
+
+export class TemplateSelector extends PolymerElement {
 	static get template() {
-		return Polymer.html`
+		return html`
 		<style>
 			:host ::slotted([hidden]) {
 				display: none !important;

@@ -11,19 +11,16 @@ with features like group count display and folding
 @demo demo/full.html Full Demo
 @demo demo/basic.html Basic Demo
 */
-import './cosmoz-grouped-list-templatize-behavior.js';
+import { PolymerElement, html } from '@polymer/polymer';
+import { timeOut } from '@polymer/polymer/lib/utils/async.js';
+import { Debouncer, enqueueDebouncer } from '@polymer/polymer/lib/utils/debounce.js';
 
+import { GroupedListTemplatizeMixin } from './cosmoz-grouped-list-templatize-behavior.js';
 import './cosmoz-grouped-list-template-selector.js';
-const { GroupedListTemplatizeMixin } = Cosmoz,
-	{
-		Async,
-		Debouncer,
-		enqueueDebouncer
-	} = Polymer;
 
-class CosmozGroupedList extends GroupedListTemplatizeMixin(Polymer.Element) {
+export class CosmozGroupedList extends GroupedListTemplatizeMixin(PolymerElement) {
 	static get template() {
-		return Polymer.html`
+		return html`
 		<style>
 			:host {
 				display: block;
@@ -47,12 +44,12 @@ class CosmozGroupedList extends GroupedListTemplatizeMixin(Polymer.Element) {
 		<iron-list id="list" items="[[ _flatData ]]" as="item">
 			<template>
 				<cosmoz-grouped-list-template-selector item="[[ item ]]" index="[[ index ]]" on-cosmoz-selector-changed="_onTemplateSelectorChanged">
-						<slot></slot>
+					<slot></slot>
 				</cosmoz-grouped-list-template-selector>
 			</template>
 		</iron-list>
 		<slot name="templates" id="templates"></slot>
-`;
+	`;
 	}
 
 	constructor() {
@@ -166,7 +163,7 @@ class CosmozGroupedList extends GroupedListTemplatizeMixin(Polymer.Element) {
 		enqueueDebouncer(
 			this._renderDebouncer = Debouncer.debounce(
 				this._renderDebouncer,
-				Async.timeOut.after(30),
+				timeOut.after(30),
 				this._boundRender
 			)
 		);
