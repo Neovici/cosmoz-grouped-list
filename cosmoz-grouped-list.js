@@ -14,6 +14,10 @@ with features like group count display and folding
 import { PolymerElement, html } from '@polymer/polymer';
 import { timeOut } from '@polymer/polymer/lib/utils/async.js';
 import { Debouncer, enqueueDebouncer } from '@polymer/polymer/lib/utils/debounce.js';
+import { useShadow } from '@polymer/polymer/lib/utils/settings';
+
+import '@polymer/iron-list/iron-list.js';
+import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
 
 import { GroupedListTemplatizeMixin } from './cosmoz-grouped-list-templatize-behavior.js';
 import './cosmoz-grouped-list-template-selector.js';
@@ -335,7 +339,7 @@ export class CosmozGroupedList extends GroupedListTemplatizeMixin(PolymerElement
 		slot.setAttribute('name', slotName);
 		instance.element.setAttribute('slot', slotName);
 		this.appendChild(
-			undefined.useShadow
+			useShadow
 				? instance.root
 				: instance.element
 		);

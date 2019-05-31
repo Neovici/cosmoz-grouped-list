@@ -4,44 +4,18 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-	<title>Cosmoz Grouped List</title>
+	<title>cosmoz-grouped-list Full Demo</title>
 
-	<script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+	<script src="/components/@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
 
-	<link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html" />
-	<link rel="import" href="../../iron-demo-helpers/demo-snippet.html" />
-
-
-	<link rel="import" href="../../iron-flex-layout/iron-flex-layout.html"/>
-	<link rel="import" href="../../iron-flex-layout/iron-flex-layout-classes.html"/>
-
+	<script type="module" src="/components/@polymer/iron-flex-layout/iron-flex-layout-classes.js"></script>
+	<script type="module" src="/components/@polymer/iron-demo-helpers/demo-pages-shared-styles.js"></script>
 	<script type="module" src="./helpers/demo-full.js"></script>
 
-	<!-- FIXME(polymer-modulizer):
-				These imperative modules that innerHTML your HTML are
-				a hacky way to be sure that any mixins in included style
-				modules are ready before any elements that reference them are
-				instantiated, otherwise the CSS @apply mixin polyfill won't be
-				able to expand the underlying CSS custom properties.
-				See: https://github.com/Polymer/polymer-modulizer/issues/154
-				-->
-		<script type="module">
-const $_documentContainer = document.createElement('template');
-
-$_documentContainer.innerHTML = `<custom-style>
-		<style is="custom-style" include="demo-pages-shared-styles iron-flex iron-flex-alignment iron-positioning"></style>
-	</custom-style>`;
-
-document.body.appendChild($_documentContainer.content);
-</script>
 </head>
-<body class="fullbleed">
-	<script type="module">
-const $_documentContainer = document.createElement('template');
-$_documentContainer.innerHTML = `<demo-full class="fit"></demo-full>`;
-document.body.appendChild($_documentContainer.content);
-</script>
-	<script type="module">
-import './helpers/demo-full.js';
-</script>
+<body>
+	<custom-style>
+		<style is="custom-style" include="demo-pages-shared-styles iron-flex iron-flex-alignment iron-positioning"></style>
+	</custom-style>
+	<demo-full class="fit"></demo-full>
 </body></html>

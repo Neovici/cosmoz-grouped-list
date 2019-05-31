@@ -1,12 +1,8 @@
-window.Cosmoz = window.Cosmoz || {};
-
-Cosmoz.Demo = Cosmoz.Demo || {};
-
 function getRandomInt(min, max) {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-Cosmoz.Demo.generateListDemoData = (groupsMin, groupsMax, itemsMin, itemsMax) => {
+export const generateListDemoData = (groupsMin, groupsMax, itemsMin, itemsMax) => {
 	const
 		data = [],
 		groupsCount = getRandomInt(groupsMin, groupsMax);
