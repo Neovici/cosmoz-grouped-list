@@ -1,6 +1,6 @@
 import { dedupingMixin } from '@polymer/polymer/lib/utils/mixin.js';
 import { FlattenedNodesObserver } from '@polymer/polymer/lib/utils/flattened-nodes-observer.js';
-import { Templatize } from '@polymer/polymer/lib/utils/templatize.js';
+import { templatize } from '@polymer/polymer/lib/utils/templatize.js';
 
 /** @polymerBehavior */
 export const GroupedListTemplatizeMixin = dedupingMixin(base => class extends base {
@@ -88,7 +88,7 @@ export const GroupedListTemplatizeMixin = dedupingMixin(base => class extends ba
 
 		this._ctors = templates.reduce((ctors, template) => {
 			const type = template.dataset.type;
-			ctors[type] = Templatize.templatize(template, this, {
+			ctors[type] = templatize(template, this, {
 				instanceProps: this._getInstanceDefaultProps(),
 				parentModel: true,
 				forwardHostProp: this._forwardHostProp,
