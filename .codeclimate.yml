@@ -43,4 +43,5 @@ plugins:
 exclude_patterns:
   - "node_modules/"
   - "tests/"
+  - "demo/"
   - "*.bak"
