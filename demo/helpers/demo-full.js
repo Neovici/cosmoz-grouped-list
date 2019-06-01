@@ -1,5 +1,8 @@
 import { PolymerElement, html } from '@polymer/polymer';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
+import '@polymer/paper-dropdown-menu/paper-dropdown-menu-light.js';
+import '@polymer/paper-item/paper-item.js';
+import '@polymer/paper-listbox/paper-listbox.js';
 
 import '../../cosmoz-grouped-list.js';
 import { generateListDemoData } from './demo-list-helper.js';
