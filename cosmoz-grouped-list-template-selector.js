@@ -1,17 +1,9 @@
 /**
-@demo demo/full.html Full Demo
-*/
-/*
-	FIXME(polymer-modulizer): the above comments were extracted
-	from HTML and may be out of place here. Review them and
-	then delete this comment!
-*/
-/**
  * # TemplateSelector
  *
  * @customElement
  * @polymer
- * @demo demo/index.html
+ * @demo demo/full.html Full Demo
  */
 
 import { PolymerElement, html } from '@polymer/polymer';
