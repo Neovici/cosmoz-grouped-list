@@ -110,7 +110,7 @@ export class CosmozGroupedList extends GroupedListTemplatizeMixin(PolymerElement
 			},
 
 			_flatData: {
-				type: Array,
+				type: Array
 			}
 
 		};
@@ -189,16 +189,17 @@ export class CosmozGroupedList extends GroupedListTemplatizeMixin(PolymerElement
 	 * @returns {void}
 	 */
 	_forwardItemPath(path, value) {
-		const match = path.match(/data(?:\.#?(\d+)\.items)?\.#?(\d+)(\..+)$/i);
+		const match = path.match(/data(?:\.#?(\d+)\.items)?\.#?(\d+)(\..+)$/ui);
 
 		if (!match) {
 			return;
 		}
 
 		const groupIndex = match[1],
-			itemIndex =	 match[2],
+			itemIndex = match[2],
 			propertyPath = 'item' + match[3],
-			item =	groupIndex ? this.data[groupIndex].items[itemIndex] : itemIndex ? this.data[itemIndex] : null;
+			items = groupIndex ? this.data[groupIndex].items : this.data,
+			item = items ? items[itemIndex] : null;
 
 		if (item == null) {
 			console.warn('Item not found when forwarding path', path);
@@ -213,10 +214,7 @@ export class CosmozGroupedList extends GroupedListTemplatizeMixin(PolymerElement
 		}
 
 		instance._setPendingPropertyOrPath(propertyPath, value, false, true);
-
-		if (instance._flushProperties) {
-			instance._flushProperties(true);
-		}
+		instance._flushProperties(true);
 
 		return true;
 	}
@@ -308,8 +306,10 @@ export class CosmozGroupedList extends GroupedListTemplatizeMixin(PolymerElement
 		}
 	}
 
-	_onTemplateSelectorChanged(e, {item, index, hidden, selector}) {
-		const idx = index != null ? index : this._flatData ? this._flatData.indexOf(item) : '',
+	_onTemplateSelectorChanged(e, { item, index, hidden, selector }) {
+		const
+			fidx = this._flatData ? this._flatData.indexOf(item) : '',
+			idx = index == null ? fidx : index,
 			prevInstance = selector.__instance;
 
 		if (!item) {
@@ -330,8 +330,8 @@ export class CosmozGroupedList extends GroupedListTemplatizeMixin(PolymerElement
 				[this.indexAs]: idx,
 				selected: isGroup ? this.isGroupSelected(item) : this.isItemSelected(item),
 				folded: isGroup ? this.isFolded(item) : undefined,
-				expanded: !isGroup ? this.isExpanded(item) : undefined,
-				highlighted: this.isItemHighlighted(item),
+				expanded: isGroup ? undefined : this.isExpanded(item),
+				highlighted: this.isItemHighlighted(item)
 			},
 			instance = this._getInstance(type, props, prevInstance, item != null),
 			slot = selector.querySelector('slot');
@@ -404,6 +404,7 @@ export class CosmozGroupedList extends GroupedListTemplatizeMixin(PolymerElement
 					this.splice('data.' + groupIndex + '.items', index, 1);
 					return true;
 				}
+				return false;
 			}, this);
 		}
 		const i = this.data.indexOf(item);
@@ -563,7 +564,7 @@ export class CosmozGroupedList extends GroupedListTemplatizeMixin(PolymerElement
 	 */
 	toggleSelectGroup(group, selected) {
 		const groupState = this._getItemState(group);
-		const willSelect = selected ? false : true;
+		const willSelect = !selected;
 		const itemAction = willSelect ? 'selectItem' : 'deselectItem';
 		groupState.selected = willSelect;
 		this._forwardPropertyByItem(group, 'selected', willSelect, true);

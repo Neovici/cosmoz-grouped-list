@@ -141,9 +141,9 @@ class DemoFull extends PolymerElement {
 
 	connectedCallback() {
 		super.connectedCallback();
-		window.setTimeout(function () {
+		window.setTimeout(() => {
 			this.data = generateListDemoData(10, 13, 1, 7);
-		}.bind(this), 16);
+		}, 16);
 	}
 
 	removeSelected() {

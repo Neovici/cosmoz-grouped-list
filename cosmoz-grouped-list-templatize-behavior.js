@@ -14,7 +14,7 @@ export const GroupedListTemplatizeMixin = dedupingMixin(base => class extends ba
 			indexAs: {
 				type: String,
 				value: 'index'
-			},
+			}
 		};
 	}
 

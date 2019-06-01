@@ -97,7 +97,7 @@ class DemoBasic extends PolymerElement {
 			},
 			selectedItems: {
 				type: Array
-			},
+			}
 		};
 	}
 }

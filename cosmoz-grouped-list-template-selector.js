@@ -40,7 +40,7 @@ export class TemplateSelector extends PolymerElement {
 			hidden: {
 				type: Boolean,
 				observer: '_onHiddenChanged'
-			},
+			}
 		};
 	}
 	/**
@@ -114,7 +114,7 @@ export class TemplateSelector extends PolymerElement {
 			bubbles: true,
 			composed: true,
 			detail: Object.assign({
-				selector: this,
+				selector: this
 			}, props)
 		}));
 	}
