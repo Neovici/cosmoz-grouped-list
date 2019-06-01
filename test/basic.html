@@ -5,42 +5,40 @@
 	<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
 	<title>cosmoz-grouped-list basic test</title>
 
-	<script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-	<script src="../../web-component-tester/browser.js"></script>
-	<script src="../../test-fixture/test-fixture-mocha.js"></script>
-
-	<link rel="import" href="../../test-fixture/test-fixture.html">
-	<link rel="import" href="../../iron-test-helpers/iron-test-helpers.html">
-
-	<script type="module" src="../cosmoz-grouped-list.js"></script>
-</head>
-<body>
-	<test-fixture id="basic">
-		<template>
-			<cosmoz-grouped-list style="min-height: 300px">
-				<template slot="templates" data-type="item">
-					<div class="item-template" style="border-bottom: 1px solid grey;">
-						<div>
-							ID:<span class="item-id">{{ item.id }}</span>
-							NAME:<span class="item-name">{{ item.name }}</span>
-							VALUE:<span class="item-value">{{ item.value }}</span>
-							SELECTED: <span class="item-selected">{{ selected }}</span>
-							EXPANDED: <span class="item-expanded">{{ expanded }}</span>
-						</div>
-					</div>
-				</template>
-				<template slot="templates" data-type="group">
-					<div class="group-template">
+	<script src="/components/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+	<script src="/components/mocha/mocha.js"></script>
+	<script src="/components/chai/chai.js"></script>
+  <script src="/components/@polymer/test-fixture/test-fixture.js"></script>
+	<script src="/components/wct-mocha/wct-mocha.js"></script>
+</head><body>
+<test-fixture id="basic">
+	<template>
+		<cosmoz-grouped-list style="min-height: 300px">
+			<template slot="templates" data-type="item">
+				<div class="item-template" style="border-bottom: 1px solid grey;">
+					<div>
+						ID:<span class="item-id">{{ item.id }}</span>
 						NAME:<span class="item-name">{{ item.name }}</span>
-						VALUE: <span class="item-value">{{ item.value }}</span>
+						VALUE:<span class="item-value">{{ item.value }}</span>
 						SELECTED: <span class="item-selected">{{ selected }}</span>
-						FOLDED: <span class="item-expanded">{{ folded }}</span>
+						EXPANDED: <span class="item-expanded">{{ expanded }}</span>
 					</div>
-				</template>
-			</cosmoz-grouped-list>
-		</template>
-	</test-fixture>
-	<script type="module">
+				</div>
+			</template>
+			<template slot="templates" data-type="group">
+				<div class="group-template">
+					NAME:<span class="item-name">{{ item.name }}</span>
+					VALUE: <span class="item-value">{{ item.value }}</span>
+					SELECTED: <span class="item-selected">{{ selected }}</span>
+					FOLDED: <span class="item-expanded">{{ folded }}</span>
+				</div>
+			</template>
+		</cosmoz-grouped-list>
+	</template>
+</test-fixture>
+<script type="module">
+import { flushAsynchronousOperations } from '@polymer/iron-test-helpers/test-helpers';
+import sinon from 'sinon/pkg/sinon-esm.js';
 import '../cosmoz-grouped-list.js';
 
 const getInstanceByItemProperty = (element, item, property) => {
@@ -54,12 +52,12 @@ suite('empty', () => {
 		element = fixture('basic');
 		element._templatesObserver.flush();
 		element.data = [];
+		flushAsynchronousOperations();
 		flush(done);
 	});
 
-	test('does not render any items', done => {
+	test('does not render any items', () => {
 		assert.lengthOf(element.shadowRoot.querySelectorAll('cosmoz-grouped-list-template-selector'), 0);
-		done();
 	});
 });
 
@@ -85,6 +83,7 @@ suite('flat data', () => {
 
 		element._templatesObserver.flush();
 		element.data = items;
+		flushAsynchronousOperations();
 		flush(done);
 	});
 
@@ -111,26 +110,26 @@ suite('flat data', () => {
 		assert.equal(element.selectedItems[0], item);
 	});
 
-	test('removing a selected item does not clear rest of selection [#41]', done => {
+	test('removing a selected item does not clear rest of selection [#41]', () => {
 		const allItems = items.slice();
 		element.selectItem(allItems[0]);
 		element.selectItem(allItems[1]);
 		element.selectItem(allItems[2]);
 		element.removeItem(allItems[0]);
-		flush(() => {
-			assert.isUndefined(element._getInstanceByProperty('item', allItems[0]));
-			assert.isTrue(getInstanceByItemProperty(element, allItems[1], 'selected'));
-			assert.isTrue(getInstanceByItemProperty(element, allItems[2], 'selected'));
 
-			assert.isFalse(element.isItemSelected(allItems[0]));
-			assert.isTrue(element.isItemSelected(allItems[1]));
-			assert.isTrue(element.isItemSelected(allItems[2]));
+		flushAsynchronousOperations();
 
-			assert.equal(element.selectedItems.length, 2);
-			assert.equal(element.selectedItems[0], allItems[1]);
-			assert.equal(element.selectedItems[1], allItems[2]);
-			done();
-		});
+		assert.isUndefined(element._getInstanceByProperty('item', allItems[0]));
+		assert.isTrue(getInstanceByItemProperty(element, allItems[1], 'selected'));
+		assert.isTrue(getInstanceByItemProperty(element, allItems[2], 'selected'));
+
+		assert.isFalse(element.isItemSelected(allItems[0]));
+		assert.isTrue(element.isItemSelected(allItems[1]));
+		assert.isTrue(element.isItemSelected(allItems[2]));
+
+		assert.equal(element.selectedItems.length, 2);
+		assert.equal(element.selectedItems[0], allItems[1]);
+		assert.equal(element.selectedItems[1], allItems[2]);
 	});
 
 	test('select all items [#977]', () => {
@@ -170,6 +169,7 @@ suite('empty-groups', () => {
 				value: 1
 			}]
 		}];
+		flushAsynchronousOperations();
 		flush(done);
 	});
 
@@ -177,14 +177,12 @@ suite('empty-groups', () => {
 		assert.lengthOf(element.shadowRoot.querySelectorAll('cosmoz-grouped-list-template-selector'), 3);
 	});
 
-	test('renders empty groups when `displayEmptyGroups` is true', done => {
+	test('renders empty groups when `displayEmptyGroups` is true', () => {
 		element.displayEmptyGroups = true;
 		// force render, because displayEmptyGroups is not observed
 		element._render();
-		flush(() => {
-			assert.lengthOf(element.shadowRoot.querySelectorAll('cosmoz-grouped-list-template-selector'), 4);
-			done();
-		});
+		flushAsynchronousOperations();
+		assert.lengthOf(element.shadowRoot.querySelectorAll('cosmoz-grouped-list-template-selector'), 4);
 	});
 });
 
@@ -222,6 +220,7 @@ suite('basic', () => {
 		}];
 		element._templatesObserver.flush();
 		element.data = groups;
+		flushAsynchronousOperations();
 		flush(done);
 	});
 
@@ -340,7 +339,7 @@ suite('basic', () => {
 		assert.isTrue(getInstanceByItemProperty(element, group.items[0], 'selected'));
 	});
 
-	test('removing a selected item does not clear rest of selection [#41]', done => {
+	test('removing a selected item does not clear rest of selection [#41]', () => {
 		const group = groups[0],
 			firstItem = group.items[0],
 			secondItem = group.items[1];
@@ -349,14 +348,13 @@ suite('basic', () => {
 		assert.equal(element.selectedItems[0], firstItem);
 		assert.equal(element.selectedItems[1], secondItem);
 		element.removeItem(firstItem);
-		flush(() => {
-			assert.isFalse(element.isItemSelected(firstItem));
-			assert.isTrue(element.isItemSelected(secondItem));
+		flushAsynchronousOperations();
+		assert.isFalse(element.isItemSelected(firstItem));
+		assert.isTrue(element.isItemSelected(secondItem));
 
-			assert.equal(element.selectedItems.length, 1);
-			assert.equal(element.selectedItems[0], secondItem);
-			done();
-		});
+		assert.equal(element.selectedItems.length, 1);
+		assert.equal(element.selectedItems[0], secondItem);
+
 	});
 
 	test('selects all items', () => {
@@ -557,7 +555,6 @@ suite('basic', () => {
 		element.removeItem(first);
 		assert.equal(element.data[0].items.length, length - 1);
 	});
-
 });
 </script>
 </body></html>

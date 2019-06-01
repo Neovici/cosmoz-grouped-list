@@ -17,7 +17,7 @@
 			"dir": "./coverage",
 			"reporters": ["text-summary", "lcov"],
 			"include": [
-				"**.js"
+				"**/*.js"
 			],
 			"exclude": []
 		},
