@@ -2,7 +2,7 @@
 	"name": "cosmoz-grouped-list",
 	"version": "3.0.0",
 	"description": "[![Build Status](https://travis-ci.org/Neovici/cosmoz-grouped-list.svg?branch=master)](https://travis-ci.org/Neovici/cosmoz-grouped-list)",
-	"main": "cosmoz-grouped-list.html",
+	"main": "cosmoz-grouped-list.js",
 	"directories": {
 		"test": "test"
 	},
