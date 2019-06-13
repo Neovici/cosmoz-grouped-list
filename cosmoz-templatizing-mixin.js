@@ -2,7 +2,7 @@ import { dedupingMixin } from '@polymer/polymer/lib/utils/mixin';
 import { FlattenedNodesObserver } from '@polymer/polymer/lib/utils/flattened-nodes-observer';
 import { templatize } from '@polymer/polymer/lib/utils/templatize';
 
-/** @polymerBehavior */
+/** @polymerMixin */
 export const templatizing = dedupingMixin(base => class extends base { // eslint-disable-line max-lines-per-function
 	static get properties() {
 		return {

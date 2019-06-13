@@ -22,6 +22,7 @@ with features like group count display and folding
 @element cosmoz-grouped-list
 @demo demo/full.html Full Demo
 @demo demo/basic.html Basic Demo
+@appliesMixin templatizing
 */
 export class CosmozGroupedList extends templatizing(PolymerElement) {
 	static get template() {
