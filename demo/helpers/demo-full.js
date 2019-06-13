@@ -8,6 +8,7 @@ import '../../cosmoz-grouped-list.js';
 import { generateListDemoData } from './demo-list-helper.js';
 
 class DemoFull extends PolymerElement {
+	/* eslint-disable-next-line max-lines-per-function */
 	static get template() {
 		return html`
 			<style include="iron-flex iron-flex-alignment iron-positioning">
@@ -95,7 +96,13 @@ class DemoFull extends PolymerElement {
 							</paper-dropdown-menu-light>
 							<div on-click="toggleCollapse">[+]</div>
 							<div class\$="{{_computeExtraContentClass(expanded)}}">
-								Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed quis posuere turpis, quis commodo neque. Aenean dapibus consequat dolor, et vestibulum enim volutpat a. Donec vel dui at diam tristique condimentum dapibus ac elit. Sed consequat nibh id nibh posuere egestas. Phasellus blandit convallis tellus, nec pharetra orci viverra ut. In at arcu consectetur, tempus velit sit amet, congue diam. Suspendisse potenti. In ac tristique nulla, quis elementum nisi.
+								Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed quis
+								posuere turpis, quis commodo neque. Aenean dapibus consequat dolor,
+								et vestibulum enim volutpat a. Donec vel dui at diam tristique
+								condimentum dapibus ac elit. Sed consequat nibh id nibh posuere
+								egestas. Phasellus blandit convallis tellus, nec pharetra orci
+								viverra ut. In at arcu consectetur, tempus velit sit amet, congue
+								diam. Suspendisse potenti. In ac tristique nulla, quis elementum nisi.
 							</div>
 						</div>
 					</template>
@@ -155,7 +162,7 @@ class DemoFull extends PolymerElement {
 		}
 		// !!!WARN: do not use removeItem using forEach on this.selectedItems,
 		// as removing an item will remove it from the selection
-		for (let i = this.selectedItems.length - 1 ; i >= 0 ; i -= 1) {
+		for (let i = this.selectedItems.length - 1; i >= 0; i -= 1) {
 			const item = this.selectedItems[i];
 			this.$.groupedList.removeItem(item);
 		}

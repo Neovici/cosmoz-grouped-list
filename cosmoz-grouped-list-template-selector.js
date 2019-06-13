@@ -1,3 +1,5 @@
+import { PolymerElement, html } from '@polymer/polymer';
+
 /**
  * # TemplateSelector
  *
@@ -5,9 +7,6 @@
  * @polymer
  * @demo demo/full.html Full Demo
  */
-
-import { PolymerElement, html } from '@polymer/polymer';
-
 export class TemplateSelector extends PolymerElement {
 	static get template() {
 		return html`

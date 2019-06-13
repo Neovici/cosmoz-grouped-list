@@ -3,6 +3,7 @@ import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
 import '../../cosmoz-grouped-list.js';
 
 class DemoBasic extends PolymerElement {
+	/* eslint-disable-next-line max-lines-per-function */
 	static get template() {
 		return html`
 			<style include="iron-flex iron-flex-alignment iron-positioning">

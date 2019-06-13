@@ -12,6 +12,7 @@
 		"@polymer/iron-list": "^3.0.0"
 	},
 	"devDependencies": {
+		"@neovici/eslint-config": "neovici/eslint-config#semver:~1.0.0",
 		"@polymer/iron-icons": "^3.0.0",
 		"@polymer/iron-icon": "^3.0.0",
 		"@polymer/paper-dropdown-menu": "^3.0.0",

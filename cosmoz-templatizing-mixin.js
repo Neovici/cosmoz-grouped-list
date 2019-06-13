@@ -1,9 +1,9 @@
-import { dedupingMixin } from '@polymer/polymer/lib/utils/mixin.js';
-import { FlattenedNodesObserver } from '@polymer/polymer/lib/utils/flattened-nodes-observer.js';
-import { templatize } from '@polymer/polymer/lib/utils/templatize.js';
+import { dedupingMixin } from '@polymer/polymer/lib/utils/mixin';
+import { FlattenedNodesObserver } from '@polymer/polymer/lib/utils/flattened-nodes-observer';
+import { templatize } from '@polymer/polymer/lib/utils/templatize';
 
 /** @polymerBehavior */
-export const GroupedListTemplatizeMixin = dedupingMixin(base => class extends base {
+export const templatizing = dedupingMixin(base => class extends base { // eslint-disable-line max-lines-per-function
 	static get properties() {
 		return {
 			as: {
@@ -107,7 +107,7 @@ export const GroupedListTemplatizeMixin = dedupingMixin(base => class extends ba
 	 * @param		{Boolean}						flush					 True if instance properties should be flushed.
 	 * @returns {TemplateInstance}								 The instance to use
 	*/
-	_getInstance(type, props = {}, prevInstance, flush = true) {
+	_getInstance(type, props = {}, prevInstance, flush = true) { // eslint-disable-line max-statements
 		const ctors = this._ctors;
 		if (ctors == null || Object.keys(ctors).length === 0) {
 			console.warn('cosmoz-grouped-list templates are required.');

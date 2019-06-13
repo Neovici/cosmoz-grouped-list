@@ -1,16 +1,4 @@
-/**
-`<cosmoz-grouped-list>` is an example implementation of grouping for iron-list
-with features like group count display and folding
-
-### Usage
-
-		<cosmoz-grouped-list data="{{ data }}"></cosmoz-grouped-list>
-
-@group Cosmoz Elements
-@element cosmoz-grouped-list
-@demo demo/full.html Full Demo
-@demo demo/basic.html Basic Demo
-*/
+/* eslint-disable max-lines */
 import { PolymerElement, html } from '@polymer/polymer';
 import { timeOut } from '@polymer/polymer/lib/utils/async.js';
 import { Debouncer, enqueueDebouncer } from '@polymer/polymer/lib/utils/debounce.js';
@@ -19,10 +7,23 @@ import { useShadow } from '@polymer/polymer/lib/utils/settings';
 import '@polymer/iron-list/iron-list.js';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
 
-import { GroupedListTemplatizeMixin } from './cosmoz-grouped-list-templatize-behavior.js';
+import { templatizing } from './cosmoz-templatizing-mixin.js';
 import './cosmoz-grouped-list-template-selector.js';
 
-export class CosmozGroupedList extends GroupedListTemplatizeMixin(PolymerElement) {
+/**
+`<cosmoz-grouped-list>` is an example implementation of grouping for iron-list
+with features like group count display and folding
+
+### Usage
+
+	<cosmoz-grouped-list data="{{ data }}"></cosmoz-grouped-list>
+
+@group Cosmoz Elements
+@element cosmoz-grouped-list
+@demo demo/full.html Full Demo
+@demo demo/basic.html Basic Demo
+*/
+export class CosmozGroupedList extends templatizing(PolymerElement) {
 	static get template() {
 		return html`
 		<style>
