@@ -86,7 +86,7 @@ class DemoFull extends PolymerElement {
 								<div>Highlighted: <span>[[highlighted]]</span></div>
 							</div>
 							<div on-click="select">Selected: <span>{{ selected }}</span> (click to select/deselect)</div>
-							<paper-dropdown-menu-light no-animations="" label="dropdown menu">
+							<paper-dropdown-menu-light no-animations label="dropdown menu">
 								<paper-listbox slot="dropdown-content">
 									<paper-item>Item 1</paper-item>
 									<paper-item>Item 2</paper-item>

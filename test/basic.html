@@ -39,7 +39,7 @@
 <script type="module">
 /* eslint-disable max-lines */
 import { flushAsynchronousOperations } from '@polymer/iron-test-helpers/test-helpers';
-import sinon from 'sinon/pkg/sinon-esm.js';
+import { spy as sinonSpy, assert as sinonAssert} from 'sinon/pkg/sinon-esm.js';
 import '../cosmoz-grouped-list.js';
 
 const getInstanceByItemProperty = (element, item, property) => {
@@ -468,9 +468,9 @@ suite('basic', () => {
 
 	test('_getInstance calls _reuseInstance if prevInstance has different type', () => {
 		const itemInstance = element._getInstance('item'),
-			spy = sinon.spy(element, '_reuseInstance');
+			spy = sinonSpy(element, '_reuseInstance');
 		element._getInstance('group', {}, itemInstance);
-		sinon.assert.calledOnce(spy);
+		sinonAssert.calledOnce(spy);
 		spy.restore();
 	});
 
@@ -479,9 +479,9 @@ suite('basic', () => {
 	});
 
 	test('getFirstVisibleItemElement calls _getInstanceByProperty', () => {
-		const spy = sinon.spy(element, '_getInstanceByProperty');
+		const spy = sinonSpy(element, '_getInstanceByProperty');
 		const first = element.getFirstVisibleItemElement();
-		sinon.assert.called(spy);
+		sinonAssert.called(spy);
 		assert.isNotNull(first);
 		spy.restore();
 	});
@@ -492,16 +492,16 @@ suite('basic', () => {
 	});
 
 	test('_dataChanged calls _forwardItemPath for item changes', () => {
-		const spy = sinon.spy(element, '_forwardItemPath');
+		const spy = sinonSpy(element, '_forwardItemPath');
 		element.set('data.0.value', -1);
-		sinon.assert.calledOnce(spy);
-		sinon.assert.calledWith(spy, 'data.0.value', -1);
+		sinonAssert.calledOnce(spy);
+		sinonAssert.calledWith(spy, 'data.0.value', -1);
 		element.set('data.0.items.value', -2);
-		sinon.assert.calledWith(spy, 'data.0.items.value', -2);
+		sinonAssert.calledWith(spy, 'data.0.items.value', -2);
 	});
 
 	test('_dataChanged calls _debounceRender for splices changes', () => {
-		const spy = sinon.spy(element, '_debounceRender'),
+		const spy = sinonSpy(element, '_debounceRender'),
 			newData = [{
 				name: 'Group 0',
 				id: 'g0',
@@ -512,11 +512,11 @@ suite('basic', () => {
 				}]
 			}];
 		element.data = newData;
-		sinon.assert.calledOnce(spy);
+		sinonAssert.calledOnce(spy);
 	});
 
 	test('_dataChanged calls _debounceRender for other changes in data', () => {
-		const spy = sinon.spy(element, '_debounceRender'),
+		const spy = sinonSpy(element, '_debounceRender'),
 			newData = [{
 				name: 'Group 0',
 				id: 'g0',
@@ -528,7 +528,7 @@ suite('basic', () => {
 			}],
 			change = {path: 'other', value: newData, base: newData};
 		element._dataChanged(change);
-		sinon.assert.calledOnce(spy);
+		sinonAssert.calledOnce(spy);
 		spy.restore();
 	});
 
