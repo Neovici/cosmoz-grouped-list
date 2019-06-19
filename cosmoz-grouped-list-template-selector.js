@@ -48,8 +48,8 @@ export class TemplateSelector extends PolymerElement {
 	 */
 	constructor() {
 		super();
-		this._onDropdownOpen = this._onDropdownOpen.bind(this);
-		this._onDropdownClose = this._onDropdownClose.bind(this);
+		this._boundOnDropdownOpen = this._onDropdownOpen.bind(this);
+		this._boundOnDropdownClose = this._onDropdownClose.bind(this);
 	}
 	/**
 	 * Add event listeners for the drop down open and close and dispatch
@@ -59,8 +59,8 @@ export class TemplateSelector extends PolymerElement {
 	connectedCallback() {
 		super.connectedCallback();
 
-		this.addEventListener('paper-dropdown-open', this._onDropdownOpen);
-		this.addEventListener('paper-dropdown-close', this._onDropdownClose);
+		this.addEventListener('paper-dropdown-open', this._boundOnDropdownOpen);
+		this.addEventListener('paper-dropdown-close', this._boundOnDropdownClose);
 
 		const {index, item, hidden} = this;
 
@@ -76,8 +76,8 @@ export class TemplateSelector extends PolymerElement {
 	 */
 	disconnectedCallback() {
 		super.disconnectedCallback();
-		this.removeEventListener('paper-dropdown-open', this._onDropdownOpen);
-		this.removeEventListener('paper-dropdown-close', this._onDropdownClose);
+		this.removeEventListener('paper-dropdown-open', this._boundOnDropdownOpen);
+		this.removeEventListener('paper-dropdown-close', this._boundOnDropdownClose);
 		this._fireChange({hidden: true});
 	}
 	/**
