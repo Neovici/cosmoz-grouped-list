@@ -17,10 +17,7 @@
 			"dir": "./coverage",
 			"reporters": ["text-summary", "lcov"],
 			"include": [
-				"cosmoz-grouped-list-templatize-behavior.html",
-				"cosmoz-grouped-list-template-selector.html",
-				"cosmoz-grouped-list.html",
-				"cosmoz-grouped-list.js"
+				"**/*.js"
 			],
 			"exclude": []
 		},
@@ -36,7 +33,7 @@
 			}, {
 				"browserName": "chrome",
 				"platform": "Windows 10",
-				"version": "beta"
+				"version": "latest"
 			}, {
 				"browserName": "firefox",
 				"platform": "Windows 10",

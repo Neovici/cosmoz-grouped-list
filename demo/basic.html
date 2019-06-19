@@ -6,26 +6,16 @@
 
 	<title>cosmoz-grouped-list Basic Demo</title>
 
-	<script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+	<script src="/components/@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
 
-	<link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html" />
-	<link rel="import" href="../../iron-demo-helpers/demo-snippet.html" />
+	<script type="module" src="/components/@polymer/iron-flex-layout/iron-flex-layout-classes.js"></script>
+	<script type="module" src="/components/@polymer/iron-demo-helpers/demo-pages-shared-styles.js"></script>
+	<script type="module" src="./helpers/demo-basic.js"></script>
 
-	<link rel="import" href="../../iron-flex-layout/iron-flex-layout.html" />
-	<link rel="import" href="../../iron-flex-layout/iron-flex-layout-classes.html" />
-
-	<link rel="import" href="./helpers/demo-basic.html" />
-
+</head>
+<body>
 	<custom-style>
 		<style is="custom-style" include="demo-pages-shared-styles iron-flex iron-flex-alignment iron-positioning"></style>
 	</custom-style>
-
-</head>
-<body unresolved class="fullbleed">
 	<demo-basic class="fit"></demo-basic>
-	<script type="text/javascript">
-		(function () {
-			//
-		})();
-	</script>
 </body></html>
