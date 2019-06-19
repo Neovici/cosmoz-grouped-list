@@ -87,11 +87,10 @@ export class TemplateSelector extends PolymerElement {
 	 * @returns {void}
 	 */
 	_onItemChanged(item) {
-		const {index, hidden} = this;
-		if (item == null || hidden) {
+		if (item == null || this.hidden) {
 			return;
 		}
-		this._fireChange({index, item});
+		this._fireChange({index: this.index, item});
 	}
 	/**
 	 * Dispatch an event that the selector has changed with the hidden
@@ -100,8 +99,7 @@ export class TemplateSelector extends PolymerElement {
 	 * @returns {void}
 	 */
 	_onHiddenChanged(hidden) {
-		const {index, item} = this;
-		this._fireChange({index, hidden, item});
+		this._fireChange({index: this.index, hidden, item: this.item});
 	}
 	/**
 	 * Dispatch an event that the selector has changed.
