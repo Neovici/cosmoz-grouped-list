@@ -146,6 +146,7 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 	disconnectedCallback() {
 		super.disconnectedCallback();
 		this._renderDebouncer.cancel();
+		this._renderDebouncer = undefined;
 	}
 	/**
 	 * Forward item path if necessary and debounce render.
