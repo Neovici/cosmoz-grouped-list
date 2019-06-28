@@ -1,0 +1,136 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<title>cosmoz-grouped-list Basic Demo</title>
+
+	<script src="/components/@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
+
+	<script type="module" src="../../cosmoz-grouped-list.js"></script>
+
+	<style>
+		cosmoz-grouped-list {
+			height: 200px;
+		}
+	</style>
+</head>
+<body>
+	<button id="add">Instantiate</button>
+	<button id="remove">Destroy</button>
+	<button id="cycle">Cycle</button>
+
+	<script type="module">
+		import {flush} from '@polymer/polymer/lib/utils/flush.js';
+		window.flush = flush;
+		const wait = (time = 50) => new Promise(resolve => setTimeout(resolve, time));
+		// const template = document.getElementById('list-template');
+
+		const createFragment = htmlStr => {
+
+			const frag = document.createDocumentFragment(),
+				temp = document.createElement('div');
+
+			temp.innerHTML = htmlStr;
+
+			while (temp.firstChild) {
+				frag.appendChild(temp.firstChild);
+			}
+
+			return frag;
+		};
+
+		const instantiate = () => {
+			const node = createFragment(`
+				<cosmoz-grouped-list id="the-list">
+					<template slot="templates" data-type="item">
+						<div class="item-template" style="border-bottom: 1px solid grey;">
+							<div>
+								ID:<span class="item-id">{{ item.id }}</span>
+								NAME:<span class="item-name">{{ item.name }}</span>
+								VALUE:<span class="item-value">{{ item.value }}</span>
+							</div>
+						</div>
+					</template>
+					<template slot="templates" data-type="group">
+						<div class="group-template">
+							NAME:<span class="item-name">{{ item.name }}</span>
+							VALUE: <span class="item-value">{{ item.value }}</span>
+							SELECTED: <span class="item-selected">{{ selected }}</span>
+						</div>
+					</template>
+				</cosmoz-grouped-list>`);
+			// debugger;
+			// const node = document.importNode(template.content, true);
+			const list = node.firstElementChild;
+			document.body.appendChild(node);
+			return list;
+		};
+
+		const addData = list => {
+			list.data = [{
+				name: 'Group 0',
+				id: 'g0',
+				items: [{
+					id: 'g0-0',
+					name: 'Group 0 item 0',
+					value: 0
+				}, {
+					id: 'g0-1',
+					name: 'Group 0 item 1',
+					value: 1
+				}]
+			}, {
+				name: 'Group 1',
+				id: 'g1',
+				items: [{
+					id: 'g1-0',
+					name: 'Group 1 item 0',
+					value: 0
+				}, {
+					id: 'g1-1',
+					name: 'Group 1 item 1',
+					value: 1
+				}]
+			}];
+		};
+
+		let instance;
+		const $add = document.getElementById('add');
+		const $remove = document.getElementById('remove');
+		const $cycle = document.getElementById('cycle');
+
+		const add = () => {
+			if (instance) {
+				return;
+			}
+			instance = instantiate();
+			addData(instance);
+		};
+
+		const remove = () => {
+			if (!instance) {
+				return;
+			}
+			instance.parentNode.removeChild(instance);
+			instance = null;
+		};
+
+		$add.addEventListener('click', add);
+
+		$remove.addEventListener('click', remove);
+
+		$cycle.addEventListener('click', async () => {
+			let i = 0;
+			while (i < 50) {
+				i++;
+				add();
+				await wait();
+				remove();
+				await wait();
+			}
+		});
+	</script>
+</body>
+</html>
