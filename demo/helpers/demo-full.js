@@ -77,7 +77,7 @@ class DemoFull extends PolymerElement {
 				</div>-->
 				<cosmoz-grouped-list id="groupedList" data="{{ data }}" selected-items="{{ selectedItems }}" class="flex">
 					<template slot="templates" data-type="item">
-						<div highlighted\$="[[highlighted]]" class="item-template" style="border-bottom: 1px solid grey;">
+						<div highlighted$="[[highlighted]]" class="item-template" style="border-bottom: 1px solid grey;">
 							<div on-click="highlight">
 								<div>Outer binding: <span>[[outerValue]]</span></div>
 								<div>Id: <span>{{item.id}}</span></div>
@@ -95,7 +95,7 @@ class DemoFull extends PolymerElement {
 								</paper-listbox>
 							</paper-dropdown-menu-light>
 							<div on-click="toggleCollapse">[+]</div>
-							<div class\$="{{_computeExtraContentClass(expanded)}}">
+							<div class$="{{_computeExtraContentClass(expanded)}}">
 								Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed quis
 								posuere turpis, quis commodo neque. Aenean dapibus consequat dolor,
 								et vestibulum enim volutpat a. Donec vel dui at diam tristique
