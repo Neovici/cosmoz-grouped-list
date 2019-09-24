@@ -270,8 +270,11 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 			return acc;
 		}, []);
 
-		// keep selected items accross data updates
-		this.selectedItems = this.selectedItems.filter(i => flatData.includes(i));
+		// keep selected items across data updates
+		const oldSelected = this.selectedItems.filter(i => flatData.includes(i));
+		if (oldSelected.length > 0) {
+			this.selectedItems = oldSelected;
+		}
 
 		return flatData;
 	}
