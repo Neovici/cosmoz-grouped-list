@@ -479,8 +479,8 @@ suite('basic', () => {
 	});
 
 	test('getFirstVisibleItemElement calls _getInstanceByProperty', () => {
-		const spy = sinonSpy(element, '_getInstanceByProperty');
-		const first = element.getFirstVisibleItemElement();
+		const spy = sinonSpy(element, '_getInstanceByProperty'),
+			first = element.getFirstVisibleItemElement();
 		sinonAssert.called(spy);
 		assert.isNotNull(first);
 		spy.restore();

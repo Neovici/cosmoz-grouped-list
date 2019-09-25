@@ -257,6 +257,7 @@ class DemoFull extends PolymerElement {
 		this.data = data[3].items;
 	}
 	_firstVisibleItem() {
+		// eslint-disable-next-line no-console
 		console.log(this.$.groupedList.getFirstVisibleItemElement());
 	}
 }

@@ -82,6 +82,7 @@ export const templatizing = dedupingMixin(base => class extends base { // eslint
 			.filter(n => n.matches && n.matches('template[data-type]'));
 
 		if (templates.length === 0) {
+			// eslint-disable-next-line no-console
 			console.warn('cosmoz-grouped-list requires templates');
 			return;
 		}
@@ -110,10 +111,12 @@ export const templatizing = dedupingMixin(base => class extends base { // eslint
 	_getInstance(type, props = {}, prevInstance, flush = true) { // eslint-disable-line max-statements
 		const ctors = this._ctors;
 		if (ctors == null || Object.keys(ctors).length === 0) {
+			// eslint-disable-next-line no-console
 			console.warn('cosmoz-grouped-list templates are required.');
 			return;
 		}
 		if (ctors[type] == null) {
+			// eslint-disable-next-line no-console
 			console.warn(`cosmoz-grouped-list template for ${type} type not found.`);
 		}
 

@@ -31,6 +31,7 @@ export const generateListDemoData = (groupsMin, groupsMax, itemsMin, itemsMax) =
 		}
 		data.push(group);
 	}
+	// eslint-disable-next-line no-console
 	console.log('generated ' + n + ' data items');
 	return data;
 };
