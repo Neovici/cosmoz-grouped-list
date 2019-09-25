@@ -204,6 +204,7 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 			item = items ? items[itemIndex] : null;
 
 		if (item == null) {
+			// eslint-disable-next-line no-console
 			console.warn('Item not found when forwarding path', path);
 			return;
 		}
@@ -211,6 +212,7 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 		const instance = this._getInstanceByProperty('item', item);
 
 		if (!instance) {
+			// eslint-disable-next-line no-console
 			console.warn('Template instance for item not found when forwarding path', path);
 			return;
 		}
@@ -253,25 +255,26 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 
 		const flatData = data.reduce((acc, item) => {
 			// simple items
-			if (!item.items) {
-				return acc.concat(item);
-			}
+				if (!item.items) {
+					return acc.concat(item);
+				}
 
-			// groups with items
-			if (item.items.length) {
-				return acc.concat(item, item.items);
-			}
+				// groups with items
+				if (item.items.length) {
+					return acc.concat(item, item.items);
+				}
 
-			// groups without items
-			if (this.displayEmptyGroups) {
-				return acc.concat(item);
-			}
+				// groups without items
+				if (this.displayEmptyGroups) {
+					return acc.concat(item);
+				}
 
-			return acc;
-		}, []);
+				return acc;
+			}, []),
 
-		// keep selected items across data updates
-		const oldSelected = this.selectedItems.filter(i => flatData.includes(i));
+			// keep selected items across data updates
+			oldSelected = this.selectedItems.filter(i => flatData.includes(i));
+
 		if (oldSelected.length > 0) {
 			this.selectedItems = oldSelected;
 		}
@@ -568,9 +571,10 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 	 * @returns {void}
 	 */
 	toggleSelectGroup(group, selected) {
-		const groupState = this._getItemState(group);
-		const willSelect = !selected;
-		const itemAction = willSelect ? 'selectItem' : 'deselectItem';
+		const groupState = this._getItemState(group),
+			willSelect = !selected,
+			itemAction = willSelect ? 'selectItem' : 'deselectItem';
+
 		groupState.selected = willSelect;
 		this._forwardPropertyByItem(group, 'selected', willSelect, true);
 		group.items.forEach(this[itemAction], this);
