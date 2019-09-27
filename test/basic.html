@@ -6,10 +6,10 @@
 	<title>cosmoz-grouped-list basic test</title>
 
 	<script src="/components/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
-	<script src="/components/mocha/mocha.js"></script>
-	<script src="/components/chai/chai.js"></script>
+	<script src="/components/mocha/mocha.js?nocompile"></script>
+	<script src="/components/chai/chai.js?nocompile"></script>
   <script src="/components/@polymer/test-fixture/test-fixture.js"></script>
-	<script src="/components/wct-mocha/wct-mocha.js"></script>
+	<script src="/components/wct-mocha/wct-mocha.js?nocompile"></script>
 </head><body>
 <test-fixture id="basic">
 	<template>
@@ -59,6 +59,71 @@ suite('empty', () => {
 
 	test('does not render any items', () => {
 		assert.lengthOf(element.shadowRoot.querySelectorAll('cosmoz-grouped-list-template-selector'), 0);
+	});
+
+	test('during init, it only updates selectedItems once', () => {
+		const el = document.createElement('cosmoz-grouped-list'),
+			spy = sinonSpy();
+
+		el.addEventListener('selected-items-changed', spy);
+		el.data = [];
+
+		document.body.appendChild(el);
+
+		flushAsynchronousOperations(); // flush _render debouncer
+
+		assert.isTrue(spy.calledOnce);
+	});
+
+	test('it maintains selection accross data updates', () => {
+		const data = [{id: 0}, {id: 1}, {id: 2}, {id: 3}];
+
+		element.data = data;
+
+		element.selectItem(data[2]);
+		element.selectItem(data[3]);
+
+		element.data = data.concat([{id: 4}, {id: 5}]);
+		flushAsynchronousOperations(); // flush _render debouncer
+		assert.deepEqual(element.data, [{id: 0}, {id: 1}, {id: 2}, {id: 3}, {id: 4}, {id: 5}]);
+		assert.deepEqual(element.selectedItems, [{id: 2}, {id: 3}]);
+
+		element.data = [data[2]];
+		flushAsynchronousOperations(); // flush _render debouncer
+		assert.deepEqual(element.data, [{id: 2}]);
+		assert.deepEqual(element.selectedItems, [{id: 2}]);
+
+		element.data = data;
+		flushAsynchronousOperations(); // flush _render debouncer
+		assert.deepEqual(element.data, [{id: 0}, {id: 1}, {id: 2}, {id: 3}]);
+		assert.deepEqual(element.selectedItems, [{id: 2}]);
+
+		element.deselectItem(data[2]);
+		flushAsynchronousOperations(); // flush _render debouncer
+		assert.deepEqual(element.data, [{id: 0}, {id: 1}, {id: 2}, {id: 3}]);
+		assert.deepEqual(element.selectedItems, []);
+
+		element.data = [{id: 6}];
+		flushAsynchronousOperations(); // flush _render debouncer
+		assert.deepEqual(element.data, [{id: 6}]);
+		assert.deepEqual(element.selectedItems, []);
+	});
+
+	test('it clears selection when all selected items are removed from the dataset', () => {
+		const data = [{id: 0}, {id: 1}, {id: 2}, {id: 3}];
+
+		element.data = data;
+
+		element.selectItem(data[2]);
+		element.selectItem(data[3]);
+		flushAsynchronousOperations(); // flush _render debouncer
+		assert.deepEqual(element.data, [{id: 0}, {id: 1}, {id: 2}, {id: 3}]);
+		assert.deepEqual(element.selectedItems, [{id: 2}, {id: 3}]);
+
+		element.data = data.splice(0, 2);
+		flushAsynchronousOperations(); // flush _render debouncer
+		assert.deepEqual(element.data, [{id: 0}, {id: 1}]);
+		assert.deepEqual(element.selectedItems, []);
 	});
 });
 
