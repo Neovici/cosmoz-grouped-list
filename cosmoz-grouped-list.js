@@ -255,28 +255,26 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 
 		const flatData = data.reduce((acc, item) => {
 			// simple items
-				if (!item.items) {
-					return acc.concat(item);
-				}
+			if (!item.items) {
+				return acc.concat(item);
+			}
 
-				// groups with items
-				if (item.items.length) {
-					return acc.concat(item, item.items);
-				}
+			// groups with items
+			if (item.items.length) {
+				return acc.concat(item, item.items);
+			}
 
-				// groups without items
-				if (this.displayEmptyGroups) {
-					return acc.concat(item);
-				}
+			// groups without items
+			if (this.displayEmptyGroups) {
+				return acc.concat(item);
+			}
 
-				return acc;
-			}, []),
+			return acc;
+		}, []);
 
-			// keep selected items across data updates
-			oldSelected = this.selectedItems.filter(i => flatData.includes(i));
-
-		if (oldSelected.length > 0) {
-			this.selectedItems = oldSelected;
+		// keep selected items across data updates
+		if (this.selectedItems.length > 0) {
+			this.selectedItems = this.selectedItems.filter(i => flatData.includes(i));
 		}
 
 		return flatData;
