@@ -22,6 +22,7 @@
 			"exclude": []
 		},
 		"sauce": {
+			"jobName": "cosmoz-grouped-list",
 			"browsers": [{
 				"browserName": "microsoftedge",
 				"platform": "Windows 10",
