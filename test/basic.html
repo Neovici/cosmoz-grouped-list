@@ -622,5 +622,39 @@ suite('basic', () => {
 		assert.equal(element.data[0].items.length, length - 1);
 	});
 });
+
+suite('compare items function', () => {
+	let element;
+
+	setup(done => {
+		element = fixture('basic');
+		element._templatesObserver.flush();
+		element.data = [];
+		flushAsynchronousOperations();
+		flush(done);
+	});
+
+
+	test('compare by id', () => {
+		const data = [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }];
+
+		element.data = data;
+		element.compareItemsFn = function (a, b) {
+			return a.id === b.id;
+		};
+
+		element.selectItem(data[0]);
+		element.selectItem(data[1]);
+		assert.deepEqual(element.selectedItems, [{ id: 0 }, { id: 1 }]);
+
+		element.data = [{ id: 0 }, { id: 1 }, { id: 5 }];
+		flushAsynchronousOperations(); // flush _render debouncer
+		assert.deepEqual(element.selectedItems, [{ id: 0 }, { id: 1 }]);
+
+		element.data = [{ id: 0 }, { id: 5 }];
+		flushAsynchronousOperations(); // flush _render debouncer
+		assert.deepEqual(element.selectedItems, [{ id: 0 }]);
+	});
+});
 </script>
 </body></html>
