@@ -94,6 +94,16 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 				notify: true
 			},
 
+			/**
+			 * This function is used to determine which items are kept selected across data updates
+			 */
+			compareItemsFn: {
+				type: Function,
+				value: () => function (a, b) {
+					return a === b;
+				}
+			},
+
 			highlightedItems: {
 				type: Array,
 				value() {
@@ -274,7 +284,11 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 
 		// keep selected items across data updates
 		if (this.selectedItems.length > 0) {
-			this.selectedItems = this.selectedItems.filter(i => flatData.includes(i));
+			this.selectedItems = flatData.filter(
+				i => this.selectedItems.find(
+					item =>	this.compareItemsFn(i, item)
+				)
+			);
 		}
 
 		return flatData;
