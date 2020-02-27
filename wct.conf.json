@@ -28,21 +28,9 @@
 				"platform": "Windows 10",
 				"version": ""
 			}, {
-				"browserName": "chrome",
-				"platform": "Windows 10",
-				"version": "beta"
-			}, {
-				"browserName": "chrome",
-				"platform": "Windows 10",
-				"version": "latest"
-			}, {
 				"browserName": "firefox",
 				"platform": "Windows 10",
-				"version": "latest-1"
-			}, {
-				"browserName": "safari",
-				"platform": "macOS 10.13",
-				"version": "11.1"
+				"version": "latest"
 			}]
 		}
 	}
