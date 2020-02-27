@@ -1,7 +1,11 @@
 /* eslint-disable max-lines */
-import { PolymerElement, html } from '@polymer/polymer';
+import {
+	PolymerElement, html
+} from '@polymer/polymer';
 import { timeOut } from '@polymer/polymer/lib/utils/async.js';
-import { Debouncer, enqueueDebouncer } from '@polymer/polymer/lib/utils/debounce.js';
+import {
+	Debouncer, enqueueDebouncer
+} from '@polymer/polymer/lib/utils/debounce.js';
 import { useShadow } from '@polymer/polymer/lib/utils/settings';
 
 import '@polymer/iron-list/iron-list.js';
@@ -326,7 +330,9 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 		}
 	}
 
-	_onTemplateSelectorChanged(e, { item, index, hidden, selector }) {
+	_onTemplateSelectorChanged(e, {
+		item, index, hidden, selector
+	}) {
 		const
 			fidx = this._flatData ? this._flatData.indexOf(item) : '',
 			idx = index == null ? fidx : index,
@@ -372,12 +378,12 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 	 * @returns {HTMLElement|null} The first visible element or null
 	 */
 	getFirstVisibleItemElement() {
-		const {_flatData: flat} = this;
+		const { _flatData: flat } = this;
 		if (!Array.isArray(flat) || flat.length === 0) {
 			return false;
 		}
 
-		let {firstVisibleIndex: index} = this.$.list,
+		let { firstVisibleIndex: index } = this.$.list,
 			instance = null;
 
 		while (index < flat.length && !instance) {
@@ -400,7 +406,10 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 	 * this means we are displaying only group templates.
 	 */
 	get hasRenderedData() {
-		const {_flatData: flat, _instances: instances} = this;
+		const {
+			_flatData: flat,
+			_instances: instances
+		} = this;
 		if (!Array.isArray(flat) || flat.length === 0) {
 			return false;
 		}

@@ -1,4 +1,6 @@
-import { PolymerElement, html } from '@polymer/polymer';
+import {
+	PolymerElement, html
+} from '@polymer/polymer';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
 import '@polymer/paper-dropdown-menu/paper-dropdown-menu-light.js';
 import '@polymer/paper-item/paper-item.js';
@@ -169,7 +171,7 @@ class DemoFull extends PolymerElement {
 	}
 
 	toggleFold(event) {
-		const { model: {item }} = event;
+		const { model: { item }} = event;
 		this.$.groupedList.toggleFold(item);
 	}
 

@@ -71,7 +71,7 @@ export const templatizing = dedupingMixin(base => class extends base { // eslint
 	 * @param {array} addedNodes Added nodes.
 	 * @returns {void}
 	 */
-	_onTemplatesChange({addedNodes}) {
+	_onTemplatesChange({ addedNodes }) {
 		const ctors = this._ctors;
 
 		if (ctors && Object.keys(ctors) > 0) {
@@ -129,9 +129,12 @@ export const templatizing = dedupingMixin(base => class extends base { // eslint
 			this._reuseInstance(prevInstance);
 		}
 
-		const {_reusableInstances: reusable, _instances: instances} = this;
+		const {
+			_reusableInstances: reusable,
+			_instances: instances
+		} = this;
 
-		let instance = reusable.find(({__type}) => __type === type);
+		let instance = reusable.find(({ __type }) => __type === type);
 
 		if (instance) {
 			reusable.splice(reusable.indexOf(instance), 1);
@@ -234,7 +237,9 @@ export const templatizing = dedupingMixin(base => class extends base { // eslint
 		if (!instance) {
 			return;
 		}
-		const {children, root} = instance;
+		const {
+			children, root
+		} = instance;
 
 		for (let i = 0; i < children.length; i++) {
 			const child = children[i],
@@ -260,7 +265,10 @@ export const templatizing = dedupingMixin(base => class extends base { // eslint
 		if (!instance) {
 			return;
 		}
-		const {_reusableInstances: reusable, _instances: instances} = this,
+		const {
+				_reusableInstances: reusable,
+				_instances: instances
+			} = this,
 			index = instances.indexOf(instance);
 		if (index < 0) {
 			return;
@@ -280,7 +288,10 @@ export const templatizing = dedupingMixin(base => class extends base { // eslint
 			return;
 		}
 
-		const {_reusableInstances: reusable, _instances: instances} = this,
+		const {
+				_reusableInstances: reusable,
+				_instances: instances
+			} = this,
 			ridx = reusable.indexOf(instance),
 			uidx = instances.indexOf(instance);
 		if (ridx) {
