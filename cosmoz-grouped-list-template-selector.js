@@ -1,4 +1,6 @@
-import { PolymerElement, html } from '@polymer/polymer';
+import {
+	PolymerElement, html
+} from '@polymer/polymer';
 
 /**
  * # TemplateSelector
@@ -62,12 +64,20 @@ export class TemplateSelector extends PolymerElement {
 		this.addEventListener('paper-dropdown-open', this._boundOnDropdownOpen);
 		this.addEventListener('paper-dropdown-close', this._boundOnDropdownClose);
 
-		const {index, item, hidden} = this;
+		const {
+			index,
+			item,
+			hidden
+		} = this;
 
 		if (index == null && item == null) {
 			return;
 		}
-		this._fireChange({index, item, hidden});
+		this._fireChange({
+			index,
+			item,
+			hidden
+		});
 	}
 	/**
 	 * Remove event listeners for the drop down open and close and
@@ -78,7 +88,7 @@ export class TemplateSelector extends PolymerElement {
 		super.disconnectedCallback();
 		this.removeEventListener('paper-dropdown-open', this._boundOnDropdownOpen);
 		this.removeEventListener('paper-dropdown-close', this._boundOnDropdownClose);
-		this._fireChange({hidden: true});
+		this._fireChange({ hidden: true });
 	}
 	/**
 	 * Check if the changed item contains something and if so dispatch
@@ -90,7 +100,10 @@ export class TemplateSelector extends PolymerElement {
 		if (item == null || this.hidden) {
 			return;
 		}
-		this._fireChange({index: this.index, item});
+		this._fireChange({
+			index: this.index,
+			item
+		});
 	}
 	/**
 	 * Dispatch an event that the selector has changed with the hidden
@@ -99,7 +112,11 @@ export class TemplateSelector extends PolymerElement {
 	 * @returns {void}
 	 */
 	_onHiddenChanged(hidden) {
-		this._fireChange({index: this.index, hidden, item: this.item});
+		this._fireChange({
+			index: this.index,
+			hidden,
+			item: this.item
+		});
 	}
 	/**
 	 * Dispatch an event that the selector has changed.

@@ -39,7 +39,10 @@
 <script type="module">
 /* eslint-disable max-lines */
 import { flushAsynchronousOperations } from '@polymer/iron-test-helpers/test-helpers';
-import { spy as sinonSpy, assert as sinonAssert} from 'sinon/pkg/sinon-esm.js';
+import {
+	spy as sinonSpy,
+	assert as sinonAssert
+} from 'sinon/pkg/sinon-esm.js';
 import '../cosmoz-grouped-list.js';
 
 const getInstanceByItemProperty = (element, item, property) => {
@@ -517,8 +520,11 @@ suite('basic', () => {
 	});
 
 	test('_onTemplatesChange does not return constructors if they already exist', () => {
-		element._ctors = {item: {}, group: {}};
-		assert.isUndefined(element._onTemplatesChange({addedNodes: []}));
+		element._ctors = {
+			item: {},
+			group: {}
+		};
+		assert.isUndefined(element._onTemplatesChange({ addedNodes: []}));
 	});
 
 	test('_getInstance types are item, group', () => {
@@ -591,7 +597,11 @@ suite('basic', () => {
 					value: 0
 				}]
 			}],
-			change = {path: 'other', value: newData, base: newData};
+			change = {
+				path: 'other',
+				value: newData,
+				base: newData
+			};
 		element._dataChanged(change);
 		sinonAssert.calledOnce(spy);
 		spy.restore();

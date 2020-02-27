@@ -1,4 +1,6 @@
-import { PolymerElement, html } from '@polymer/polymer';
+import {
+	PolymerElement, html
+} from '@polymer/polymer';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
 import '../../cosmoz-grouped-list.js';
 
