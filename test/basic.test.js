@@ -1,18 +1,21 @@
-<!doctype html>
-<html>
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-	<title>cosmoz-grouped-list basic test</title>
+/* eslint-disable max-lines */
+import { flushAsynchronousOperations } from '@polymer/iron-test-helpers/test-helpers';
+import {
+	spy as sinonSpy,
+	assert as sinonAssert
+} from 'sinon/pkg/sinon-esm.js';
 
-	<script src="/components/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
-	<script src="/components/mocha/mocha.js?nocompile"></script>
-	<script src="/components/chai/chai.js?nocompile"></script>
-  <script src="/components/@polymer/test-fixture/test-fixture.js"></script>
-	<script src="/components/wct-mocha/wct-mocha.js?nocompile"></script>
-</head><body>
-<test-fixture id="basic">
-	<template>
+import {
+	assert, html, fixture
+} from '@open-wc/testing';
+
+import '../cosmoz-grouped-list.js';
+
+const getInstanceByItemProperty = (element, item, property) => {
+		const instance = element._getInstanceByProperty('item', item);
+		return element._getInstanceProperty(instance, property);
+	},
+	basicHtmlFixture = html`
 		<cosmoz-grouped-list style="min-height: 300px">
 			<template slot="templates" data-type="item">
 				<div class="item-template" style="border-bottom: 1px solid grey;">
@@ -34,30 +37,14 @@
 				</div>
 			</template>
 		</cosmoz-grouped-list>
-	</template>
-</test-fixture>
-<script type="module">
-/* eslint-disable max-lines */
-import { flushAsynchronousOperations } from '@polymer/iron-test-helpers/test-helpers';
-import {
-	spy as sinonSpy,
-	assert as sinonAssert
-} from 'sinon/pkg/sinon-esm.js';
-import '../cosmoz-grouped-list.js';
-
-const getInstanceByItemProperty = (element, item, property) => {
-	const instance = element._getInstanceByProperty('item', item);
-	return element._getInstanceProperty(instance, property);
-};
+	`;
 
 suite('empty', () => {
 	let element;
-	setup(done => {
-		element = fixture('basic');
+	setup(async () => {
+		element = await fixture(basicHtmlFixture);
 		element._templatesObserver.flush();
 		element.data = [];
-		flushAsynchronousOperations();
-		flush(done);
 	});
 
 	test('does not render any items', () => {
@@ -79,53 +66,53 @@ suite('empty', () => {
 	});
 
 	test('it maintains selection accross data updates', () => {
-		const data = [{id: 0}, {id: 1}, {id: 2}, {id: 3}];
+		const data = [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }];
 
 		element.data = data;
 
 		element.selectItem(data[2]);
 		element.selectItem(data[3]);
 
-		element.data = data.concat([{id: 4}, {id: 5}]);
+		element.data = data.concat([{ id: 4 }, { id: 5 }]);
 		flushAsynchronousOperations(); // flush _render debouncer
-		assert.deepEqual(element.data, [{id: 0}, {id: 1}, {id: 2}, {id: 3}, {id: 4}, {id: 5}]);
-		assert.deepEqual(element.selectedItems, [{id: 2}, {id: 3}]);
+		assert.deepEqual(element.data, [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }]);
+		assert.deepEqual(element.selectedItems, [{ id: 2 }, { id: 3 }]);
 
 		element.data = [data[2]];
 		flushAsynchronousOperations(); // flush _render debouncer
-		assert.deepEqual(element.data, [{id: 2}]);
-		assert.deepEqual(element.selectedItems, [{id: 2}]);
+		assert.deepEqual(element.data, [{ id: 2 }]);
+		assert.deepEqual(element.selectedItems, [{ id: 2 }]);
 
 		element.data = data;
 		flushAsynchronousOperations(); // flush _render debouncer
-		assert.deepEqual(element.data, [{id: 0}, {id: 1}, {id: 2}, {id: 3}]);
-		assert.deepEqual(element.selectedItems, [{id: 2}]);
+		assert.deepEqual(element.data, [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }]);
+		assert.deepEqual(element.selectedItems, [{ id: 2 }]);
 
 		element.deselectItem(data[2]);
 		flushAsynchronousOperations(); // flush _render debouncer
-		assert.deepEqual(element.data, [{id: 0}, {id: 1}, {id: 2}, {id: 3}]);
+		assert.deepEqual(element.data, [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }]);
 		assert.deepEqual(element.selectedItems, []);
 
-		element.data = [{id: 6}];
+		element.data = [{ id: 6 }];
 		flushAsynchronousOperations(); // flush _render debouncer
-		assert.deepEqual(element.data, [{id: 6}]);
+		assert.deepEqual(element.data, [{ id: 6 }]);
 		assert.deepEqual(element.selectedItems, []);
 	});
 
 	test('it clears selection when all selected items are removed from the dataset', () => {
-		const data = [{id: 0}, {id: 1}, {id: 2}, {id: 3}];
+		const data = [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }];
 
 		element.data = data;
 
 		element.selectItem(data[2]);
 		element.selectItem(data[3]);
 		flushAsynchronousOperations(); // flush _render debouncer
-		assert.deepEqual(element.data, [{id: 0}, {id: 1}, {id: 2}, {id: 3}]);
-		assert.deepEqual(element.selectedItems, [{id: 2}, {id: 3}]);
+		assert.deepEqual(element.data, [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }]);
+		assert.deepEqual(element.selectedItems, [{ id: 2 }, { id: 3 }]);
 
 		element.data = data.splice(0, 2);
 		flushAsynchronousOperations(); // flush _render debouncer
-		assert.deepEqual(element.data, [{id: 0}, {id: 1}]);
+		assert.deepEqual(element.data, [{ id: 0 }, { id: 1 }]);
 		assert.deepEqual(element.selectedItems, []);
 	});
 });
@@ -134,8 +121,8 @@ suite('flat data', () => {
 	let element,
 		items;
 
-	setup(done => {
-		element = fixture('basic');
+	setup(async () => {
+		element = await fixture(basicHtmlFixture);
 		items = [{
 			id: 'i0',
 			name: 'item 0',
@@ -153,7 +140,6 @@ suite('flat data', () => {
 		element._templatesObserver.flush();
 		element.data = items;
 		flushAsynchronousOperations();
-		flush(done);
 	});
 
 	test('attaches a iron-list element', () => {
@@ -218,8 +204,8 @@ suite('flat data', () => {
 
 suite('empty-groups', () => {
 	let element;
-	setup(done => {
-		element = fixture('basic');
+	setup(async () => {
+		element = await fixture(basicHtmlFixture);
 		element._templatesObserver.flush();
 		element.data = [{
 			name: 'Group 0',
@@ -239,7 +225,6 @@ suite('empty-groups', () => {
 			}]
 		}];
 		flushAsynchronousOperations();
-		flush(done);
 	});
 
 	test('does not render empty groups by default', () => {
@@ -259,8 +244,8 @@ suite('basic', () => {
 	let element,
 		groups;
 
-	setup(done => {
-		element = fixture('basic');
+	setup(async () => {
+		element = await fixture(basicHtmlFixture);
 
 		groups = [{
 			name: 'Group 0',
@@ -290,7 +275,6 @@ suite('basic', () => {
 		element._templatesObserver.flush();
 		element.data = groups;
 		flushAsynchronousOperations();
-		flush(done);
 	});
 
 	test('instantiates a cosmoz-grouped-list element', () => {
@@ -636,12 +620,11 @@ suite('basic', () => {
 suite('compare items function', () => {
 	let element;
 
-	setup(done => {
-		element = fixture('basic');
+	setup(async () => {
+		element = await fixture(basicHtmlFixture);
 		element._templatesObserver.flush();
 		element.data = [];
 		flushAsynchronousOperations();
-		flush(done);
 	});
 
 
@@ -649,9 +632,7 @@ suite('compare items function', () => {
 		const data = [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }];
 
 		element.data = data;
-		element.compareItemsFn = function (a, b) {
-			return a.id === b.id;
-		};
+		element.compareItemsFn = (a, b) => a.id === b.id;
 
 		element.selectItem(data[0]);
 		element.selectItem(data[1]);
@@ -666,5 +647,3 @@ suite('compare items function', () => {
 		assert.deepEqual(element.selectedItems, [{ id: 0 }]);
 	});
 });
-</script>
-</body></html>
