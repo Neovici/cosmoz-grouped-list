@@ -29,19 +29,9 @@ checks:
     enabled: true
 
 plugins:
-  eslint:
-    enabled: true
-    channel: "eslint-5"
-    config:
-      sanitize_batch: false
-      extensions:
-        - .js
-        - .html
   fixme:
     enabled: true
 
 exclude_patterns:
-  - "node_modules/"
-  - "tests/"
-  - "demo/"
-  - "*.bak"
+  - "**/node_modules/"
+  - "coverage/"
