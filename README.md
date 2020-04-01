@@ -1,4 +1,4 @@
 cosmoz-grouped-list
 ====================
 
-[![Build Status](https://travis-ci.com/Neovici/cosmoz-grouped-list.svg?branch=master)](https://travis-ci.com/Neovici/cosmoz-grouped-list)
+![Build Status](https://github.com/Neovici/cosmoz-grouped-list/workflows/Github%20CI/badge.svg)
