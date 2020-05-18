@@ -58,14 +58,14 @@
 	"dependencies": {
 		"@polymer/iron-flex-layout": "^3.0.0",
 		"@polymer/iron-list": "^3.1.0",
-		"@polymer/polymer": "^3.3.1"
+		"@polymer/polymer": "^3.4.1"
 	},
 	"devDependencies": {
 		"@commitlint/cli": "^8.3.5",
 		"@commitlint/config-conventional": "^8.3.4",
-		"@neovici/eslint-config": "^1.2.0",
-		"@open-wc/testing": "^2.5.8",
-		"@open-wc/testing-karma": "^3.3.10",
+		"@neovici/eslint-config": "^1.2.2",
+		"@open-wc/testing": "^2.5.16",
+		"@open-wc/testing-karma": "^3.3.27",
 		"@polymer/iron-component-page": "^4.0.0",
 		"@polymer/iron-demo-helpers": "^3.0.0",
 		"@polymer/iron-icon": "^3.0.0",
@@ -78,14 +78,14 @@
 		"@semantic-release/changelog": "^5.0.1",
 		"@semantic-release/git": "^9.0.0",
 		"deepmerge": "^4.2.2",
-		"es-dev-server": "^1.46.0",
+		"es-dev-server": "^1.50.5",
 		"eslint": "^6.8.0",
-		"husky": "^4.2.3",
+		"husky": "^4.2.5",
 		"karma": "^4.4.1",
 		"karma-firefox-launcher": "^1.3.0",
 		"karma-sauce-launcher": "^2.0.2",
 		"lit-html": "^1.2.1",
-		"semantic-release": "^17.0.4",
-		"sinon": "^9.0.1"
+		"semantic-release": "^17.0.7",
+		"sinon": "^9.0.2"
 	}
 }
