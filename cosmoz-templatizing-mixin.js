@@ -117,7 +117,7 @@ export const templatizing = dedupingMixin(base => class extends base { // eslint
 		}
 		if (ctors[type] == null) {
 			// eslint-disable-next-line no-console
-			console.warn(`cosmoz-grouped-list template for ${type} type not found.`);
+			console.warn(`cosmoz-grouped-list template for ${ type } type not found.`);
 		}
 
 		if (prevInstance && prevInstance.__type === type) {

@@ -18,6 +18,7 @@ export class TemplateSelector extends PolymerElement {
 			}
 
 			/* This will give a row with an opened dropdown a z-index higher than all other rows */
+			:host(:focus-within),
 			:host(.has-dropdown) {
 				z-index: 100;
 			}
