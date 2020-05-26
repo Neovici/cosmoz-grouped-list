@@ -697,7 +697,7 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 	 * @returns {string} Slot.
 	 */
 	_getSlotByIndex(index) {
-		return `cosmoz-glts-${index}`;
+		return `cosmoz-glts-${ index }`;
 	}
 	/**
 	 * Get item type.
