@@ -1,3 +1,11 @@
+## [3.1.1](https://github.com/neovici/cosmoz-grouped-list/compare/v3.1.0...v3.1.1) (2020-05-26)
+
+
+### Bug Fixes
+
+* increase z-index on selector focus-within ([52c7389](https://github.com/neovici/cosmoz-grouped-list/commit/52c738985175c3e72f73887310d99993d76805af))
+* **deps:** update ([baf814c](https://github.com/neovici/cosmoz-grouped-list/commit/baf814cb88dc906c11e4c27115ab2944364dac76))
+
 # [3.1.0](https://github.com/neovici/cosmoz-grouped-list/compare/v3.0.5...v3.1.0) (2019-11-28)
 
 
