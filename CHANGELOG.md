@@ -1,3 +1,10 @@
+## [3.1.2](https://github.com/neovici/cosmoz-grouped-list/compare/v3.1.1...v3.1.2) (2020-10-03)
+
+
+### Bug Fixes
+
+* replace iron-flex-layout with css ([98f3fdf](https://github.com/neovici/cosmoz-grouped-list/commit/98f3fdf39d229a4f2de1d979264ceded6b0ba8d2))
+
 ## [3.1.1](https://github.com/neovici/cosmoz-grouped-list/compare/v3.1.0...v3.1.1) (2020-05-26)
 
 
