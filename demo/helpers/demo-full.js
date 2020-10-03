@@ -1,7 +1,6 @@
 import {
 	PolymerElement, html
 } from '@polymer/polymer';
-import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
 import '@polymer/paper-dropdown-menu/paper-dropdown-menu-light.js';
 import '@polymer/paper-item/paper-item.js';
 import '@polymer/paper-listbox/paper-listbox.js';
@@ -13,7 +12,20 @@ class DemoFull extends PolymerElement {
 	/* eslint-disable-next-line max-lines-per-function */
 	static get template() {
 		return html`
-			<style include="iron-flex iron-flex-alignment iron-positioning">
+			<style>
+				:host {
+					display: flex;
+					flex-direction: column;
+				}
+
+				.actions {
+					display: flex;
+					align-items: center;
+					flex-wrap: wrap;
+				}
+
+				cosmoz-grouped-list, .group-name { flex: auto }
+
 				.group-header {
 					padding: 5px;
 					background-color: #ccc;
@@ -34,7 +46,8 @@ class DemoFull extends PolymerElement {
 				}
 
 				.item-template {
-					@apply --layout-vertical;
+					display: flex;
+					flex-direction: column;
 				}
 
 				.item-template[highlighted] {
@@ -42,81 +55,79 @@ class DemoFull extends PolymerElement {
 				}
 
 				.group-template {
-					@apply --layout-horizontal;
-					@apply --layout-center;
+					display: flex;
+					align-items: center;
 					padding: 5px;
 					background-color: #ccc;
 					font-weight: bold;
 				}
 			</style>
-			<div class="layout vertical fit">
-				<h3>cosmoz-grouped-list demo</h3>
-				<div class="layout horizontal center wrap">
-					<button class="action" on-click="_newData">generate new data with grouping</button>
-					<button class="action" on-click="_newSmallData">generate new small data with grouping</button>
-					<button class="action" on-click="_newFlatData">generate new data without grouping</button>
-					<button class="action" on-click="_emptyData">empty data</button>
-					<button class="action" on-click="_emptySelectedItems">Empty selectedItems</button>
-					<button class="action" on-click="_changeOuterValue">Increment outer binding value</button>
-					<input class="action" value="{{itemValue::input}}">
-					<button class="action" on-click="_changeItemValue">change item value</button>
-					<button class="action" on-click="_firstVisibleItem">First visible item</button>
-				</div>
-				<div class="layout horizontal center wrap">
-					<button class="action" on-click="selectAll">Select all</button>
-					<button class="action" on-click="deselectAll">Deselect all</button>
-					<button class="action" on-click="removeSelected">Remove selected items</button>
-					<div class="action">Selected items count = {{selectedItems.length}}</div>
-				</div>
-				<!--<div class="layout horizontal center">
-					<label class="action">Group index</label>
-					<input class="action" value="{{groupIndex::input}}">
-					<label class="action">Item index</label>
-					<input class="action" value="{{itemIndex::input}}">
-					<label class="action">Item value</label>
-					<input class="action" value="{{itemValue::input}}">
-					<button class="action" class="action" on-click="_changeItemValue">change item value</button>
-				</div>-->
-				<cosmoz-grouped-list id="groupedList" data="{{ data }}" selected-items="{{ selectedItems }}" class="flex">
-					<template slot="templates" data-type="item">
-						<div highlighted$="[[highlighted]]" class="item-template" style="border-bottom: 1px solid grey;">
-							<div on-click="highlight">
-								<div>Outer binding: <span>[[outerValue]]</span></div>
-								<div>Id: <span>{{item.id}}</span></div>
-								<div>Name: <span>{{item.name}}</span></div>
-								<div>Value: <span>{{item.value}}</span></div>
-								<div>Highlighted: <span>[[highlighted]]</span></div>
-							</div>
-							<div on-click="select">Selected: <span>{{ selected }}</span> (click to select/deselect)</div>
-							<paper-dropdown-menu-light no-animations label="dropdown menu">
-								<paper-listbox slot="dropdown-content">
-									<paper-item>Item 1</paper-item>
-									<paper-item>Item 2</paper-item>
-									<paper-item>Item 3</paper-item>
-									<paper-item>Item 4</paper-item>
-								</paper-listbox>
-							</paper-dropdown-menu-light>
-							<div on-click="toggleCollapse">[+]</div>
-							<div class$="{{_computeExtraContentClass(expanded)}}">
-								Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed quis
-								posuere turpis, quis commodo neque. Aenean dapibus consequat dolor,
-								et vestibulum enim volutpat a. Donec vel dui at diam tristique
-								condimentum dapibus ac elit. Sed consequat nibh id nibh posuere
-								egestas. Phasellus blandit convallis tellus, nec pharetra orci
-								viverra ut. In at arcu consectetur, tempus velit sit amet, congue
-								diam. Suspendisse potenti. In ac tristique nulla, quis elementum nisi.
-							</div>
-						</div>
-					</template>
-					<template slot="templates" data-type="group">
-						<div class="group-template">
-							<div class="flex" on-click="toggleSelect"><span>[[item.name]]</span>(selected=<span>{{selected}}</span>)</div>
-							<div>[[ item.items.length ]]</div>
-							<iron-icon icon="[[ getFoldIcon(folded) ]]" on-click="toggleFold"></iron-icon>
-						</div>
-					</template>
-				</cosmoz-grouped-list>
+			<h3>cosmoz-grouped-list demo</h3>
+			<div class="actions">
+				<button class="action" on-click="_newData">generate new data with grouping</button>
+				<button class="action" on-click="_newSmallData">generate new small data with grouping</button>
+				<button class="action" on-click="_newFlatData">generate new data without grouping</button>
+				<button class="action" on-click="_emptyData">empty data</button>
+				<button class="action" on-click="_emptySelectedItems">Empty selectedItems</button>
+				<button class="action" on-click="_changeOuterValue">Increment outer binding value</button>
+				<input class="action" value="{{itemValue::input}}">
+				<button class="action" on-click="_changeItemValue">change item value</button>
+				<button class="action" on-click="_firstVisibleItem">First visible item</button>
 			</div>
+			<div class="actions">
+				<button class="action" on-click="selectAll">Select all</button>
+				<button class="action" on-click="deselectAll">Deselect all</button>
+				<button class="action" on-click="removeSelected">Remove selected items</button>
+				<div class="action">Selected items count = {{selectedItems.length}}</div>
+			</div>
+			<!--<div class="actions">
+				<label class="action">Group index</label>
+				<input class="action" value="{{groupIndex::input}}">
+				<label class="action">Item index</label>
+				<input class="action" value="{{itemIndex::input}}">
+				<label class="action">Item value</label>
+				<input class="action" value="{{itemValue::input}}">
+				<button class="action" class="action" on-click="_changeItemValue">change item value</button>
+			</div>-->
+			<cosmoz-grouped-list id="groupedList" data="{{ data }}" selected-items="{{ selectedItems }}">
+				<template slot="templates" data-type="item">
+					<div highlighted$="[[highlighted]]" class="item-template" style="border-bottom: 1px solid grey;">
+						<div on-click="highlight">
+							<div>Outer binding: <span>[[outerValue]]</span></div>
+							<div>Id: <span>{{item.id}}</span></div>
+							<div>Name: <span>{{item.name}}</span></div>
+							<div>Value: <span>{{item.value}}</span></div>
+							<div>Highlighted: <span>[[highlighted]]</span></div>
+						</div>
+						<div on-click="select">Selected: <span>{{ selected }}</span> (click to select/deselect)</div>
+						<paper-dropdown-menu-light no-animations label="dropdown menu">
+							<paper-listbox slot="dropdown-content">
+								<paper-item>Item 1</paper-item>
+								<paper-item>Item 2</paper-item>
+								<paper-item>Item 3</paper-item>
+								<paper-item>Item 4</paper-item>
+							</paper-listbox>
+						</paper-dropdown-menu-light>
+						<div on-click="toggleCollapse">[+]</div>
+						<div class$="{{_computeExtraContentClass(expanded)}}">
+							Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed quis
+							posuere turpis, quis commodo neque. Aenean dapibus consequat dolor,
+							et vestibulum enim volutpat a. Donec vel dui at diam tristique
+							condimentum dapibus ac elit. Sed consequat nibh id nibh posuere
+							egestas. Phasellus blandit convallis tellus, nec pharetra orci
+							viverra ut. In at arcu consectetur, tempus velit sit amet, congue
+							diam. Suspendisse potenti. In ac tristique nulla, quis elementum nisi.
+						</div>
+					</div>
+				</template>
+				<template slot="templates" data-type="group">
+					<div class="group-template">
+						<div class="group-name" on-click="toggleSelect"><span>[[item.name]]</span>(selected=<span>{{selected}}</span>)</div>
+						<div>[[ item.items.length ]]</div>
+						<iron-icon icon="[[ getFoldIcon(folded) ]]" on-click="toggleFold"></iron-icon>
+					</div>
+				</template>
+			</cosmoz-grouped-list>
 		`;
 	}
 

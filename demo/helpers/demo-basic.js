@@ -1,14 +1,18 @@
 import {
 	PolymerElement, html
 } from '@polymer/polymer';
-import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
 import '../../cosmoz-grouped-list.js';
 
 class DemoBasic extends PolymerElement {
 	/* eslint-disable-next-line max-lines-per-function */
 	static get template() {
 		return html`
-			<style include="iron-flex iron-flex-alignment iron-positioning">
+			<style>
+				:host {
+					display: flex;
+					flex-direction: column;
+				}
+				cosmoz-grouped-list { flex: auto}
 				.group-header {
 					padding: 5px;
 					background-color: #ccc;
@@ -29,38 +33,37 @@ class DemoBasic extends PolymerElement {
 				}
 
 				.item-template {
-					@apply --layout-vertical;
+					display: flex;
+					flex-direction: column;
 				}
 
 				.group-template {
-					@apply --layout-horizontal;
-					@apply --layout-center;
+					display: flex;
+					align-items: center;
 					padding: 5px;
 					background-color: #ccc;
 					font-weight: bold;
 				}
 			</style>
-			<div class="layout vertical fit">
-				<h3>cosmoz-grouped-list demo</h3>
-				<cosmoz-grouped-list id="groupedList" data="{{ data }}" selected-items="{{ selectedItems }}" class="flex">
-					<template slot="templates" data-type="item">
-						<div class="item-template" style="border-bottom: 1px solid grey;">
-							<div>
-								ID:<span class="item-id">{{ item.id }}</span>
-								NAME:<span class="item-name">{{ item.name }}</span>
-								VALUE:<span class="item-value">{{ item.value }}</span>
-							</div>
-						</div>
-					</template>
-					<template slot="templates" data-type="group">
-						<div class="group-template">
+			<h3>cosmoz-grouped-list demo</h3>
+			<cosmoz-grouped-list id="groupedList" data="{{ data }}" selected-items="{{ selectedItems }}">
+				<template slot="templates" data-type="item">
+					<div class="item-template" style="border-bottom: 1px solid grey;">
+						<div>
+							ID:<span class="item-id">{{ item.id }}</span>
 							NAME:<span class="item-name">{{ item.name }}</span>
-							VALUE: <span class="item-value">{{ item.value }}</span>
-							SELECTED: <span class="item-selected">{{ selected }}</span>
+							VALUE:<span class="item-value">{{ item.value }}</span>
 						</div>
-					</template>
-				</cosmoz-grouped-list>
-			</div>
+					</div>
+				</template>
+				<template slot="templates" data-type="group">
+					<div class="group-template">
+						NAME:<span class="item-name">{{ item.name }}</span>
+						VALUE: <span class="item-value">{{ item.value }}</span>
+						SELECTED: <span class="item-selected">{{ selected }}</span>
+					</div>
+				</template>
+			</cosmoz-grouped-list>
 		`;
 	}
 

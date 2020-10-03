@@ -9,7 +9,6 @@ import {
 import { useShadow } from '@polymer/polymer/lib/utils/settings';
 
 import '@polymer/iron-list/iron-list.js';
-import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
 
 import { templatizing } from './cosmoz-templatizing-mixin.js';
 import './cosmoz-grouped-list-template-selector.js';
@@ -33,9 +32,9 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 		return html`
 		<style>
 			:host {
-				display: block;
+				display: flex;
 				position: relative;
-				@apply --layout-vertical;
+				flex-direction: column;
 			}
 
 			:host(:not(.has-scroll-target)) #list {
