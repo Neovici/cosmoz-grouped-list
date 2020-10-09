@@ -1,3 +1,10 @@
+## [3.1.4](https://github.com/neovici/cosmoz-grouped-list/compare/v3.1.3...v3.1.4) (2020-10-09)
+
+
+### Bug Fixes
+
+* getFirstVisibleItemElement handles grouping ([addefa2](https://github.com/neovici/cosmoz-grouped-list/commit/addefa251edf05e65eb2ffa481cdcdd7febb71ee))
+
 ## [3.1.3](https://github.com/neovici/cosmoz-grouped-list/compare/v3.1.2...v3.1.3) (2020-10-09)
 
 
