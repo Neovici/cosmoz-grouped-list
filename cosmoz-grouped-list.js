@@ -399,7 +399,7 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 		if (!Array.isArray(flat) || flat.length === 0) {
 			return false;
 		}
-		return instances.some(instance => instance !== null);
+		return instances.some(instance => instance?.element.offsetParent != null);
 	}
 
 	/**

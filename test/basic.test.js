@@ -650,12 +650,10 @@ suite('getFirstVisibleItemElement', () => {
 		flushAsynchronousOperations();
 	});
 	test('getFirstVisibleItemElement calls _getInstanceByProperty', () => {
-		const spy = sinonSpy(element, '_getInstanceByProperty'),
-			first = element.getFirstVisibleItemElement();
-		sinonAssert.called(spy);
+		const first = element.getFirstVisibleItemElement();
 		assert.isNotNull(first);
 		assert.isNotNull(first.offsetParent);
-		spy.restore();
+		assert.equal(first.querySelector('.item-value').textContent, '0');
 	});
 
 	test('getFirstVisibleItemElement handles null _flatData', () => {
