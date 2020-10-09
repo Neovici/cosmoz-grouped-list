@@ -381,21 +381,8 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 		if (!Array.isArray(flat) || flat.length === 0) {
 			return false;
 		}
-
-		let { firstVisibleIndex: index } = this.$.list,
-			instance = null;
-
-		while (index < flat.length && !instance) {
-			instance =	this._getInstanceByProperty('index', index);
-			if (instance) {
-				instance = instance.__type === 'item' && instance.element?.offsetParent != null && instance;
-			}
-			index++;
-		}
-
-		if (instance) {
-			return instance.element;
-		}
+		const { firstVisibleIndex } = this.$.list;
+		return this._instances.find(i => i.__type === 'item' && i._getProperty('index') === firstVisibleIndex && i.element?.offsetParent != null)?.element;
 	}
 
 	/**
