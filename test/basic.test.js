@@ -533,18 +533,6 @@ suite('basic', () => {
 		assert.isUndefined(element._removeInstance());
 	});
 
-	test('getFirstVisibleItemElement calls _getInstanceByProperty', () => {
-		const spy = sinonSpy(element, '_getInstanceByProperty'),
-			first = element.getFirstVisibleItemElement();
-		sinonAssert.called(spy);
-		assert.isNotNull(first);
-		spy.restore();
-	});
-
-	test('getFirstVisibleItemElement handles null _flatData', () => {
-		element._flatData = null;
-		assert.isFalse(element.getFirstVisibleItemElement());
-	});
 
 	test('_dataChanged calls _forwardItemPath for item changes', () => {
 		const spy = sinonSpy(element, '_forwardItemPath');
@@ -645,5 +633,33 @@ suite('compare items function', () => {
 		element.data = [{ id: 0 }, { id: 5 }];
 		flushAsynchronousOperations(); // flush _render debouncer
 		assert.deepEqual(element.selectedItems, [{ id: 0 }]);
+	});
+});
+
+
+suite('getFirstVisibleItemElement', () => {
+	let element;
+	setup(async () => {
+		element = await fixture(basicHtmlFixture);
+		element._templatesObserver.flush();
+		element.data = new Array(200).fill().map((_, i) => ({
+			id: `id-${ i }`,
+			title: `Item ${ i }`,
+			value: i
+		}));
+		flushAsynchronousOperations();
+	});
+	test('getFirstVisibleItemElement calls _getInstanceByProperty', () => {
+		const spy = sinonSpy(element, '_getInstanceByProperty'),
+			first = element.getFirstVisibleItemElement();
+		sinonAssert.called(spy);
+		assert.isNotNull(first);
+		assert.isNotNull(first.offsetParent);
+		spy.restore();
+	});
+
+	test('getFirstVisibleItemElement handles null _flatData', () => {
+		element._flatData = null;
+		assert.isFalse(element.getFirstVisibleItemElement());
 	});
 });
