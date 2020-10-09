@@ -388,7 +388,7 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 		while (index < flat.length && !instance) {
 			instance =	this._getInstanceByProperty('index', index);
 			if (instance) {
-				instance = instance.__type === 'item' && instance;
+				instance = instance.__type === 'item' && instance.element?.offsetParent != null && instance;
 			}
 			index++;
 		}
