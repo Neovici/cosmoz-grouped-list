@@ -382,7 +382,7 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 			return false;
 		}
 		const { firstVisibleIndex } = this.$.list;
-		return this._instances.find(i => i.__type === 'item' && i._getProperty('index') === firstVisibleIndex && i.element?.offsetParent != null)?.element;
+		return this._instances.find(i => i.__type === 'item' && i._getProperty('index') >= firstVisibleIndex && i.element?.offsetParent != null)?.element;
 	}
 
 	/**
