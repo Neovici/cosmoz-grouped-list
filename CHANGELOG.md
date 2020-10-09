@@ -1,3 +1,12 @@
+## [3.1.3](https://github.com/neovici/cosmoz-grouped-list/compare/v3.1.2...v3.1.3) (2020-10-09)
+
+
+### Bug Fixes
+
+* check item visibility in hasRenderedData ([32057b1](https://github.com/neovici/cosmoz-grouped-list/commit/32057b17a7561b209e9686a79ccd656c576e6496))
+* correctly find instance with index ([96daa0c](https://github.com/neovici/cosmoz-grouped-list/commit/96daa0c4f03339f99b8e7bd05bd28c6d157e66c5))
+* getFirstVisibleItemElement returns a visible item ([8de91ee](https://github.com/neovici/cosmoz-grouped-list/commit/8de91ee1d1aa2c1fc9bab681b725b31a585e8912))
+
 ## [3.1.2](https://github.com/neovici/cosmoz-grouped-list/compare/v3.1.1...v3.1.2) (2020-10-03)
 
 
