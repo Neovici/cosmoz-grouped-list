@@ -10,8 +10,7 @@ import { useShadow } from '@polymer/polymer/lib/utils/settings';
 
 import '@polymer/iron-list/iron-list.js';
 
-import { templatizing } from './cosmoz-templatizing-mixin.js';
-import './cosmoz-grouped-list-template-selector.js';
+import './cosmoz-grouped-list-item.js';
 
 /**
 `<cosmoz-grouped-list>` is an example implementation of grouping for iron-list
@@ -27,17 +26,17 @@ with features like group count display and folding
 @demo demo/basic.html Basic Demo
 @appliesMixin templatizing
 */
-export class CosmozGroupedList extends templatizing(PolymerElement) {
+export class CosmozGroupedList extends PolymerElement {
 	static get template() {
 		return html`
 		<style>
-			:host {
+			cosmoz-grouped-list {
 				display: flex;
 				position: relative;
 				flex-direction: column;
 			}
 
-			:host(:not(.has-scroll-target)) #list {
+			cosmoz-grouped-list(:not(.has-scroll-target)) #list {
 				position: absolute;
 				top: 0;
 				right: 0;
@@ -45,19 +44,23 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 				left: 0;
 			}
 
-			:host(.has-scroll-target) #list {
+			cosmoz-grouped-list(.has-scroll-target) #list {
 				flex: 1;
 			}
 		</style>
 
 		<iron-list id="list" items="[[ _flatData ]]" as="item">
 			<template>
-				<cosmoz-grouped-list-template-selector item="[[ item ]]" index="[[ index ]]" on-cosmoz-selector-changed="_onTemplateSelectorChanged">
-					<slot></slot>
-				</cosmoz-grouped-list-template-selector>
+				<cosmoz-grouped-list-item
+					item="[[ item ]]"
+					index="[[ index ]]"
+					render-item-row="[[ _renderItemRow ]]"
+					render-group-row="[[ _renderGroupRow ]]"
+				></cosmoz-grouped-list-item>
+				<!--cosmoz-grouped-list-template-selector item="[[ item ]]" index="[[ index ]]" on-cosmoz-selector-changed="_onTemplateSelectorChanged">
+				</cosmoz-grouped-list-template-selector-->
 			</template>
 		</iron-list>
-		<slot name="templates" id="templates"></slot>
 	`;
 	}
 
@@ -69,7 +72,14 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 		this.selectedItems = [];
 
 		this._boundRender = this._render.bind(this);
+		this._renderItemRow = this._renderItemRow.bind(this);
+		this._renderGroupRow = this._renderGroupRow.bind(this);
 	}
+
+	_attachDom(dom) {
+		this.appendChild(dom);
+	}
+
 	/**
 	 * Get component name.
 	 * @returns {string} Name.
@@ -126,8 +136,15 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 
 			_flatData: {
 				type: Array
-			}
+			},
 
+			renderItemRow: {
+				type: Function
+			},
+
+			renderGroupRow: {
+				type: Function
+			}
 		};
 	}
 	/**
@@ -377,6 +394,7 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 	 * @returns {HTMLElement|null} The first visible element or null
 	 */
 	getFirstVisibleItemElement() {
+		return;
 		const { _flatData: flat } = this;
 		if (!Array.isArray(flat) || flat.length === 0) {
 			return false;
@@ -392,6 +410,7 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 	 * this means we are displaying only group templates.
 	 */
 	get hasRenderedData() {
+		return true;
 		const {
 			_flatData: flat,
 			_instances: instances
@@ -693,6 +712,14 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 	 */
 	_getItemType(item) {
 		return this.isGroup(item) ? 'group' : 'item';
+	}
+
+	_renderItemRow(item) {
+		return this.renderItemRow(item, this._getItemState(item));
+	}
+
+	_renderGroupRow(group) {
+		return this.renderGroupRow(group, this._getItemState(group));
 	}
 }
 customElements.define(CosmozGroupedList.is, CosmozGroupedList);
