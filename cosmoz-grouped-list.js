@@ -2,15 +2,9 @@
 import {
 	PolymerElement, html
 } from '@polymer/polymer';
-import { timeOut } from '@polymer/polymer/lib/utils/async.js';
-import {
-	Debouncer, enqueueDebouncer
-} from '@polymer/polymer/lib/utils/debounce.js';
-import { useShadow } from '@polymer/polymer/lib/utils/settings';
-
 import '@polymer/iron-list/iron-list.js';
-
 import './cosmoz-grouped-list-item.js';
+import { isEmpty } from '@neovici/cosmoz-utils/lib/template';
 
 /**
 `<cosmoz-grouped-list>` is an example implementation of grouping for iron-list
@@ -52,8 +46,11 @@ export class CosmozGroupedList extends PolymerElement {
 		<iron-list id="list" items="[[ _flatData ]]" as="item">
 			<template>
 				<cosmoz-grouped-list-item
+					item-row$="[[ isEmpty(item.items) ]]"
 					item="[[ item ]]"
 					index="[[ index ]]"
+					visible-columns="[[ visibleColumns ]]"
+					selected-items="[[ selectedItems ]]"
 					render-item-row="[[ _renderItemRow ]]"
 					render-group-row="[[ _renderGroupRow ]]"
 				></cosmoz-grouped-list-item>
@@ -64,6 +61,10 @@ export class CosmozGroupedList extends PolymerElement {
 	`;
 	}
 
+	isEmpty() {
+		return isEmpty(...arguments);
+	}
+
 	constructor() {
 		super();
 
@@ -71,7 +72,6 @@ export class CosmozGroupedList extends PolymerElement {
 
 		this.selectedItems = [];
 
-		this._boundRender = this._render.bind(this);
 		this._renderItemRow = this._renderItemRow.bind(this);
 		this._renderGroupRow = this._renderGroupRow.bind(this);
 	}
@@ -117,14 +117,6 @@ export class CosmozGroupedList extends PolymerElement {
 				}
 			},
 
-			highlightedItems: {
-				type: Array,
-				value() {
-					return [];
-				},
-				notify: true
-			},
-
 			/**
 			 * Indicates wether this grouped-list should render groups without items.
 			 */
@@ -135,7 +127,8 @@ export class CosmozGroupedList extends PolymerElement {
 			},
 
 			_flatData: {
-				type: Array
+				type: Array,
+				computed: '_prepareData(data)'
 			},
 
 			renderItemRow: {
@@ -158,100 +151,6 @@ export class CosmozGroupedList extends PolymerElement {
 		];
 	}
 
-	/**
-	 * Polymer `connectedCallback` livecycle function.
-	 *
-	 * @return {void}
-	 */
-	connectedCallback() {
-		super.connectedCallback();
-		this._debounceRender();
-	}
-
-	/**
-	 * Polymer `disconnectedCallback` livecycle function.
-	 *
-	 * @return {void}
-	 */
-	disconnectedCallback() {
-		super.disconnectedCallback();
-		this._renderDebouncer.cancel();
-	}
-	/**
-	 * Forward item path if necessary and debounce render.
-	 * @param {object} change Change notifier.
-	 * @returns {void}
-	 */
-	_dataChanged(change) {
-		if (change.path === 'data' || change.path.slice(-8) === '.splices') {
-			this._debounceRender();
-		} else if (change.path.slice(-7) !== '.length') {
-			if (!this._forwardItemPath(change.path, change.value)) {
-				this._debounceRender();
-			}
-		}
-	}
-	/**
-	 * Debounce render.
-	 * @returns {void}
-	 */
-	_debounceRender() {
-		enqueueDebouncer(
-			this._renderDebouncer = Debouncer.debounce(
-				this._renderDebouncer,
-				timeOut.after(30),
-				this._boundRender
-			)
-		);
-	}
-	/**
-	 * Prepare and set flat data.
-	 * @returns {void}
-	 */
-	_render() {
-		if (!this.isConnected) {
-			return;
-		}
-		this._flatData = this._prepareData(this.data);
-	}
-	/**
-	 * Forward item path.
-	 * @param {string} path Path.
-	 * @param {any} value Value.
-	 * @returns {void}
-	 */
-	_forwardItemPath(path, value) {
-		const match = path.match(/data(?:\.#?(\d+)\.items)?\.#?(\d+)(\..+)$/ui);
-
-		if (!match) {
-			return;
-		}
-
-		const groupIndex = match[1],
-			itemIndex = match[2],
-			propertyPath = 'item' + match[3],
-			items = groupIndex ? this.data[groupIndex].items : this.data,
-			item = items ? items[itemIndex] : null;
-
-		if (item == null) {
-			// eslint-disable-next-line no-console
-			console.warn('Item not found when forwarding path', path);
-			return;
-		}
-
-		const instance = this._getInstanceByProperty('item', item);
-
-		if (!instance) {
-			// eslint-disable-next-line no-console
-			console.warn('Template instance for item not found when forwarding path', path);
-			return;
-		}
-
-		instance._setPendingPropertyOrPath(propertyPath, value, false, true);
-		instance._flushProperties(true);
-
-		return true;
-	}
 	/**
 	 * Add or remove has scroll target classes and set or remove list scroll
 	 * target.
@@ -346,61 +245,16 @@ export class CosmozGroupedList extends PolymerElement {
 		}
 	}
 
-	_onTemplateSelectorChanged(e, {
-		item, index, hidden, selector
-	}) {
-		const
-			fidx = this._flatData ? this._flatData.indexOf(item) : '',
-			idx = index == null ? fidx : index,
-			prevInstance = selector.__instance;
-
-		if (!item) {
-			return;
-		}
-
-		if (hidden && prevInstance != null) {
-			this._reuseInstance(prevInstance);
-			selector.__instance = null;
-			return;
-		}
-
-		const slotName = this._getSlotByIndex(idx) + Date.now(),
-			isGroup = this.isGroup(item),
-			type = this._getItemType(item),
-			props = {
-				[this.as]: item,
-				[this.indexAs]: idx,
-				selected: isGroup ? this.isGroupSelected(item) : this.isItemSelected(item),
-				folded: isGroup ? this.isFolded(item) : undefined,
-				expanded: isGroup ? undefined : this.isExpanded(item),
-				highlighted: this.isItemHighlighted(item)
-			},
-			instance = this._getInstance(type, props, prevInstance, item != null),
-			slot = selector.querySelector('slot');
-
-		slot.setAttribute('name', slotName);
-		instance.element.setAttribute('slot', slotName);
-		this.appendChild(
-			useShadow
-				? instance.root
-				: instance.element
-		);
-		selector.__instance = instance;
-	}
-
 	/**
 	 * Utility method that returns the element that displays the first visible item in the list.
 	 * This method is mainly aimed at `cosmoz-omnitable`.
 	 * @returns {HTMLElement|null} The first visible element or null
 	 */
 	getFirstVisibleItemElement() {
-		return;
-		const { _flatData: flat } = this;
-		if (!Array.isArray(flat) || flat.length === 0) {
+		if (!Array.isArray(this._flatData) || this._flatData.length === 0) {
 			return false;
 		}
-		const { firstVisibleIndex } = this.$.list;
-		return this._instances.find(i => i.__type === 'item' && i._getProperty('index') >= firstVisibleIndex && i.element?.offsetParent != null)?.element;
+		return this.$.list.querySelector('cosmoz-grouped-list-item[item-row]');
 	}
 
 	/**
@@ -410,41 +264,7 @@ export class CosmozGroupedList extends PolymerElement {
 	 * this means we are displaying only group templates.
 	 */
 	get hasRenderedData() {
-		return true;
-		const {
-			_flatData: flat,
-			_instances: instances
-		} = this;
-		if (!Array.isArray(flat) || flat.length === 0) {
-			return false;
-		}
-		return instances.some(instance => instance?.element.offsetParent != null);
-	}
-
-	/**
-	 * Utility method to remove an item from the list.
-	 * This method simply removes the specified item from the `data` using
-	 * Polymer array mutation methods.
-	 * Cannot be used to remove a group.
-	 * @deprecated
-	 * @param {Object} item The item to remove
-	 * @returns {Boolean|undefined} true/false or null
-	 */
-	removeItem(item) {
-		if (this.data[0].items) {
-			return this.data.some((group, groupIndex) => {
-				const index = group.items.indexOf(item);
-				if (index >= 0) {
-					this.splice('data.' + groupIndex + '.items', index, 1);
-					return true;
-				}
-				return false;
-			}, this);
-		}
-		const i = this.data.indexOf(item);
-		if (i >= 0) {
-			this.splice('data', i, 1);
-		}
+		return this.$.list.querySelector('cosmoz-grouped-list-item').length >= 1;
 	}
 
 	/**
@@ -503,7 +323,7 @@ export class CosmozGroupedList extends PolymerElement {
 		groupState.folded = false;
 		const groupFlatIndex = this._flatData.indexOf(group);
 		this.splice.apply(this, ['_flatData', groupFlatIndex + 1, 0].concat(group.items));
-		this._forwardPropertyByItem(group, 'folded', false, true);
+		// this._forwardPropertyByItem(group, 'folded', false, true);
 
 	}
 	/**
@@ -521,7 +341,7 @@ export class CosmozGroupedList extends PolymerElement {
 		groupState.folded = true;
 		const groupFlatIndex = this._flatData.indexOf(group);
 		this.splice('_flatData', groupFlatIndex + 1, group.items.length);
-		this._forwardPropertyByItem(group, 'folded', true, true);
+		// this._forwardPropertyByItem(group, 'folded', true, true);
 	}
 	/**
 	 * Add an item to the list of selected items and set it as selected.
@@ -530,27 +350,11 @@ export class CosmozGroupedList extends PolymerElement {
 	 */
 	selectItem(item) {
 		if (!this.isItemSelected(item)) {
-			this.push('selectedItems', item);
+			const state = this._getItemState(item);
+			state.selected = true;
+			this.selectedItems = this.selectedItems.concat(item);
 		}
-		this._forwardPropertyByItem(item, 'selected', true, true);
-	}
-	/**
-	 * Highlight or un-highlight an item.
-	 * @param {object} item Item.
-	 * @param {boolean} reverse Set to true to un-highlight.
-	 * @returns {void}
-	 */
-	highlightItem(item, reverse) {
-		const highlightedIndex = this.highlightedItems.indexOf(item);
-
-		if (highlightedIndex === -1 && !reverse) {
-			this.push('highlightedItems', item);
-		}
-
-		if (highlightedIndex > -1 && reverse) {
-			this.splice('highlightedItems', highlightedIndex, 1);
-		}
-		this._forwardPropertyByItem(item, 'highlighted', !reverse, true);
+		// this._forwardPropertyByItem(item, 'selected', true, true);
 	}
 	/**
 	 * Remove an item to the list of selected items and set it as deselected.
@@ -558,18 +362,21 @@ export class CosmozGroupedList extends PolymerElement {
 	 * @returns {void}
 	 */
 	deselectItem(item) {
-		const index = this.selectedItems.indexOf(item);
+		const index = this.selectedItems.indexOf(item),
+			state = this._getItemState(item);
+		state.selected = false;
 		if (index >= 0) {
-			this.splice('selectedItems', index, 1);
+			this.selectedItems = this.selectedItems.splice(index, 1);
 		}
-		this._forwardPropertyByItem(item, 'selected', false, true);
+		// this._forwardPropertyByItem(item, 'selected', false, true);
+
 		// If the containing group was selected, then deselect it
 		// as all items are not selected anymore
 		const group = this.getItemGroup(item);
 		if (group && this.isGroupSelected(group)) {
 			const groupState = this._getItemState(group);
 			groupState.selected = false;
-			this._forwardPropertyByItem(group, 'selected', false, true);
+			// this._forwardPropertyByItem(group, 'selected', false, true);
 		}
 	}
 
@@ -583,14 +390,6 @@ export class CosmozGroupedList extends PolymerElement {
 	}
 
 	/**
-	 * Check if item is highlighted.
-	 * @param {object} item Item.
-	 * @returns {boolean} Whether item is highlighted.
-	 */
-	isItemHighlighted(item) {
-		return this.highlightedItems.indexOf(item) >= 0;
-	}
-	/**
 	 * Toggle group selection.
 	 * @param {object} group Group.
 	 * @param {boolean} selected Whether selected.
@@ -602,7 +401,7 @@ export class CosmozGroupedList extends PolymerElement {
 			itemAction = willSelect ? 'selectItem' : 'deselectItem';
 
 		groupState.selected = willSelect;
-		this._forwardPropertyByItem(group, 'selected', willSelect, true);
+		// this._forwardPropertyByItem(group, 'selected', willSelect, true);
 		group.items.forEach(this[itemAction], this);
 	}
 
@@ -616,14 +415,6 @@ export class CosmozGroupedList extends PolymerElement {
 	}
 
 	/**
-	 * Toggle instance selection by value.
-	 * @param {any} value Value.
-	 * @returns {void}
-	 */
-	_toggleSelected(value) {
-		this._instances.forEach(instance => this._forwardProperty(instance, 'selected', value, true));
-	}
-	/**
 	 * Select all items.
 	 * @returns {void}
 	 */
@@ -634,29 +425,25 @@ export class CosmozGroupedList extends PolymerElement {
 			// select both groups and flat items
 			return all.concat(item.items || item);
 		}, []);
-		this.splice.apply(this, ['selectedItems', 0, this.selectedItems.length].concat(selected));
-
-		// Set the selected property to all visible items
-		this._toggleSelected(true);
+		this.set('selectedItems', selected);
 	}
 	/**
 	 * Deselect all selected items.
 	 * @returns {void}
 	 */
 	deselectAll() {
-		this.splice('selectedItems', 0, this.selectedItems.length);
+		this.set('selectedItems', []);
 
-		this.data.forEach(group => {
-			if (!group.items) {
+		this.data.forEach(groupOrItem => {
+			if (!groupOrItem.items) {
+				const state = this._getItemState(groupOrItem);
+				state.selected = false;
 				return;
 			}
 
-			const groupState = this._getItemState(group);
+			const groupState = this._getItemState(groupOrItem);
 			groupState.selected = false;
 		});
-
-		// Set the selected property to all visible items
-		this._toggleSelected(false);
 	}
 	/**
 	 * Update size for an item.
@@ -666,17 +453,10 @@ export class CosmozGroupedList extends PolymerElement {
 	updateSize(item) {
 		// Do not attempt to update size of item is not visible (for example when groups are folded)
 		if (this._flatData.indexOf(item) >= 0) {
-			this.$.list.updateSizeForItem(item);
+			requestAnimationFrame(() => this.$.list.updateSizeForItem(item));
 		}
 	}
-	/**
-	 * Update item sizes in a group.
-	 * @param {object} group Group to update item sizes in.
-	 * @returns {void}
-	 */
-	updateSizes(group) {
-		group.items.forEach(this.updateSize, this);
-	}
+
 	/**
 	 * Toggle collapse status on an item.
 	 * @param {object} item Item.
@@ -685,41 +465,16 @@ export class CosmozGroupedList extends PolymerElement {
 	toggleCollapse(item) {
 		const state = this._getItemState(item),
 			willExpand = state.expanded = !state.expanded;
-		this._forwardPropertyByItem(item, 'expanded', willExpand, true);
+		// this._forwardPropertyByItem(item, 'expanded', willExpand, true);
 		this.$.list.updateSizeForItem(item);
 	}
-	/**
-	 * Determine if an item is expanded.
-	 * @param {object} item Item.
-	 * @returns {boolean} Whether the item is expanded.
-	 */
-	isExpanded(item) {
-		return this._getItemState(item).expanded;
-	}
-	/**
-	 * Get slot by index.
-	 * @param {number} index Index.
-	 * @returns {string} Slot.
-	 */
-	_getSlotByIndex(index) {
-		return `cosmoz-glts-${ index }`;
-	}
-	/**
-	 * Get item type.
-	 * @param {object} item Item.
-	 * @param {boolean} isGroup Whether item is a group.
-	 * @returns {string} Item type.
-	 */
-	_getItemType(item) {
-		return this.isGroup(item) ? 'group' : 'item';
+
+	_renderItemRow(item, selectedItems, visibleColumns) {
+		return this.renderItemRow(item, selectedItems, visibleColumns, this._getItemState(item));
 	}
 
-	_renderItemRow(item) {
-		return this.renderItemRow(item, this._getItemState(item));
-	}
-
-	_renderGroupRow(group) {
-		return this.renderGroupRow(group, this._getItemState(group));
+	_renderGroupRow(group, selectedItems) {
+		return this.renderGroupRow(group, selectedItems, this._getItemState(group));
 	}
 }
 customElements.define(CosmozGroupedList.is, CosmozGroupedList);

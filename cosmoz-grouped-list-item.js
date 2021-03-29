@@ -1,14 +1,28 @@
-import { component } from 'haunted';
+import {
+	component, useEffect
+} from 'haunted';
 
 const ListItem = host => {
 	const {
-		item, index, renderItemRow, renderGroupRow
+		item, index, selectedItems, visibleColumns, renderItemRow, renderGroupRow
 	} = host;
-	console.log(item);
+
+	useEffect(() => {
+		if (!host.__hasRenderedOnce) {
+			host.__hasRenderedOnce = true;
+			return;
+		}
+
+		host.dispatchEvent(new CustomEvent('update-item-size', {
+			bubbles: true,
+			composed: true,
+			detail: { item }
+		}));
+	}, [item]);
 
 	return item.items instanceof Array
-		? renderGroupRow(item)
-		: renderItemRow(item);
+		? renderGroupRow(item, selectedItems)
+		: renderItemRow(item, selectedItems, visibleColumns);
 };
 
 customElements.define('cosmoz-grouped-list-item', component(ListItem, { useShadowDOM: false }));
