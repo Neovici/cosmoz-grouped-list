@@ -146,7 +146,6 @@ export class CosmozGroupedList extends PolymerElement {
 	 */
 	static get observers() {
 		return [
-			'_dataChanged(data.*)',
 			'_scrollTargetChanged(scrollTarget)'
 		];
 	}
