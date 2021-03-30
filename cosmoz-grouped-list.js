@@ -5,6 +5,8 @@ import {
 import '@polymer/iron-list/iron-list.js';
 import './cosmoz-grouped-list-item.js';
 import { isEmpty } from '@neovici/cosmoz-utils/lib/template';
+import { animationFrame } from '@polymer/polymer/lib/utils/async';
+import { Debouncer } from '@polymer/polymer/lib/utils/debounce';
 
 /**
 `<cosmoz-grouped-list>` is an example implementation of grouping for iron-list
@@ -48,14 +50,12 @@ export class CosmozGroupedList extends PolymerElement {
 				<cosmoz-grouped-list-item
 					item-row$="[[ isEmpty(item.items) ]]"
 					item="[[ item ]]"
-					index="[[ index ]]"
 					visible-columns="[[ visibleColumns ]]"
 					selected-items="[[ selectedItems ]]"
 					render-item-row="[[ _renderItemRow ]]"
 					render-group-row="[[ _renderGroupRow ]]"
+					update-size="[[ updateSize ]]"
 				></cosmoz-grouped-list-item>
-				<!--cosmoz-grouped-list-template-selector item="[[ item ]]" index="[[ index ]]" on-cosmoz-selector-changed="_onTemplateSelectorChanged">
-				</cosmoz-grouped-list-template-selector-->
 			</template>
 		</iron-list>
 	`;
@@ -74,6 +74,7 @@ export class CosmozGroupedList extends PolymerElement {
 
 		this._renderItemRow = this._renderItemRow.bind(this);
 		this._renderGroupRow = this._renderGroupRow.bind(this);
+		this.updateSize = this.updateSize.bind(this);
 	}
 
 	_attachDom(dom) {
@@ -444,16 +445,16 @@ export class CosmozGroupedList extends PolymerElement {
 			groupState.selected = false;
 		});
 	}
-	/**
-	 * Update size for an item.
-	 * @param {object} item Item to update size on.
-	 * @returns {void}
-	 */
-	updateSize(item) {
-		// Do not attempt to update size of item is not visible (for example when groups are folded)
-		if (this._flatData.indexOf(item) >= 0) {
-			requestAnimationFrame(() => this.$.list.updateSizeForItem(item));
+
+	updateSize() {
+		if (this._updateSizeQueued) {
+			return;
 		}
+		this._updateSizeQueued = true;
+		window.requestAnimationFrame(() => {
+			this.$.list._render();
+			this._updateSizeQueued = false;
+		});
 	}
 
 	/**
