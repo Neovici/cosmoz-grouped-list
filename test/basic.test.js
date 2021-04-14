@@ -1,9 +1,9 @@
 /* eslint-disable max-lines */
-import { flushAsynchronousOperations } from '@polymer/iron-test-helpers/test-helpers';
+import { flush } from '@polymer/polymer/lib/utils/flush';
 import {
 	spy as sinonSpy,
 	assert as sinonAssert
-} from 'sinon/pkg/sinon-esm.js';
+} from 'sinon';
 
 import {
 	assert, html, fixture
@@ -60,7 +60,7 @@ suite('empty', () => {
 
 		document.body.appendChild(el);
 
-		flushAsynchronousOperations(); // flush _render debouncer
+		flush(); // flush _render debouncer
 
 		assert.isTrue(spy.calledOnce);
 	});
@@ -74,27 +74,27 @@ suite('empty', () => {
 		element.selectItem(data[3]);
 
 		element.data = data.concat([{ id: 4 }, { id: 5 }]);
-		flushAsynchronousOperations(); // flush _render debouncer
+		flush(); // flush _render debouncer
 		assert.deepEqual(element.data, [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }]);
 		assert.deepEqual(element.selectedItems, [{ id: 2 }, { id: 3 }]);
 
 		element.data = [data[2]];
-		flushAsynchronousOperations(); // flush _render debouncer
+		flush(); // flush _render debouncer
 		assert.deepEqual(element.data, [{ id: 2 }]);
 		assert.deepEqual(element.selectedItems, [{ id: 2 }]);
 
 		element.data = data;
-		flushAsynchronousOperations(); // flush _render debouncer
+		flush(); // flush _render debouncer
 		assert.deepEqual(element.data, [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }]);
 		assert.deepEqual(element.selectedItems, [{ id: 2 }]);
 
 		element.deselectItem(data[2]);
-		flushAsynchronousOperations(); // flush _render debouncer
+		flush(); // flush _render debouncer
 		assert.deepEqual(element.data, [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }]);
 		assert.deepEqual(element.selectedItems, []);
 
 		element.data = [{ id: 6 }];
-		flushAsynchronousOperations(); // flush _render debouncer
+		flush(); // flush _render debouncer
 		assert.deepEqual(element.data, [{ id: 6 }]);
 		assert.deepEqual(element.selectedItems, []);
 	});
@@ -106,12 +106,12 @@ suite('empty', () => {
 
 		element.selectItem(data[2]);
 		element.selectItem(data[3]);
-		flushAsynchronousOperations(); // flush _render debouncer
+		flush(); // flush _render debouncer
 		assert.deepEqual(element.data, [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }]);
 		assert.deepEqual(element.selectedItems, [{ id: 2 }, { id: 3 }]);
 
 		element.data = data.splice(0, 2);
-		flushAsynchronousOperations(); // flush _render debouncer
+		flush(); // flush _render debouncer
 		assert.deepEqual(element.data, [{ id: 0 }, { id: 1 }]);
 		assert.deepEqual(element.selectedItems, []);
 	});
@@ -139,7 +139,7 @@ suite('flat data', () => {
 
 		element._templatesObserver.flush();
 		element.data = items;
-		flushAsynchronousOperations();
+		flush();
 	});
 
 	test('attaches a iron-list element', () => {
@@ -172,7 +172,7 @@ suite('flat data', () => {
 		element.selectItem(allItems[2]);
 		element.removeItem(allItems[0]);
 
-		flushAsynchronousOperations();
+		flush();
 
 		assert.isUndefined(element._getInstanceByProperty('item', allItems[0]));
 		assert.isTrue(getInstanceByItemProperty(element, allItems[1], 'selected'));
@@ -224,7 +224,7 @@ suite('empty-groups', () => {
 				value: 1
 			}]
 		}];
-		flushAsynchronousOperations();
+		flush();
 	});
 
 	test('does not render empty groups by default', () => {
@@ -235,7 +235,7 @@ suite('empty-groups', () => {
 		element.displayEmptyGroups = true;
 		// force render, because displayEmptyGroups is not observed
 		element._render();
-		flushAsynchronousOperations();
+		flush();
 		assert.lengthOf(element.shadowRoot.querySelectorAll('cosmoz-grouped-list-template-selector'), 4);
 	});
 });
@@ -274,7 +274,7 @@ suite('basic', () => {
 		}];
 		element._templatesObserver.flush();
 		element.data = groups;
-		flushAsynchronousOperations();
+		flush();
 	});
 
 	test('instantiates a cosmoz-grouped-list element', () => {
@@ -401,7 +401,7 @@ suite('basic', () => {
 		assert.equal(element.selectedItems[0], firstItem);
 		assert.equal(element.selectedItems[1], secondItem);
 		element.removeItem(firstItem);
-		flushAsynchronousOperations();
+		flush();
 		assert.isFalse(element.isItemSelected(firstItem));
 		assert.isTrue(element.isItemSelected(secondItem));
 
@@ -612,7 +612,7 @@ suite('compare items function', () => {
 		element = await fixture(basicHtmlFixture);
 		element._templatesObserver.flush();
 		element.data = [];
-		flushAsynchronousOperations();
+		flush();
 	});
 
 
@@ -627,11 +627,11 @@ suite('compare items function', () => {
 		assert.deepEqual(element.selectedItems, [{ id: 0 }, { id: 1 }]);
 
 		element.data = [{ id: 0 }, { id: 1 }, { id: 5 }];
-		flushAsynchronousOperations(); // flush _render debouncer
+		flush(); // flush _render debouncer
 		assert.deepEqual(element.selectedItems, [{ id: 0 }, { id: 1 }]);
 
 		element.data = [{ id: 0 }, { id: 5 }];
-		flushAsynchronousOperations(); // flush _render debouncer
+		flush(); // flush _render debouncer
 		assert.deepEqual(element.selectedItems, [{ id: 0 }]);
 	});
 });
@@ -647,7 +647,7 @@ suite('getFirstVisibleItemElement', () => {
 			title: `Item ${ i }`,
 			value: i
 		}));
-		flushAsynchronousOperations();
+		flush();
 	});
 	test('getFirstVisibleItemElement calls _getInstanceByProperty', () => {
 		const first = element.getFirstVisibleItemElement();
