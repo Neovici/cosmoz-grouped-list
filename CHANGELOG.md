@@ -1,3 +1,10 @@
+## [3.1.5](https://github.com/neovici/cosmoz-grouped-list/compare/v3.1.4...v3.1.5) (2021-04-15)
+
+
+### Bug Fixes
+
+* improve selection ([adfb657](https://github.com/neovici/cosmoz-grouped-list/commit/adfb657d20597af444279d6125d99ecc1df3a4a6))
+
 ## [3.1.4](https://github.com/neovici/cosmoz-grouped-list/compare/v3.1.3...v3.1.4) (2020-10-09)
 
 
