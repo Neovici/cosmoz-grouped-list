@@ -300,7 +300,6 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 	_getItemState(item) {
 		if (!this._itemsState.has(item)) {
 			const state = {
-				selected: false,
 				folded: false,
 				expanded: false
 			};
@@ -505,17 +504,6 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 		this._forwardPropertyByItem(group, 'folded', true, true);
 	}
 	/**
-	 * Add an item to the list of selected items and set it as selected.
-	 * @param {object}	item Item to select.
-	 * @returns {void}
-	 */
-	selectItem(item) {
-		if (!this.isItemSelected(item)) {
-			this.push('selectedItems', item);
-		}
-		this._forwardPropertyByItem(item, 'selected', true, true);
-	}
-	/**
 	 * Highlight or un-highlight an item.
 	 * @param {object} item Item.
 	 * @param {boolean} reverse Set to true to un-highlight.
@@ -533,6 +521,38 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 		}
 		this._forwardPropertyByItem(item, 'highlighted', !reverse, true);
 	}
+
+	/**
+	 * Check if item is selected.
+	 * @param {object} item Item.
+	 * @returns {boolean} Whether item is selected.
+	 */
+	isItemSelected(item) {
+		return this.selectedItems.includes(item);
+	}
+
+	/**
+	 * Check if group is selected.
+	 * @param {object} group Group.
+	 * @returns {boolean} Whether group is selected.
+	 */
+	isGroupSelected(group) {
+		return group.items.every(this.isItemSelected, this);
+	}
+
+	/**
+	 * Add an item to the list of selected items and set it as selected.
+	 * @param {object}	item Item to select.
+	 * @returns {void}
+	 */
+	selectItem(item) {
+		if (!this.isItemSelected(item)) {
+			this.push('selectedItems', item);
+		}
+		this._forwardPropertyByItem(item, 'selected', true, true);
+		this._updateGroupSelection(item);
+	}
+
 	/**
 	 * Remove an item to the list of selected items and set it as deselected.
 	 * @param {object} item Item to deselect.
@@ -544,77 +564,15 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 			this.splice('selectedItems', index, 1);
 		}
 		this._forwardPropertyByItem(item, 'selected', false, true);
-		// If the containing group was selected, then deselect it
-		// as all items are not selected anymore
-		const group = this.getItemGroup(item);
-		if (group && this.isGroupSelected(group)) {
-			const groupState = this._getItemState(group);
-			groupState.selected = false;
-			this._forwardPropertyByItem(group, 'selected', false, true);
-		}
+		this._updateGroupSelection(item);
 	}
 
-	/**
-	 * Check if item is selected.
-	 * @param {object} item Item.
-	 * @returns {boolean} Whether item is selected.
-	 */
-	isItemSelected(item) {
-		return this.selectedItems.indexOf(item) >= 0;
-	}
-
-	/**
-	 * Check if item is highlighted.
-	 * @param {object} item Item.
-	 * @returns {boolean} Whether item is highlighted.
-	 */
-	isItemHighlighted(item) {
-		return this.highlightedItems.indexOf(item) >= 0;
-	}
-	/**
-	 * Toggle group selection.
-	 * @param {object} group Group.
-	 * @param {boolean} selected Whether selected.
-	 * @returns {void}
-	 */
-	toggleSelectGroup(group, selected) {
-		const groupState = this._getItemState(group),
-			willSelect = !selected,
-			itemAction = willSelect ? 'selectItem' : 'deselectItem';
-
-		groupState.selected = willSelect;
-		this._forwardPropertyByItem(group, 'selected', willSelect, true);
-		group.items.forEach(this[itemAction], this);
-	}
-
-	/**
-	 * Check if group is selected.
-	 * @param {object} group Group.
-	 * @returns {boolean} Whether group is selected.
-	 */
-	isGroupSelected(group) {
-		return this._getItemState(group).selected;
-	}
-
-	/**
-	 * Toggle instance selection by value.
-	 * @param {any} value Value.
-	 * @returns {void}
-	 */
-	_toggleSelected(value) {
-		this._instances.forEach(instance => this._forwardProperty(instance, 'selected', value, true));
-	}
 	/**
 	 * Select all items.
 	 * @returns {void}
 	 */
 	selectAll() {
-		const selected = this.data.reduce((all, item) =>	{
-			const state = this._getItemState(item);
-			state.selected = true;
-			// select both groups and flat items
-			return all.concat(item.items || item);
-		}, []);
+		const selected = this.data.flatMap(item => item.items || item);
 		this.splice.apply(this, ['selectedItems', 0, this.selectedItems.length].concat(selected));
 
 		// Set the selected property to all visible items
@@ -626,18 +584,46 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 	 */
 	deselectAll() {
 		this.splice('selectedItems', 0, this.selectedItems.length);
-
-		this.data.forEach(group => {
-			if (!group.items) {
-				return;
-			}
-
-			const groupState = this._getItemState(group);
-			groupState.selected = false;
-		});
-
 		// Set the selected property to all visible items
 		this._toggleSelected(false);
+	}
+
+	/**
+	 * Toggle instance selection by value.
+	 * @param {any} value Value.
+	 * @returns {void}
+	 */
+	_toggleSelected(value) {
+		this._instances.forEach(instance => this._forwardProperty(instance, 'selected', value, true));
+	}
+
+	_updateGroupSelection(item) {
+		const group = this.getItemGroup(item);
+		if (!group) {
+			return;
+		}
+		this._forwardPropertyByItem(group, 'selected', this.isGroupSelected(group), true);
+	}
+
+	/**
+	 * Toggle group selection.
+	 * @param {object} group Group.
+	 * @param {boolean} selected Whether selected.
+	 * @returns {void}
+	 */
+	toggleSelectGroup(group, selected) {
+		const willSelect = !selected;
+		this._forwardPropertyByItem(group, 'selected', willSelect, true);
+		group.items.forEach(willSelect ? this.selectItem : this.deselectItem, this);
+	}
+
+	/**
+	 * Check if item is highlighted.
+	 * @param {object} item Item.
+	 * @returns {boolean} Whether item is highlighted.
+	 */
+	isItemHighlighted(item) {
+		return this.highlightedItems.indexOf(item) >= 0;
 	}
 	/**
 	 * Update size for an item.
