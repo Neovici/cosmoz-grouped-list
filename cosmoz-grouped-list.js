@@ -13,7 +13,7 @@ import '@polymer/iron-list/iron-list.js';
 import { templatizing } from './cosmoz-templatizing-mixin.js';
 import './cosmoz-grouped-list-template-selector.js';
 
-export const symbols = {
+const symbols = {
 	group: Symbol('group')
 };
 
@@ -563,8 +563,8 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 	select(item) {
 		const items = item.items ?? [item],
 			selection = this.selectedItems;
-		 this.selectedItems = [...selection, ...items.filter(i => !selection.includes(i))];
-		 this._lastSelection = item;
+		this.selectedItems = [...selection, ...items.filter(i => !selection.includes(i))];
+		this._lastSelection = item;
 	}
 
 	/**
@@ -575,8 +575,8 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 	deselect(item) {
 		const items = item.items ?? [item],
 			selection = this.selectedItems;
-		 this.selectedItems = selection.filter(i => !items.includes(i));
-		 this._lastSelection = item;
+		this.selectedItems = selection.filter(i => !items.includes(i));
+		this._lastSelection = item;
 	}
 
 	/**
@@ -586,7 +586,7 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 	 * @returns {void}
 	 */
 	toggleSelect(item, selected = !this.isSelected(item)) {
-		selected ? this.select(item) : this.deselect(item);
+		return selected ? this.select(item) : this.deselect(item);
 	}
 
 	selectOnly(item) {
