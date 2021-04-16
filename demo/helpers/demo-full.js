@@ -99,7 +99,7 @@ class DemoFull extends PolymerElement {
 							<div>Value: <span>{{item.value}}</span></div>
 							<div>Highlighted: <span>[[highlighted]]</span></div>
 						</div>
-						<div on-click="select">Selected: <span>{{ selected }}</span> (click to select/deselect)</div>
+						<div on-click="toggleSelect">Selected: <span>{{ selected }}</span> (click to select/deselect)</div>
 						<paper-dropdown-menu-light no-animations label="dropdown menu">
 							<paper-listbox slot="dropdown-content">
 								<paper-item>Item 1</paper-item>
@@ -187,12 +187,7 @@ class DemoFull extends PolymerElement {
 	}
 
 	toggleSelect(event) {
-		const
-			model = event.model,
-			group = model.item,
-			selected = model.selected;
-
-		this.$.groupedList.toggleSelectGroup(group, selected);
+		this.$.groupedList.toggleSelect(event.model.item);
 	}
 
 	getFoldIcon(folded) {
@@ -200,18 +195,6 @@ class DemoFull extends PolymerElement {
 			return 'expand-more';
 		}
 		return 'expand-less';
-	}
-
-	select(event) {
-		const
-			model = event.model,
-			item = model.item,
-			selected = model.selected;
-		if (selected) {
-			this.$.groupedList.deselectItem(item);
-		} else {
-			this.$.groupedList.selectItem(item);
-		}
 	}
 
 	highlight(event) {
