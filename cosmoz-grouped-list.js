@@ -596,7 +596,7 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 
 
 	toggleSelectTo(item, selected) {
-		const last = this._lastSelection ? this._flatData.indexOf(this._lastSelection) : -1;
+		const last = this._lastSelection ? this._flatData.findIndex(i => this.compareItemsFn(i, this._lastSelection)) : -1;
 		if (last < 0) {
 			return this.toggleSelect(item, selected);
 		}
@@ -616,6 +616,7 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 	 */
 	selectAll() {
 		this.selectedItems = this.data.flatMap(item => item.items || item);
+		this._lastSelection = undefined;
 	}
 	/**
 	 * Deselect all selected items.
@@ -623,6 +624,7 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 	 */
 	deselectAll() {
 		this.selectedItems = [];
+		this._lastSelection = undefined;
 	}
 
 	/**
@@ -675,7 +677,6 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 		for (const group of groups) {
 			this._forwardPropertyByItem(group, 'selected', this.isGroupSelected(group), true);
 		}
-		this._lastSelection = undefined;
 	}
 
 
