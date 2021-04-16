@@ -1,3 +1,10 @@
+# [3.2.0](https://github.com/neovici/cosmoz-grouped-list/compare/v3.1.5...v3.2.0) (2021-04-16)
+
+
+### Features
+
+* implement multi-select ([555f287](https://github.com/neovici/cosmoz-grouped-list/commit/555f287972da6bac17058a3be1d0c8c33f4478b0))
+
 ## [3.1.5](https://github.com/neovici/cosmoz-grouped-list/compare/v3.1.4...v3.1.5) (2021-04-15)
 
 
