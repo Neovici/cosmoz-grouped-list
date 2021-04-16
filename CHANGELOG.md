@@ -1,3 +1,10 @@
+## [3.2.1](https://github.com/neovici/cosmoz-grouped-list/compare/v3.2.0...v3.2.1) (2021-04-16)
+
+
+### Bug Fixes
+
+* **multi-select:** use compareItemsFn for _lastSelection ([d0b3c77](https://github.com/neovici/cosmoz-grouped-list/commit/d0b3c77cb6b8d73bcfae2816ab56fc8443369194))
+
 # [3.2.0](https://github.com/neovici/cosmoz-grouped-list/compare/v3.1.5...v3.2.0) (2021-04-16)
 
 
