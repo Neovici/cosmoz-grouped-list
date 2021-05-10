@@ -72,9 +72,9 @@
 		"@web/dev-server": "^0.1.17",
 		"@web/test-runner": "^0.12.20",
 		"@web/test-runner-selenium": "^0.5.1",
-		"eslint": "^7.25.0",
+		"eslint": "^7.26.0",
 		"husky": "^4.3.0",
-		"lit-html": "^1.4.0",
+		"lit-html": "^1.4.1",
 		"semantic-release": "^17.4.0",
 		"sinon": "^10.0.0"
 	}
