@@ -56,7 +56,7 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 
 		<iron-list id="list" items="[[ _flatData ]]" as="item">
 			<template>
-				<cosmoz-grouped-list-template-selector item="[[ item ]]" index="[[ index ]]" on-cosmoz-selector-changed="_onTemplateSelectorChanged">
+				<cosmoz-grouped-list-template-selector item="[[ item ]]" index="[[ index ]]" on-cosmoz-selector-changed="_onTemplateSelectorChanged" part="template-selector">
 					<slot></slot>
 				</cosmoz-grouped-list-template-selector>
 			</template>

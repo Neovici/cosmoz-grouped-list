@@ -1,6 +1,4 @@
-import {
-	PolymerElement, html
-} from '@polymer/polymer';
+import { PolymerElement, html } from '@polymer/polymer';
 
 /**
  * # TemplateSelector
@@ -13,15 +11,10 @@ export class TemplateSelector extends PolymerElement {
 	static get template() {
 		return html`
 		<style>
-			:host ::slotted([hidden]) {
-				display: none !important;
-			}
-
-			/* This will give a row with an opened dropdown a z-index higher than all other rows */
-			:host(:focus-within),
-			:host(.has-dropdown) {
-				z-index: 100;
-			}
+			:host ::slotted([hidden]) { display: none !important; }
+			:host(:focus-within) { z-index: 100; }
+			:host(:hover) { z-index: 101; }
+			:host(.has-dropdown) { z-index: 102; }
 		</style>
 		<slot></slot>
 `;
