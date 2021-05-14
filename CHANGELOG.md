@@ -1,3 +1,10 @@
+## [3.2.2](https://github.com/neovici/cosmoz-grouped-list/compare/v3.2.1...v3.2.2) (2021-05-14)
+
+
+### Bug Fixes
+
+* **template-selector:** add part and handle hover z-index ([1ae98fb](https://github.com/neovici/cosmoz-grouped-list/commit/1ae98fb95965814f83cda5821882f0e1f8da749b))
+
 ## [3.2.1](https://github.com/neovici/cosmoz-grouped-list/compare/v3.2.0...v3.2.1) (2021-04-16)
 
 
