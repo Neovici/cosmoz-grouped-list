@@ -1,3 +1,10 @@
+## [3.2.3](https://github.com/neovici/cosmoz-grouped-list/compare/v3.2.2...v3.2.3) (2021-06-15)
+
+
+### Bug Fixes
+
+* **cosmoz-grouped-list:**  safari slots ([7decd16](https://github.com/neovici/cosmoz-grouped-list/commit/7decd16312059eee4e8d00d0f538078f6416719d))
+
 ## [3.2.2](https://github.com/neovici/cosmoz-grouped-list/compare/v3.2.1...v3.2.2) (2021-05-14)
 
 
