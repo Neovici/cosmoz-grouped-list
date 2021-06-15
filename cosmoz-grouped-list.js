@@ -56,9 +56,8 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 
 		<iron-list id="list" items="[[ _flatData ]]" as="item">
 			<template>
-				<cosmoz-grouped-list-template-selector item="[[ item ]]" index="[[ index ]]" on-cosmoz-selector-changed="_onTemplateSelectorChanged" part="template-selector">
-					<slot></slot>
-				</cosmoz-grouped-list-template-selector>
+				<cosmoz-grouped-list-template-selector item="[[ item ]]" index="[[ index ]]" on-cosmoz-selector-changed="_onTemplateSelectorChanged"
+					part="template-selector"></cosmoz-grouped-list-template-selector>
 			</template>
 		</iron-list>
 		<slot name="templates" id="templates"></slot>
@@ -363,7 +362,7 @@ export class CosmozGroupedList extends templatizing(PolymerElement) {
 				highlighted: this.isItemHighlighted(item)
 			},
 			instance = this._getInstance(type, props, prevInstance, item != null),
-			slot = selector.querySelector('slot');
+			slot = selector.querySelector('slot') ?? selector.appendChild(document.createElement('slot'));
 
 		slot.setAttribute('name', slotName);
 		instance.element.setAttribute('slot', slotName);
