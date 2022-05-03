@@ -1,13 +1,23 @@
-import {
-	PolymerElement, html
-} from '@polymer/polymer';
+import { PolymerElement, html } from '@polymer/polymer';
 import '@polymer/paper-dropdown-menu/paper-dropdown-menu-light.js';
 import '@polymer/paper-item/paper-item.js';
 import '@polymer/paper-listbox/paper-listbox.js';
+import '@polymer/iron-icon/iron-icon';
+import '@polymer/iron-icons';
 
 import '../../cosmoz-grouped-list.js';
 import { generateListDemoData } from './demo-list-helper.js';
+import { html as litHtml } from 'lit-html';
 
+const getFoldIcon = folded => {
+		if (folded) {
+			return 'expand-more';
+		}
+		return 'expand-less';
+	},
+	_computeExtraContentClass = expanded => {
+		return expanded ? 'extra-content expanded' : 'extra-content';
+	};
 class DemoFull extends PolymerElement {
 	/* eslint-disable-next-line max-lines-per-function */
 	static get template() {
@@ -50,9 +60,6 @@ class DemoFull extends PolymerElement {
 					flex-direction: column;
 				}
 
-				.item-template[highlighted] {
-					background-color: #dcdcff;
-				}
 
 				.group-template {
 					display: flex;
@@ -72,7 +79,6 @@ class DemoFull extends PolymerElement {
 				<button class="action" on-click="_changeOuterValue">Increment outer binding value</button>
 				<input class="action" value="{{itemValue::input}}">
 				<button class="action" on-click="_changeItemValue">change item value</button>
-				<button class="action" on-click="_firstVisibleItem">First visible item</button>
 			</div>
 			<div class="actions">
 				<button class="action" on-click="selectAll">Select all</button>
@@ -89,44 +95,9 @@ class DemoFull extends PolymerElement {
 				<input class="action" value="{{itemValue::input}}">
 				<button class="action" class="action" on-click="_changeItemValue">change item value</button>
 			</div>-->
-			<cosmoz-grouped-list id="groupedList" data="{{ data }}" selected-items="{{ selectedItems }}">
-				<template slot="templates" data-type="item">
-					<div highlighted$="[[highlighted]]" class="item-template" style="border-bottom: 1px solid grey;">
-						<div on-click="highlight">
-							<div>Outer binding: <span>[[outerValue]]</span></div>
-							<div>Id: <span>{{item.id}}</span></div>
-							<div>Name: <span>{{item.name}}</span></div>
-							<div>Value: <span>{{item.value}}</span></div>
-							<div>Highlighted: <span>[[highlighted]]</span></div>
-						</div>
-						<div on-click="toggleSelect">Selected: <span>{{ selected }}</span> (click to select/deselect)</div>
-						<paper-dropdown-menu-light no-animations label="dropdown menu">
-							<paper-listbox slot="dropdown-content">
-								<paper-item>Item 1</paper-item>
-								<paper-item>Item 2</paper-item>
-								<paper-item>Item 3</paper-item>
-								<paper-item>Item 4</paper-item>
-							</paper-listbox>
-						</paper-dropdown-menu-light>
-						<div on-click="toggleCollapse">[+]</div>
-						<div class$="{{_computeExtraContentClass(expanded)}}">
-							Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed quis
-							posuere turpis, quis commodo neque. Aenean dapibus consequat dolor,
-							et vestibulum enim volutpat a. Donec vel dui at diam tristique
-							condimentum dapibus ac elit. Sed consequat nibh id nibh posuere
-							egestas. Phasellus blandit convallis tellus, nec pharetra orci
-							viverra ut. In at arcu consectetur, tempus velit sit amet, congue
-							diam. Suspendisse potenti. In ac tristique nulla, quis elementum nisi.
-						</div>
-					</div>
-				</template>
-				<template slot="templates" data-type="group">
-					<div class="group-template">
-						<div class="group-name" on-click="toggleSelect"><span>[[item.name]]</span>(selected=<span>{{selected}}</span>)</div>
-						<div>[[ item.items.length ]]</div>
-						<iron-icon icon="[[ getFoldIcon(folded) ]]" on-click="toggleFold"></iron-icon>
-					</div>
-				</template>
+			<cosmoz-grouped-list id="groupedList" data="[[ data ]]" selected-items="{{ selectedItems }}"
+				render-item="[[ renderItem(outerValue) ]]" render-group="[[ renderGroup ]]"
+				compare-items-fn="[[ compareItemsFn ]]"></cosmoz-grouped-list>
 			</cosmoz-grouped-list>
 		`;
 	}
@@ -173,36 +144,35 @@ class DemoFull extends PolymerElement {
 		if (this.selectedItems.length === 0) {
 			return;
 		}
-		// !!!WARN: do not use removeItem using forEach on this.selectedItems,
-		// as removing an item will remove it from the selection
-		for (let i = this.selectedItems.length - 1; i >= 0; i -= 1) {
-			const item = this.selectedItems[i];
-			this.$.groupedList.removeItem(item);
-		}
+
+		this.data = this.data.reduce((results, item) => {
+			if (item.items?.length > 0) {
+				return [
+					...results,
+					{
+						...item,
+						items: item.items.filter(i => !this.selectedItems.includes(i))
+					}
+				];
+			}
+
+			if (!this.selectedItems.includes(item)) {
+				return [...results, item];
+			}
+
+			return results;
+		}, []);
 	}
 
 	toggleFold(event) {
-		const { model: { item }} = event;
+		const {
+			model: { item }
+		} = event;
 		this.$.groupedList.toggleFold(item);
 	}
 
 	toggleSelect(event) {
 		this.$.groupedList.toggleSelect(event.model.item);
-	}
-
-	getFoldIcon(folded) {
-		if (folded) {
-			return 'expand-more';
-		}
-		return 'expand-less';
-	}
-
-	highlight(event) {
-		const
-			model = event.model,
-			item = model.item,
-			highlighted = model.highlighted;
-		this.$.groupedList.highlightItem(item, highlighted);
 	}
 
 	selectAll() {
@@ -221,16 +191,16 @@ class DemoFull extends PolymerElement {
 		this.$.groupedList.toggleCollapse(event.model.item);
 	}
 
-	_computeExtraContentClass(expanded) {
-		return expanded ? 'extra-content expanded' : 'extra-content';
-	}
-
 	_changeItemValue() {
 		if (this.data[0].items) {
-			this.set('data.' + this.groupIndex + '.items.' + this.itemIndex + '.value', this.itemValue);
+			this.set(
+				'data.' + this.groupIndex + '.items.' + this.itemIndex + '.value',
+				this.itemValue
+			);
 		} else {
 			this.set('data.' + this.itemIndex + '.value', this.itemValue);
 		}
+		this.data = this.data.slice();
 	}
 	_changeOuterValue() {
 		this.outerValue += 1;
@@ -252,9 +222,57 @@ class DemoFull extends PolymerElement {
 		const data = generateListDemoData(3, 3, 50, 80);
 		this.data = data[3].items;
 	}
-	_firstVisibleItem() {
-		// eslint-disable-next-line no-console
-		console.log(this.$.groupedList.getFirstVisibleItemElement());
+
+	compareItemsFn(a, b) {
+		return a.id === b.id;
+	}
+
+	renderItem(outerValue) {
+		return (
+			item,
+			index,
+			{ selected, expanded, toggleSelect, toggleCollapse }
+		) => {
+			return litHtml`
+			<div class="item-template" style="border-bottom: 1px solid grey;">
+				<div>
+					<div>Outer binding: <span>${ outerValue }</span></div>
+					<div>Id: <span>${ item.id }</span></div>
+					<div>Name: <span>${ item.name }</span></div>
+					<div>Value: <span>${ item.value }</span></div>
+				</div>
+				<div @click=${ toggleSelect }>Selected: <span>${ selected }</span> (click to select/deselect)</div>
+				<paper-dropdown-menu-light no-animations label="dropdown menu">
+					<paper-listbox slot="dropdown-content">
+						<paper-item>Item 1</paper-item>
+						<paper-item>Item 2</paper-item>
+						<paper-item>Item 3</paper-item>
+						<paper-item>Item 4</paper-item>
+					</paper-listbox>
+				</paper-dropdown-menu-light>
+				<div @click=${ toggleCollapse }>[+]</div>
+				<div class="${ _computeExtraContentClass(expanded) }">
+					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed quis
+					posuere turpis, quis commodo neque. Aenean dapibus consequat dolor,
+					et vestibulum enim volutpat a. Donec vel dui at diam tristique
+					condimentum dapibus ac elit. Sed consequat nibh id nibh posuere
+					egestas. Phasellus blandit convallis tellus, nec pharetra orci
+					viverra ut. In at arcu consectetur, tempus velit sit amet, congue
+					diam. Suspendisse potenti. In ac tristique nulla, quis elementum nisi.
+				</div>
+			</div>`;
+		};
+	}
+	renderGroup(item, index, { selected, folded, toggleSelect, toggleFold }) {
+		return litHtml`
+			<div class="group-template">
+				<div class="group-name" @click=${ toggleSelect }>
+					<span>${ item.name }</span>
+					(selected=<span>${ selected }</span>)
+				</div>
+				<div>${ item.items.length }</div>
+				<iron-icon icon="${ getFoldIcon(folded) }" @click=${ toggleFold }></iron-icon>
+			</div>`;
 	}
 }
 customElements.define(DemoFull.is, DemoFull);

@@ -1,6 +1,7 @@
 import {
 	PolymerElement, html
 } from '@polymer/polymer';
+import { html as litHtml } from 'lit-html';
 import '../../cosmoz-grouped-list.js';
 
 class DemoBasic extends PolymerElement {
@@ -46,23 +47,8 @@ class DemoBasic extends PolymerElement {
 				}
 			</style>
 			<h3>cosmoz-grouped-list demo</h3>
-			<cosmoz-grouped-list id="groupedList" data="{{ data }}" selected-items="{{ selectedItems }}">
-				<template slot="templates" data-type="item">
-					<div class="item-template" style="border-bottom: 1px solid grey;">
-						<div>
-							ID:<span class="item-id">{{ item.id }}</span>
-							NAME:<span class="item-name">{{ item.name }}</span>
-							VALUE:<span class="item-value">{{ item.value }}</span>
-						</div>
-					</div>
-				</template>
-				<template slot="templates" data-type="group">
-					<div class="group-template">
-						NAME:<span class="item-name">{{ item.name }}</span>
-						VALUE: <span class="item-value">{{ item.value }}</span>
-						SELECTED: <span class="item-selected">{{ selected }}</span>
-					</div>
-				</template>
+			<cosmoz-grouped-list id="groupedList" data="{{ data }}" selected-items="{{ selectedItems }}"
+				render-item="[[ renderItem ]]" render-group="[[ renderGroup ]]">
 			</cosmoz-grouped-list>
 		`;
 	}
@@ -105,6 +91,32 @@ class DemoBasic extends PolymerElement {
 				type: Array
 			}
 		};
+	}
+
+
+	renderItem(item, index, { selected, toggleSelect }) {
+		return litHtml`
+			<div class="item-template" style="border-bottom: 1px solid grey;" @click=${ toggleSelect }>
+				<div>
+					ID:<span class="item-id">${ item.id }</span>
+					NAME:<span class="item-name">${ item.name }</span>
+					VALUE:<span class="item-value">${ item.value }</span>
+					SELECTED: <span class="item-selected">${ selected }</span>
+				</div>
+			</div>
+		`;
+	}
+
+	renderGroup(item, index, { selected, toggleSelect }) {
+		return litHtml`
+			<div class="group-template" @click=${ toggleSelect }>
+			 	<div>
+			 		NAME:<span class="item-name">${ item.name }</span>
+			 		VALUE: <span class="item-value">${ item.value }</span>
+			 		SELECTED: <span class="item-selected">${ selected }</span>
+			 	</div>
+			</div>
+		`;
 	}
 }
 customElements.define(DemoBasic.is, DemoBasic);
