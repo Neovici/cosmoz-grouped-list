@@ -1,3 +1,14 @@
+# [4.0.0](https://github.com/neovici/cosmoz-grouped-list/compare/v3.2.3...v4.0.0) (2022-05-11)
+
+
+* feat!: rewrite with lit + haunted ([7ad5365](https://github.com/neovici/cosmoz-grouped-list/commit/7ad5365f4f5ef9315d5b41cfd22d753c4c5e0f91))
+
+
+### BREAKING CHANGES
+
+* dropped part of the public API
+* dropped support for polymer templates
+
 ## [3.2.3](https://github.com/neovici/cosmoz-grouped-list/compare/v3.2.2...v3.2.3) (2021-06-15)
 
 
