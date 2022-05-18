@@ -2,7 +2,7 @@ import { useCallback } from 'haunted';
 import { useWeakState } from './use-weak-state';
 import { isGroup } from './utils';
 
-export const useCollapsibleItems = callback => {
+export const useCollapsibleItems = (callback, foldCallback) => {
 	const { setItemState, state, signal } = useWeakState(),
 		toggleFold = useCallback((item, folded) => {
 			if (!isGroup(item)) {
@@ -13,7 +13,7 @@ export const useCollapsibleItems = callback => {
 				folded: folded !== undefined ? folded : !state.folded
 			}));
 
-			callback(item);
+			foldCallback(item);
 		}, []),
 		toggleCollapse = useCallback((item, collapsed) => {
 			if (isGroup(item)) {

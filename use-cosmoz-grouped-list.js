@@ -1,4 +1,4 @@
-import { html } from 'lit-html';
+import { html, nothing } from 'lit-html';
 import {
 	useMemo,
 	useLayoutEffect,
@@ -8,7 +8,8 @@ import {
 	prepareData,
 	isFolded,
 	isExpanded,
-	byReference
+	byReference,
+	isItemFolded
 } from './utils';
 import { ifDefined } from 'lit-html/directives/if-defined';
 import '@polymer/iron-list/iron-list.js';
@@ -52,7 +53,8 @@ const styles = {
 				[]
 			),
 			{ toggleFold, toggleCollapse, state, signal } = useCollapsibleItems(
-				item => requestAnimationFrame(() => updateSize(item))
+				item => requestAnimationFrame(() => updateSize(item)),
+				() => requestAnimationFrame(() => host.querySelector('#list')._update())
 			),
 			flatData = useMemo(
 				() => prepareData(data, displayEmptyGroups, state),
@@ -78,6 +80,7 @@ const styles = {
 			}),
 			renderRow = useCallback(
 				(item, index) =>
+					// eslint-disable-next-line no-nested-ternary
 					Array.isArray(item.items)
 						? renderGroup(item, index, {
 							selected: isGroupSelected(item, selectedItems),
@@ -85,12 +88,14 @@ const styles = {
 							toggleSelect: selected => toggleSelect(item, typeof selected === 'boolean' ? selected : undefined),
 							toggleFold: () => toggleFold(item)
 						})
-						: renderItem(item, index, {
-							selected: selectedItems.includes(item),
-							expanded: isExpanded(item, state),
-							toggleSelect: selected => toggleSelect(item, typeof selected === 'boolean' ? selected : undefined),
-							toggleCollapse: () => toggleCollapse(item)
-						}),
+						: isItemFolded(item, state)
+							? nothing
+							: renderItem(item, index, {
+								selected: selectedItems.includes(item),
+								expanded: isExpanded(item, state),
+								toggleSelect: selected => toggleSelect(item, typeof selected === 'boolean' ? selected : undefined),
+								toggleCollapse: () => toggleCollapse(item)
+							}),
 				[renderItem, renderGroup, selectedItems, toggleSelect, signal]
 			);
 
