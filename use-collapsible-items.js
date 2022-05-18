@@ -13,7 +13,7 @@ export const useCollapsibleItems = callback => {
 				folded: folded !== undefined ? folded : !state.folded
 			}));
 
-			callback();
+			callback(item);
 		}, []),
 		toggleCollapse = useCallback((item, collapsed) => {
 			if (isGroup(item)) {
@@ -24,7 +24,7 @@ export const useCollapsibleItems = callback => {
 				expanded: collapsed !== undefined ? !collapsed : !state.expanded
 			}));
 
-			callback();
+			callback(item);
 		}, []);
 
 	return {
