@@ -10,6 +10,7 @@ const symbols = {
 	},
 	isExpanded = (item, itemsState) => getItemState(item, itemsState).expanded,
 	isFolded = (group, itemsState) => getItemState(group, itemsState).folded,
+	isItemFolded = (item, itemsState) => item?.[symbols.group] != null ? isFolded(item[symbols.group], itemsState) : false,
 	isGroup = item => item ? item.items instanceof Array : false,
 	/**
 	 * Asserts that data is either all items or all groups, never mixed.
@@ -81,6 +82,7 @@ export {
 	getItemState,
 	isExpanded,
 	isFolded,
+	isItemFolded,
 	isGroup,
 	callFn,
 	byReference
