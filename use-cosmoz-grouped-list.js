@@ -56,7 +56,7 @@ const styles = {
 			),
 			flatData = useMemo(
 				() => prepareData(data, displayEmptyGroups, state),
-				[data, displayEmptyGroups, signal]
+				[data, displayEmptyGroups]
 			),
 			{
 				selectedItems,
