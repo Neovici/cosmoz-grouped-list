@@ -1,3 +1,11 @@
+## [4.0.1](https://github.com/neovici/cosmoz-grouped-list/compare/v4.0.0...v4.0.1) (2022-05-24)
+
+
+### Bug Fixes
+
+* does not resize correctly when groups are folded ([f6b732c](https://github.com/neovici/cosmoz-grouped-list/commit/f6b732c50e2fd63a3f7774a9146574c1765b3721))
+* expand and select is slow with more than 100 items ([b21d549](https://github.com/neovici/cosmoz-grouped-list/commit/b21d549039a71a86a6e3e44710ad0e542acb7bb6))
+
 # [4.0.0](https://github.com/neovici/cosmoz-grouped-list/compare/v3.2.3...v4.0.0) (2022-05-11)
 
 
