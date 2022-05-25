@@ -1,3 +1,10 @@
+## [4.0.2](https://github.com/neovici/cosmoz-grouped-list/compare/v4.0.1...v4.0.2) (2022-05-25)
+
+
+### Bug Fixes
+
+* resize is not detected properly ([155dafd](https://github.com/neovici/cosmoz-grouped-list/commit/155dafdec4cc54b9927a7c61d80ebfd6343e5e9f))
+
 ## [4.0.1](https://github.com/neovici/cosmoz-grouped-list/compare/v4.0.0...v4.0.1) (2022-05-24)
 
 
