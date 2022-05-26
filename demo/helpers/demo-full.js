@@ -68,6 +68,10 @@ class DemoFull extends PolymerElement {
 					background-color: #ccc;
 					font-weight: bold;
 				}
+
+				[hidden] {
+					display: none;
+				}
 			</style>
 			<h3>cosmoz-grouped-list demo</h3>
 			<div class="actions">
@@ -211,7 +215,7 @@ class DemoFull extends PolymerElement {
 	}
 
 	_newData() {
-		this.data = generateListDemoData(10, 15, 1, 7);
+		this.data = generateListDemoData(100, 150, 1, 7);
 	}
 
 	_newSmallData() {
