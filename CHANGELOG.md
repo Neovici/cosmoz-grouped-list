@@ -1,3 +1,10 @@
+## [4.0.3](https://github.com/neovici/cosmoz-grouped-list/compare/v4.0.2...v4.0.3) (2022-05-26)
+
+
+### Bug Fixes
+
+* iron-list performance issues ([f238b9a](https://github.com/neovici/cosmoz-grouped-list/commit/f238b9adba524b7dc63970271dfd0cadc249f68c))
+
 ## [4.0.2](https://github.com/neovici/cosmoz-grouped-list/compare/v4.0.1...v4.0.2) (2022-05-25)
 
 
