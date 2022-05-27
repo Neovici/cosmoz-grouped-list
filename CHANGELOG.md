@@ -1,3 +1,10 @@
+## [4.0.4](https://github.com/neovici/cosmoz-grouped-list/compare/v4.0.3...v4.0.4) (2022-05-27)
+
+
+### Bug Fixes
+
+* handle item resize event ([bfccc67](https://github.com/neovici/cosmoz-grouped-list/commit/bfccc67d736fa3358dc64a34a4bb097635142ca6))
+
 ## [4.0.3](https://github.com/neovici/cosmoz-grouped-list/compare/v4.0.2...v4.0.3) (2022-05-26)
 
 
