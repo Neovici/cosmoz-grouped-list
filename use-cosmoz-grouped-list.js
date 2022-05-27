@@ -1,5 +1,5 @@
 import { html } from 'lit-html';
-import { useMemo, useLayoutEffect, useCallback } from 'haunted';
+import { useMemo, useLayoutEffect, useCallback, useEffect } from 'haunted';
 import { prepareData, isFolded, isExpanded, byReference } from './utils';
 import { ifDefined } from 'lit-html/directives/if-defined';
 import '@polymer/iron-list/iron-list.js';
@@ -46,7 +46,9 @@ const styles = {
 				item => requestAnimationFrame(() => updateSize(item)),
 				() => requestAnimationFrame(() => host.querySelector('#list')._update())
 			),
-			// TODO: verifica de ce apar 1000 de rows cand dai collapse la un grup
+			// TODO: state changes trigger recalculation, which is slow (200ms with 10k items)
+			// it only makes sense to do it when a group is folded
+			// suggested fix: separate signal for item collapse and group fold
 			flatData = useMemo(
 				() => prepareData(data, displayEmptyGroups, state),
 				[data, displayEmptyGroups, signal]
@@ -106,6 +108,13 @@ const styles = {
 			[scrollTarget]
 		);
 
+		useEffect(() => {
+			const handler = event =>
+				host.querySelector('#list').updateSizeForIndex(event.detail.index);
+			host.addEventListener('update-item-size', handler);
+			return () => host.removeEventListener('update-item-size', handler);
+		}, []);
+
 		useNotifyProperty('selectedItems', selectedItems);
 		const api = {
 			toggleFold,
@@ -138,8 +147,6 @@ const styles = {
 			.renderFn=${ renderRow }
 			.items=${ flatData }
 			.scrollTarget=${ ifDefined(scrollTarget) }
-			@update-item-size=${ event =>
-		event.target.parentNode.updateSizeForIndex(event.detail.index) }
 		>
 			<template
 				><cosmoz-grouped-list-row
