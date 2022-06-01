@@ -1,3 +1,10 @@
+## [4.0.6](https://github.com/neovici/cosmoz-grouped-list/compare/v4.0.5...v4.0.6) (2022-06-01)
+
+
+### Bug Fixes
+
+* ResizeObserver loop limit exceeded ([aade042](https://github.com/neovici/cosmoz-grouped-list/commit/aade042d59a98677654aa8d560c5e2029323b00d))
+
 ## [4.0.5](https://github.com/neovici/cosmoz-grouped-list/compare/v4.0.4...v4.0.5) (2022-06-01)
 
 
