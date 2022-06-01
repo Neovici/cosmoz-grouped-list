@@ -8,8 +8,8 @@ const symbols = {
 
 		return itemsState.get(item);
 	},
-	isExpanded = (item, itemsState) => getItemState(item, itemsState).expanded,
-	isFolded = (group, itemsState) => getItemState(group, itemsState).folded,
+	isExpanded = (item, itemsState) => Boolean(getItemState(item, itemsState).expanded),
+	isFolded = (group, itemsState) => Boolean(getItemState(group, itemsState).folded),
 	isGroup = item => item ? item.items instanceof Array : false,
 	/**
 	 * Asserts that data is either all items or all groups, never mixed.
