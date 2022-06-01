@@ -1,3 +1,10 @@
+## [4.0.5](https://github.com/neovici/cosmoz-grouped-list/compare/v4.0.4...v4.0.5) (2022-06-01)
+
+
+### Bug Fixes
+
+* **utils:** isExpanded and isFolded must return booleans ([e814c6e](https://github.com/neovici/cosmoz-grouped-list/commit/e814c6edcfc4ec1a0e05deb0c8bd7009a6fc3def))
+
 ## [4.0.4](https://github.com/neovici/cosmoz-grouped-list/compare/v4.0.3...v4.0.4) (2022-05-27)
 
 
