@@ -79,7 +79,7 @@
 		"eslint": "^7.27.0",
 		"husky": "^4.3.0",
 		"lit-html": "^1.4.1",
-		"semantic-release": "^17.4.0",
+		"semantic-release": "^19.0.3",
 		"sinon": "^11.0.0"
 	}
 }
