@@ -109,8 +109,17 @@ const styles = {
 		);
 
 		useEffect(() => {
-			const handler = event =>
-				host.querySelector('#list').updateSizeForIndex(event.detail.index);
+			const handler = e => {
+				let index = e.detail?.index;
+				if (index == null) {
+					const path = e.composedPath();
+					index = path.slice(0, path.indexOf(host))
+						.find(e => e.tagName.toLowerCase() === 'cosmoz-grouped-list-row')?.index;
+				}
+				if (index != null) {
+					host.querySelector('#list').updateSizeForIndex(index);
+				}
+			};
 			host.addEventListener('update-item-size', handler);
 			return () => host.removeEventListener('update-item-size', handler);
 		}, []);
