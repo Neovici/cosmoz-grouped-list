@@ -1,3 +1,10 @@
+## [4.0.8](https://github.com/neovici/cosmoz-grouped-list/compare/v4.0.7...v4.0.8) (2022-06-15)
+
+
+### Bug Fixes
+
+* **update-item-size:** use index from item in composePath ([e574ee6](https://github.com/neovici/cosmoz-grouped-list/commit/e574ee6c3faaa0354b6949afb946f8d56809cfd1))
+
 ## [4.0.7](https://github.com/neovici/cosmoz-grouped-list/compare/v4.0.6...v4.0.7) (2022-06-06)
 
 
