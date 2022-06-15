@@ -563,3 +563,21 @@ suite('compare items function', () => {
 		);
 	});
 });
+
+suite('update item size', () => {
+	test('updates item size with index from composed path', async () => {
+		const el = await fixture(html`
+			<cosmoz-grouped-list
+				style="min-height: 300px"
+		 		.data= ${ [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }] }
+				.renderItem=${ item => html`<div class="item" data-id=${ item.id }>id: ${ item.idex }</div>` }
+			></cosmoz-grouped-list>
+		`);
+
+		await nextFrame();
+
+		const updateSpy = sinonSpy(el.querySelector('#list'), 'updateSizeForIndex');
+		el.querySelector(`[data-id="${ 2 }"]`).dispatchEvent(new CustomEvent('update-item-size', { bubbles: true }));
+		assert.isTrue(updateSpy.calledOnceWith(2));
+	});
+});
