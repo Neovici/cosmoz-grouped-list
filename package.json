@@ -55,17 +55,17 @@
 		}
 	},
 	"dependencies": {
-		"@neovici/cosmoz-utils": "^3.29.1",
+		"@neovici/cosmoz-utils": "^4.0.0-beta.2",
 		"@polymer/iron-list": "github:Neovici/iron-list",
 		"@polymer/polymer": "^3.3.1",
-		"haunted": "^4.8.3",
-		"lit-html": "^1.4.1"
+		"haunted": "^5.0.0",
+		"lit-html": "^2.0.0"
 	},
 	"devDependencies": {
 		"@commitlint/cli": "^17.0.0",
 		"@commitlint/config-conventional": "^17.0.0",
 		"@neovici/cfg": "^1.15.2",
-		"@open-wc/testing": "^2.5.33",
+		"@open-wc/testing": "^3.0.0",
 		"@polymer/iron-icon": "^3.0.0",
 		"@polymer/iron-icons": "^3.0.0",
 		"@polymer/iron-test-helpers": "^3.0.0",

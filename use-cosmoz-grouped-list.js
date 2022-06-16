@@ -1,7 +1,7 @@
 import { html } from 'lit-html';
 import { useMemo, useLayoutEffect, useCallback, useEffect } from 'haunted';
 import { prepareData, isFolded, isExpanded, byReference } from './utils';
-import { ifDefined } from 'lit-html/directives/if-defined';
+import { ifDefined } from 'lit-html/directives/if-defined.js';
 import '@polymer/iron-list/iron-list.js';
 import { useNotifyProperty } from '@neovici/cosmoz-utils/lib/hooks/use-notify-property';
 import { useImperativeApi } from '@neovici/cosmoz-utils/lib/hooks/use-imperative-api';
