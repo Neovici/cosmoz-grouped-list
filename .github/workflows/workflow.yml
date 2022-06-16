@@ -4,46 +4,38 @@ on:
   pull_request:
     branches:
       - master
+      - beta
   push:
     branches:
       - master
+      - beta
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
 
-    - name: Use Node.js 16.x
-      uses: actions/setup-node@v1
+    - name: Use Node.js
+      uses: actions/setup-node@v2
       with:
         node-version: 16.x
-
-    - name: Restore npm cache
-      id: node-cache
-      uses: actions/cache@v2
-      with:
-        path: node_modules
-        key: ${{ runner.os }}-node-0-${{ hashFiles('**/package-lock.json') }}
+        cache: 'npm'
 
     - name: Install
-      if: steps.node-cache.outputs.cache-hit != 'true'
       run: npm ci
 
     - name: Lint commit messages
-      run: npx commitlint --from origin/master --to HEAD
+      uses: wagoid/commitlint-github-action@v3
 
     - name: ESLint
       run: npm run lint
 
     - name: Test and report
-      env:
-        GIT_BRANCH: ${{ github.ref == 'refs/heads/master' && 'master' || github.ref }}
-        GIT_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
-        SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
-        SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
       run: |
-        echo "::add-matcher::.github/karma-problem-matcher.json"
+        echo "::add-matcher::.github/problem-matcher.json"
         npm test
 
     - name: Upload coverage to Codecov
