@@ -1,3 +1,15 @@
+# [5.0.0-beta.1](https://github.com/neovici/cosmoz-grouped-list/compare/v4.0.8...v5.0.0-beta.1) (2022-06-16)
+
+
+### Features
+
+* upgrade to lit@^2 ([25b9545](https://github.com/neovici/cosmoz-grouped-list/commit/25b95450d6258b5227a1632303672da7b5939332))
+
+
+### BREAKING CHANGES
+
+* Upgrade to lit@^2 and haunted@^5
+
 ## [4.0.8](https://github.com/neovici/cosmoz-grouped-list/compare/v4.0.7...v4.0.8) (2022-06-15)
 
 
