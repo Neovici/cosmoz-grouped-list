@@ -1,3 +1,10 @@
+## [5.0.1](https://github.com/neovici/cosmoz-grouped-list/compare/v5.0.0...v5.0.1) (2022-06-22)
+
+
+### Bug Fixes
+
+* **deps:** upgrade ([fd58bc2](https://github.com/neovici/cosmoz-grouped-list/commit/fd58bc265c042ed42eb975560176e3a3bf2609ec))
+
 # [5.0.0](https://github.com/neovici/cosmoz-grouped-list/compare/v4.0.8...v5.0.0) (2022-06-22)
 
 
