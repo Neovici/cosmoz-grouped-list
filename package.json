@@ -55,7 +55,7 @@
 		}
 	},
 	"dependencies": {
-		"@neovici/cosmoz-utils": "^4.0.0",
+		"@neovici/cosmoz-utils": "^5.0.0",
 		"@polymer/iron-list": "github:Neovici/iron-list",
 		"@polymer/polymer": "^3.3.1",
 		"haunted": "^5.0.0",
