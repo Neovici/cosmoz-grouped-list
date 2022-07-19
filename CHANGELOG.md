@@ -1,3 +1,15 @@
+# [6.0.0](https://github.com/neovici/cosmoz-grouped-list/compare/v5.0.1...v6.0.0) (2022-07-19)
+
+
+### Features
+
+* **deps:** upgrade cosmoz-utils@5 ([2f40b1b](https://github.com/neovici/cosmoz-grouped-list/commit/2f40b1bedc3f1b0b2995e7899a846be18540c41c))
+
+
+### BREAKING CHANGES
+
+* **deps:** Upgrade to cosmoz-utils@5
+
 ## [5.0.1](https://github.com/neovici/cosmoz-grouped-list/compare/v5.0.0...v5.0.1) (2022-06-22)
 
 
