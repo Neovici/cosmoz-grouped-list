@@ -1,4 +1,4 @@
-import { useCallback } from 'haunted';
+import { useCallback } from '@pionjs/pion';
 import { useWeakState } from './use-weak-state';
 import { isGroup } from './utils';
 

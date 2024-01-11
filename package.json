@@ -55,17 +55,17 @@
 		}
 	},
 	"dependencies": {
-		"@neovici/cosmoz-utils": "^5.0.0",
+		"@neovici/cosmoz-utils": "^6.0.0",
+		"@pionjs/pion": "^2.0.0",
 		"@polymer/iron-list": "github:Neovici/iron-list",
 		"@polymer/polymer": "^3.3.1",
-		"haunted": "^5.0.0",
-		"lit-html": "^2.0.0"
+		"lit-html": "^2.0.0 || ^3.0.0"
 	},
 	"devDependencies": {
-		"@commitlint/cli": "^17.0.0",
-		"@commitlint/config-conventional": "^17.0.0",
+		"@commitlint/cli": "^18.0.0",
+		"@commitlint/config-conventional": "^18.0.0",
 		"@neovici/cfg": "^1.15.2",
-		"@open-wc/testing": "^3.0.0",
+		"@open-wc/testing": "^4.0.0",
 		"@polymer/iron-icon": "^3.0.0",
 		"@polymer/iron-icons": "^3.0.0",
 		"@polymer/iron-test-helpers": "^3.0.0",
@@ -74,9 +74,8 @@
 		"@polymer/paper-listbox": "^3.0.0",
 		"@semantic-release/changelog": "^6.0.1",
 		"@semantic-release/git": "^10.0.0",
-		"@web/dev-server": "^0.1.17",
 		"husky": "^4.3.0",
-		"semantic-release": "^19.0.0",
-		"sinon": "^14.0.0"
+		"semantic-release": "^22.0.0",
+		"sinon": "^17.0.0"
 	}
 }

@@ -1,10 +1,10 @@
 import {
 	renderCosmozGroupedList,
-	useCosmozGroupedList
+	useCosmozGroupedList,
 } from './use-cosmoz-grouped-list.js';
-import { component } from 'haunted';
+import { component } from '@pionjs/pion';
 
-const CosmozGroupedList = host =>
+const CosmozGroupedList = (host) =>
 	renderCosmozGroupedList(useCosmozGroupedList(host));
 
 customElements.define(
