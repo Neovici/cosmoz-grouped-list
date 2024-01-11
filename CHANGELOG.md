@@ -1,3 +1,15 @@
+# [7.0.0](https://github.com/neovici/cosmoz-grouped-list/compare/v6.0.0...v7.0.0) (2024-01-11)
+
+
+### Features
+
+* udpate to pion ([3730409](https://github.com/neovici/cosmoz-grouped-list/commit/373040971bd47765633703632f6fa771e2ccbf2c))
+
+
+### BREAKING CHANGES
+
+* Update to @pionjs/pion
+
 # [6.0.0](https://github.com/neovici/cosmoz-grouped-list/compare/v5.0.1...v6.0.0) (2022-07-19)
 
 
