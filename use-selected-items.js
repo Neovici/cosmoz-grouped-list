@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'haunted';
+import { useCallback, useEffect, useState } from '@pionjs/pion';
 import { isGroup } from './utils';
 
 // eslint-disable-next-line max-lines-per-function

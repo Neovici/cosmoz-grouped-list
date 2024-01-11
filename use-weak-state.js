@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'haunted';
+import { useCallback, useState } from '@pionjs/pion';
 import { callFn, getItemState } from './utils';
 
 export const useWeakState = () => {

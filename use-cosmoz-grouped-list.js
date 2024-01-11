@@ -1,5 +1,5 @@
 import { html } from 'lit-html';
-import { useMemo, useLayoutEffect, useCallback, useEffect } from 'haunted';
+import { useMemo, useLayoutEffect, useCallback, useEffect } from '@pionjs/pion';
 import { prepareData, isFolded, isExpanded, byReference } from './utils';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import '@polymer/iron-list/iron-list.js';
