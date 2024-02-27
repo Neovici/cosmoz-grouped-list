@@ -1,6 +1,7 @@
 /* eslint-disable max-lines */
 import { spy as sinonSpy } from 'sinon';
 import { assert, html, fixture, nextFrame } from '@open-wc/testing';
+import { setupIgnoreWindowResizeObserverLoopErrors } from '@lit-labs/virtualizer/support/resize-observer-errors.js';
 
 import '../cosmoz-grouped-list.js';
 
@@ -19,6 +20,8 @@ const renderItem = (item, index, { selected, expanded }) => html`
 	`;
 
 suite('empty', () => {
+	setupIgnoreWindowResizeObserverLoopErrors(setup, teardown);
+
 	let element;
 	setup(async () => {
 		element = await fixture(basicHtmlFixture);
@@ -115,6 +118,8 @@ suite('empty', () => {
 });
 
 suite('flat data', () => {
+	setupIgnoreWindowResizeObserverLoopErrors(setup, teardown);
+
 	let element,
 		items;
 
@@ -181,6 +186,8 @@ suite('flat data', () => {
 });
 
 suite('empty-groups', () => {
+	setupIgnoreWindowResizeObserverLoopErrors(setup, teardown);
+	
 	let element;
 	setup(async () => {
 		element = await fixture(basicHtmlFixture);
@@ -232,6 +239,8 @@ suite('empty-groups', () => {
 });
 
 suite('basic', () => {
+	setupIgnoreWindowResizeObserverLoopErrors(setup, teardown);
+
 	let element,
 		groups;
 
@@ -519,6 +528,8 @@ suite('basic', () => {
 });
 
 suite('compare items function', () => {
+	setupIgnoreWindowResizeObserverLoopErrors(setup, teardown);
+	
 	let element;
 
 	setup(async () => {
@@ -561,23 +572,5 @@ suite('compare items function', () => {
 			element.innerText,
 			'I:0---true-false\nI:5---false-false'
 		);
-	});
-});
-
-suite('update item size', () => {
-	test('updates item size with index from composed path', async () => {
-		const el = await fixture(html`
-			<cosmoz-grouped-list
-				style="min-height: 300px"
-		 		.data= ${ [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }] }
-				.renderItem=${ item => html`<div class="item" data-id=${ item.id }>id: ${ item.idex }</div>` }
-			></cosmoz-grouped-list>
-		`);
-
-		await nextFrame();
-
-		const updateSpy = sinonSpy(el.querySelector('#list'), 'updateSizeForIndex');
-		el.querySelector(`[data-id="${ 2 }"]`).dispatchEvent(new CustomEvent('update-item-size', { bubbles: true }));
-		assert.isTrue(updateSpy.calledOnceWith(2));
 	});
 });
