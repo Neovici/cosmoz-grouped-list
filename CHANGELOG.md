@@ -1,3 +1,14 @@
+# [8.0.0](https://github.com/neovici/cosmoz-grouped-list/compare/v7.0.0...v8.0.0) (2024-02-28)
+
+
+* feat!: upgrade to lit-virtualizer ([0ec6148](https://github.com/neovici/cosmoz-grouped-list/commit/0ec614830691c4b2605661d736fc4be7add06314))
+
+
+### BREAKING CHANGES
+
+* drop polymer iron-list
+* drop updateSize and scrollTarget
+
 # [7.0.0](https://github.com/neovici/cosmoz-grouped-list/compare/v6.0.0...v7.0.0) (2024-01-11)
 
 
