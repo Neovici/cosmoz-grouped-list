@@ -3,6 +3,11 @@ import { render } from 'lit-html';
 customElements.define(
 	'cosmoz-grouped-list-row',
 	class Element extends HTMLElement {
+		constructor() {
+			super();
+			this.style.width = '100%';
+		}
+
 		get item() {
 			return this._item;
 		}
