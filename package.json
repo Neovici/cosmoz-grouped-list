@@ -5,13 +5,13 @@
 	"keywords": [
 		"web-components"
 	],
-	"homepage": "https://github.com/neovici/cosmoz-grouped-list#readme",
+	"homepage": "https://github.com/Neovici/cosmoz-grouped-list#readme",
 	"bugs": {
-		"url": "https://github.com/neovici/cosmoz-grouped-list/issues"
+		"url": "https://github.com/Neovici/cosmoz-grouped-list/issues"
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/neovici/cosmoz-grouped-list.git"
+		"url": "git+https://github.com/Neovici/cosmoz-grouped-list.git"
 	},
 	"license": "Apache-2.0",
 	"author": "Neovici Development <dev@neovici.se>",
